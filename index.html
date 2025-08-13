@@ -1,0 +1,888 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Barend Generator</title>
+<style>
+  :root{
+    --bg:#0f1226;
+    --card:#161a36;
+    --accent:#6ee7f5;
+    --accent-2:#9b8cff;
+    --accent-3:#4ade80;
+    --muted:#9aa3b2;
+    --text:#e8ebff;
+    --danger:#ff4d6d;
+    --shadow: 0 20px 60px rgba(0,0,0,.45), 0 2px 10px rgba(0,0,0,.25);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #1a1f46 0%, transparent 60%),
+      radial-gradient(900px 500px at 110% 10%, #1a2b4a 0%, transparent 60%),
+      linear-gradient(180deg, #0b0e1d 0%, #0f1226 60%, #0b0e1d 100%);
+    color:var(--text);
+    font:16px/1.5 "Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    display:grid;
+    place-items:center;
+    padding:40px 16px;
+  }
+  .wrap{
+    width:min(880px,100%);
+    display:grid;
+    gap:22px;
+  }
+  .card{
+    background:
+      linear-gradient(135deg, rgba(110,231,245,.08), rgba(155,140,255,.06)) padding-box,
+      linear-gradient(135deg, rgba(110,231,245,.35), rgba(155,140,255,.35)) border-box;
+    border:1px solid transparent;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:22px;
+    backdrop-filter: blur(10px);
+  }
+  .title{
+    font-weight:800;
+    letter-spacing:.3px;
+    font-size: clamp(22px, 2.4vw, 30px);
+    background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    margin:0 0 4px 0;
+  }
+  form{
+    display:grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap:12px;
+    align-items:end;
+    margin-top:12px;
+  }
+  input[type="text"]{
+    width:100%;
+    padding:18px 20px;
+    font-size: 22px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.08);
+    background:#0e1230;
+    color:var(--text);
+    outline: none;
+    transition:.2s border-color,.2s box-shadow;
+    font-weight:600; letter-spacing:.4px;
+    grid-column: 1 / span 4;
+  }
+  input[type="text"]:focus{
+    border-color: var(--accent);
+    box-shadow: 0 0 0 6px rgba(110,231,245,.12);
+  }
+  .btn{
+    appearance:none; border:0; cursor:pointer;
+    padding:14px 16px; border-radius:12px;
+    font-weight:700; letter-spacing:.3px;
+    transition:transform .06s ease, box-shadow .2s ease, background .2s ease;
+    white-space:nowrap;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{
+    color:#02131a; background:linear-gradient(135deg, var(--accent), #6fd4ff);
+    box-shadow:0 10px 30px rgba(110,231,245,.25);
+  }
+  .btn.ghost{
+    color:#dbe7ff; background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+  }
+  .btn.stop{
+    color:#33000b; background:linear-gradient(135deg, #ff97aa, var(--danger));
+    box-shadow:0 10px 30px rgba(255,77,109,.25);
+  }
+  .grid{
+    margin-top:12px;
+    display:grid;
+    gap:14px;
+  }
+  .cell{
+    border-radius:14px;
+    padding:18px;
+    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.08);
+    text-align:center;
+    font-weight:900;
+    font-size: clamp(18px, 3.2vw, 32px);
+    letter-spacing:.6px;
+    position:relative;
+    overflow:hidden;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    line-height:1.1;
+    white-space: nowrap;
+  }
+  .cell::after{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(600px 180px at var(--x, 50%) var(--y, 50%), rgba(110,231,245,.15), transparent 60%);
+    opacity:0; transition:opacity .25s ease;
+  }
+  .cell:hover::after{opacity:1}
+  .cell.active{
+    background:
+      linear-gradient(180deg, rgba(155,140,255,.18), rgba(110,231,245,.12));
+    border-color: rgba(110,231,245,.65);
+    box-shadow: 0 0 0 6px rgba(110,231,245,.10), inset 0 0 40px rgba(110,231,245,.15);
+  }
+  
+  /* 3D Visualization Styles */
+  #canvas-container {
+    height: 600px;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.1));
+  }
+  
+  #three-canvas {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .canvas-overlay {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+    z-index: 10;
+  }
+  
+  .canvas-controls {
+    background: rgba(0,0,0,0.7);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #bbb;
+    pointer-events: auto;
+  }
+  
+  .desktop-hint { display: block; }
+  .mobile-hint { display: none; }
+  
+  @media (max-width: 768px) {
+    .desktop-hint { display: none; }
+    .mobile-hint { display: block; }
+  }
+  
+  @media (hover: none) and (pointer: coarse) {
+    .desktop-hint { display: none; }
+    .mobile-hint { display: block; }
+  }
+  
+  .dimension-info {
+    background: rgba(110,231,245,0.1);
+    border: 1px solid rgba(110,231,245,0.3);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  dialog::backdrop{background:linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,.65))}
+  dialog{
+    border:0; border-radius:20px; padding:0; overflow:hidden; max-width:min(520px, calc(100% - 28px));
+    background:linear-gradient(180deg, #1b1f45, #131736);
+    color:var(--text); box-shadow:var(--shadow)
+  }
+  .modal-head{padding:18px 20px; background:linear-gradient(90deg, rgba(255,77,109,.25), rgba(110,231,245,.10)); display:flex; align-items:center; gap:12px}
+  .modal-title{font-size:22px; font-weight:900; color:#fff}
+  .modal-body{padding:18px 20px; color:#dfe5ff}
+  .modal-note{font-size:14px; color:#bac3e3}
+  .modal-actions{padding:16px 20px; display:flex; justify-content:flex-end; background:#0e1230}
+  .kbd{
+    font:600 12px ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+    background:#0e1230; border:1px solid rgba(255,255,255,.12); padding:2px 6px; border-radius:6px; color:#b8c0de
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="card">
+      <h1 class="title">Barend Generator</h1>
+      <form id="scramble-form" autocomplete="off">
+        <input id="word" name="word" type="text" spellcheck="false" placeholder="bijv. Barend" maxlength="48" />
+        <button type="submit" class="btn primary" id="generate">Genereren</button>
+        <button type="button" class="btn ghost" id="speak">Opnieuw uitspreken</button>
+        <button type="button" class="btn stop" id="stop">Stop</button>
+      </form>
+    </header>
+
+    <section class="card">
+      <div id="grid" class="grid"></div>
+      <div id="canvas-container" style="display:none;">
+        <canvas id="three-canvas"></canvas>
+        <div class="canvas-overlay">
+          <div class="canvas-controls">
+            <span class="desktop-hint">Klik en sleep om te roteren • Scroll om in/uit te zoomen</span>
+            <span class="mobile-hint">1 vinger slepen = roteren • 2 vingers knijpen = zoomen</span>
+          </div>
+          <div class="dimension-info" id="dimension-info"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <dialog id="modal">
+    <div class="modal-head">
+      <div class="modal-title">NEEHEE</div>
+    </div>
+    <div class="modal-body">
+      <p class="modal-note">Het woord moet minstens twee verschillende klinkergroepen bevatten. Geldige groepen: <span class="kbd">a aa e ee i ie o oo u uu oe eu ui ij ei ai au ou</span>.</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn primary" id="close-modal">OK</button>
+    </div>
+  </dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+  const vowelGroups = [
+    'aa','ee','ii','ie','oo','uu',
+    'oe','eu','ui','ij','ei','ai','au','ou',
+    'a','e','i','o','u'
+  ];
+  const form = document.getElementById('scramble-form');
+  const input = document.getElementById('word');
+  const grid = document.getElementById('grid');
+  const canvasContainer = document.getElementById('canvas-container');
+  const canvas = document.getElementById('three-canvas');
+  const dimensionInfo = document.getElementById('dimension-info');
+  const btnSpeak = document.getElementById('speak');
+  const btnStop = document.getElementById('stop');
+  const modal = document.getElementById('modal');
+  const closeModal = document.getElementById('close-modal');
+
+  let scene, camera, renderer, controls;
+  let wordButtons = [];
+  let currentWords = [];
+  let speaking = false;
+
+  // Three.js setup
+  const initThreeJS = () => {
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0f1226);
+    
+    camera = new THREE.PerspectiveCamera(75, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    
+    // Add lighting
+    const ambientLight = new THREE.AmbientLight(0x6ee7f5, 0.4);
+    scene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0x9b8cff, 0.8);
+    directionalLight.position.set(5, 10, 5);
+    directionalLight.castShadow = true;
+    scene.add(directionalLight);
+    
+    // Touch and mouse controls
+    let isRotating = false;
+    let rotationX = 0, rotationY = 0;
+    let cameraDistance = 8;
+    let lastTouch = null;
+    let lastPinchDistance = null;
+    
+    // Helper functions
+    const getDistance = (touch1, touch2) => {
+      const dx = touch2.clientX - touch1.clientX;
+      const dy = touch2.clientY - touch1.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+    
+    const handleRotation = (deltaX, deltaY, sensitivity = 0.01) => {
+      rotationY += deltaX * sensitivity;
+      rotationX += deltaY * sensitivity;
+      rotationX = Math.max(-Math.PI/2, Math.min(Math.PI/2, rotationX));
+    };
+    
+    const handleZoom = (delta, sensitivity = 0.01) => {
+      cameraDistance += delta * sensitivity;
+      cameraDistance = Math.max(3, Math.min(20, cameraDistance));
+    };
+    
+    // Mouse events
+    canvas.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      isRotating = true;
+      lastTouch = { clientX: e.clientX, clientY: e.clientY };
+    });
+    
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isRotating || !lastTouch) return;
+      e.preventDefault();
+      const deltaX = e.clientX - lastTouch.clientX;
+      const deltaY = e.clientY - lastTouch.clientY;
+      handleRotation(deltaX, deltaY);
+      lastTouch = { clientX: e.clientX, clientY: e.clientY };
+    });
+    
+    canvas.addEventListener('mouseup', (e) => {
+      e.preventDefault();
+      isRotating = false;
+      lastTouch = null;
+    });
+    
+    canvas.addEventListener('mouseleave', () => {
+      isRotating = false;
+      lastTouch = null;
+    });
+    
+    // Mouse wheel zoom
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      handleZoom(e.deltaY, 0.01);
+    });
+    
+    // Touch events
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      
+      if (e.touches.length === 1) {
+        // Single finger - start rotation
+        isRotating = true;
+        lastTouch = {
+          clientX: e.touches[0].clientX,
+          clientY: e.touches[0].clientY
+        };
+        lastPinchDistance = null;
+      } else if (e.touches.length === 2) {
+        // Two fingers - start pinch zoom
+        isRotating = false;
+        lastTouch = null;
+        lastPinchDistance = getDistance(e.touches[0], e.touches[1]);
+      }
+    }, { passive: false });
+    
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      
+      if (e.touches.length === 1 && isRotating && lastTouch) {
+        // Single finger drag - rotate
+        const deltaX = e.touches[0].clientX - lastTouch.clientX;
+        const deltaY = e.touches[0].clientY - lastTouch.clientY;
+        handleRotation(deltaX, deltaY, 0.015); // Slightly more sensitive for touch
+        lastTouch = {
+          clientX: e.touches[0].clientX,
+          clientY: e.touches[0].clientY
+        };
+      } else if (e.touches.length === 2 && lastPinchDistance !== null) {
+        // Two finger pinch - zoom
+        const currentDistance = getDistance(e.touches[0], e.touches[1]);
+        const deltaDistance = lastPinchDistance - currentDistance;
+        handleZoom(deltaDistance, 0.02); // Good sensitivity for pinch
+        lastPinchDistance = currentDistance;
+      }
+    }, { passive: false });
+    
+    canvas.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      
+      if (e.touches.length === 0) {
+        // All fingers lifted
+        isRotating = false;
+        lastTouch = null;
+        lastPinchDistance = null;
+      } else if (e.touches.length === 1) {
+        // One finger remains - switch back to rotation mode
+        isRotating = true;
+        lastTouch = {
+          clientX: e.touches[0].clientX,
+          clientY: e.touches[0].clientY
+        };
+        lastPinchDistance = null;
+      }
+    }, { passive: false });
+    
+    canvas.addEventListener('touchcancel', (e) => {
+      e.preventDefault();
+      isRotating = false;
+      lastTouch = null;
+      lastPinchDistance = null;
+    }, { passive: false });
+    
+    const animate = () => {
+      requestAnimationFrame(animate);
+      
+      camera.position.x = Math.cos(rotationY) * Math.cos(rotationX) * cameraDistance;
+      camera.position.y = Math.sin(rotationX) * cameraDistance;
+      camera.position.z = Math.sin(rotationY) * Math.cos(rotationX) * cameraDistance;
+      camera.lookAt(0, 0, 0);
+      
+      renderer.render(scene, camera);
+    };
+    animate();
+    
+    // Handle resize
+    const resizeObserver = new ResizeObserver(() => {
+      const width = canvas.offsetWidth;
+      const height = canvas.offsetHeight;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    });
+    resizeObserver.observe(canvas);
+  };
+
+  // Create 3D button
+  const createWordButton = (word, position, index) => {
+    const buttonGroup = new THREE.Group();
+    
+    // Button geometry
+    const geometry = new THREE.BoxGeometry(1.8, 1.2, 0.3);
+    const material = new THREE.MeshPhongMaterial({
+      color: 0x161a36,
+      transparent: true,
+      opacity: 0.9
+    });
+    const buttonMesh = new THREE.Mesh(geometry, material);
+    buttonMesh.castShadow = true;
+    buttonMesh.receiveShadow = true;
+    buttonGroup.add(buttonMesh);
+    
+    // Text (using a simple plane with canvas texture)
+    const textCanvas = document.createElement('canvas');
+    const context = textCanvas.getContext('2d');
+    textCanvas.width = 256;
+    textCanvas.height = 128;
+    
+    context.fillStyle = '#e8ebff';
+    context.font = 'bold 48px Inter, sans-serif';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText(word, 128, 64);
+    
+    const textTexture = new THREE.CanvasTexture(textCanvas);
+    const textMaterial = new THREE.MeshBasicMaterial({ 
+      map: textTexture, 
+      transparent: true 
+    });
+    const textGeometry = new THREE.PlaneGeometry(1.6, 0.8);
+    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+    textMesh.position.z = 0.16;
+    buttonGroup.add(textMesh);
+    
+    buttonGroup.position.set(position.x, position.y, position.z);
+    buttonGroup.userData = { word, index, originalMaterial: material };
+    
+    // Click detection
+    buttonGroup.onClick = () => speakSingle(word, buttonGroup);
+    
+    return buttonGroup;
+  };
+
+  // Initialize 3D interaction handlers (only when needed)
+  let raycaster, mouse, touchStartPos, touchMoved;
+  
+  const init3DInteraction = () => {
+    if (raycaster) return; // Already initialized
+    
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+    touchStartPos = null;
+    touchMoved = false;
+    
+    const handleClick = (clientX, clientY) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+      
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(wordButtons, true);
+      
+      if (intersects.length > 0) {
+        const clickedButton = intersects[0].object.parent;
+        if (clickedButton.onClick) {
+          clickedButton.onClick();
+        }
+      }
+    };
+    
+    // Mouse click
+    canvas.addEventListener('click', (event) => {
+      handleClick(event.clientX, event.clientY);
+    });
+    
+    // Touch tap (only if not dragging)
+    canvas.addEventListener('touchstart', (event) => {
+      if (event.touches.length === 1) {
+        touchStartPos = {
+          x: event.touches[0].clientX,
+          y: event.touches[0].clientY
+        };
+        touchMoved = false;
+      }
+    });
+    
+    canvas.addEventListener('touchmove', (event) => {
+      if (touchStartPos) {
+        const deltaX = event.touches[0].clientX - touchStartPos.x;
+        const deltaY = event.touches[0].clientY - touchStartPos.y;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        if (distance > 10) { // 10px threshold for considering it a drag vs tap
+          touchMoved = true;
+        }
+      }
+    });
+    
+    canvas.addEventListener('touchend', (event) => {
+      if (touchStartPos && !touchMoved && event.changedTouches.length > 0) {
+        // This was a tap, not a drag
+        handleClick(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+      }
+      touchStartPos = null;
+      touchMoved = false;
+    });
+  };
+
+  let cachedVoice = null;
+  const pickDutchVoice = () => {
+    const list = speechSynthesis.getVoices() || [];
+    const byLang = list.find(v => /^nl(-|$)/i.test(v.lang));
+    const byName = list.find(v => /dutch|nederlands/i.test(v.name));
+    cachedVoice = byLang || byName || list.find(v => /^nl/i.test(v.lang)) || list[0] || null;
+    return cachedVoice;
+  };
+  speechSynthesis.onvoiceschanged = () => { pickDutchVoice(); };
+
+  const findVowelGroups = (word) => {
+    const lower = word.toLowerCase();
+    const matches = [];
+    let i = 0;
+    while (i < lower.length) {
+      let found = null;
+      for (const vg of vowelGroups) {
+        if (lower.startsWith(vg, i)) {
+          found = vg;
+          break;
+        }
+      }
+      if (found) {
+        matches.push({ group: found, index: i, length: found.length });
+        i += found.length;
+      } else {
+        i++;
+      }
+    }
+    return matches;
+  };
+
+  const analyzeWord = (raw) => {
+    const word = (raw || '').trim();
+    if (!/^[A-Za-z]+$/.test(word)) return { ok:false };
+    const groups = findVowelGroups(word);
+    const uniqueGroups = [...new Set(groups.map(g => g.group))];
+    if (uniqueGroups.length < 2) return { ok:false };
+    return { ok:true, word, groups, uniqueGroups };
+  };
+
+  const generateAllCombinations = (uniqueGroups, numPositions) => {
+    const combinations = [];
+    const total = Math.pow(uniqueGroups.length, numPositions);
+    
+    for (let i = 0; i < total; i++) {
+      const combo = [];
+      let temp = i;
+      
+      for (let pos = 0; pos < numPositions; pos++) {
+        combo.push(uniqueGroups[temp % uniqueGroups.length]);
+        temp = Math.floor(temp / uniqueGroups.length);
+      }
+      
+      combinations.push(combo);
+    }
+    
+    return combinations;
+  };
+
+  const buildVariants = (word, groups, uniqueGroups) => {
+    const numVowelGroups = groups.length;
+    const combinations = generateAllCombinations(uniqueGroups, numVowelGroups);
+    
+    const variants = [];
+    
+    for (const combo of combinations) {
+      let result = '';
+      let pos = 0;
+      
+      for (let i = 0; i < groups.length; i++) {
+        const group = groups[i];
+        result += word.slice(pos, group.index) + combo[i];
+        pos = group.index + group.length;
+      }
+      result += word.slice(pos);
+      variants.push(result);
+    }
+    
+    return variants;
+  };
+
+  // Generate 3D cube positions for 3 dimensions
+  const generate3DCubePositions = () => {
+    const positions = [];
+    const spacing = 3;
+    for (let x = 0; x < 3; x++) {
+      for (let y = 0; y < 3; y++) {
+        for (let z = 0; z < 3; z++) {
+          positions.push({
+            x: (x - 1) * spacing,
+            y: (y - 1) * spacing,
+            z: (z - 1) * spacing
+          });
+        }
+      }
+    }
+    return positions;
+  };
+
+  // Generate hypercube positions for 4+ dimensions
+  const generateHypercubePositions = (dimensions, size) => {
+    const positions = [];
+    const spacing = 2.5;
+    
+    // For 4D+, we'll create a projected visualization
+    // Using a technique similar to a tesseract projection
+    for (let i = 0; i < size; i++) {
+      let coords = [];
+      let temp = i;
+      
+      // Convert index to n-dimensional coordinates
+      for (let d = 0; d < dimensions; d++) {
+        coords.push(temp % dimensions);
+        temp = Math.floor(temp / dimensions);
+      }
+      
+      // Project to 3D space with some mathematical mapping
+      let x = 0, y = 0, z = 0;
+      
+      if (dimensions >= 4) {
+        // 4D tesseract-like projection
+        const w = coords[3] || 0;
+        x = (coords[0] - (dimensions-1)/2) * spacing + w * 0.8;
+        y = (coords[1] - (dimensions-1)/2) * spacing + w * 0.4;
+        z = (coords[2] - (dimensions-1)/2) * spacing + w * 0.6;
+        
+        // Add higher dimensions as perturbations
+        for (let d = 4; d < dimensions && d < coords.length; d++) {
+          const factor = 0.3 / (d - 2);
+          x += (coords[d] - (dimensions-1)/2) * factor * Math.cos(d);
+          y += (coords[d] - (dimensions-1)/2) * factor * Math.sin(d);
+          z += (coords[d] - (dimensions-1)/2) * factor * Math.cos(d * 1.5);
+        }
+      }
+      
+      positions.push({ x, y, z });
+    }
+    
+    return positions;
+  };
+
+  const render3DVisualization = (words, numDimensions) => {
+    // Initialize 3D interaction when first needed
+    init3DInteraction();
+    
+    // Clear previous buttons
+    wordButtons.forEach(button => scene.remove(button));
+    wordButtons = [];
+    
+    let positions;
+    if (numDimensions === 3) {
+      positions = generate3DCubePositions();
+      dimensionInfo.textContent = `3D Kubus (${words.length} varianten)`;
+    } else {
+      positions = generateHypercubePositions(numDimensions, words.length);
+      dimensionInfo.textContent = `${numDimensions}D Hyperkubus (${words.length} varianten)`;
+    }
+    
+    words.forEach((word, index) => {
+      if (index < positions.length) {
+        const button = createWordButton(word, positions[index], index);
+        scene.add(button);
+        wordButtons.push(button);
+      }
+    });
+  };
+
+  const fitText = (el) => {
+    let size = 32;
+    el.style.fontSize = size + 'px';
+    el.style.whiteSpace = 'nowrap';
+    while ((el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight) && size > 10) {
+      size -= 1;
+      el.style.fontSize = size + 'px';
+    }
+  };
+
+  const renderGrid = (words, N) => {
+    if (N === 3 || N >= 4) {
+      // Show 3D visualization
+      grid.style.display = 'none';
+      canvasContainer.style.display = 'block';
+      if (!scene) initThreeJS();
+      render3DVisualization(words, N);
+    } else {
+      // Show regular 2D grid
+      canvasContainer.style.display = 'none';
+      grid.style.display = 'grid';
+      grid.innerHTML = '';
+      grid.style.gridTemplateColumns = `repeat(${N}, 1fr)`;
+      words.forEach((w, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.id = 'w' + i;
+        cell.textContent = w;
+        cell.addEventListener('click', () => speakSingle(w, cell));
+        grid.appendChild(cell);
+        fitText(cell);
+      });
+    }
+  };
+
+  const speakWord = (text, onend) => {
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.95; u.pitch = 1.0; u.volume = 1.0;
+    u.lang = 'nl-NL';
+    const v = cachedVoice || pickDutchVoice();
+    if (v) u.voice = v;
+    u.onend = onend;
+    speechSynthesis.speak(u);
+  };
+
+  const playSequence = (words) => {
+    stopSpeech(true);
+    speaking = true;
+    currentWords = words;
+    
+    const step = (idx) => {
+      if (!speaking || idx >= words.length) { 
+        speaking = false; 
+        clearActive(); 
+        return; 
+      }
+      
+      clearActive();
+      
+      // Highlight current word
+      if (canvasContainer.style.display !== 'none') {
+        // 3D mode
+        if (wordButtons[idx]) {
+          const button = wordButtons[idx];
+          const highlightMaterial = new THREE.MeshPhongMaterial({
+            color: 0x9b8cff,
+            transparent: true,
+            opacity: 0.9,
+            emissive: 0x6ee7f5,
+            emissiveIntensity: 0.2
+          });
+          button.children[0].material = highlightMaterial;
+        }
+      } else {
+        // 2D mode
+        const cell = document.getElementById('w' + idx);
+        if (cell) cell.classList.add('active');
+      }
+      
+      speakWord(words[idx], () => step(idx + 1));
+    };
+    step(0);
+  };
+
+  const speakSingle = (word, element) => {
+    stopSpeech(true);
+    clearActive();
+    
+    if (element.userData) {
+      // 3D button
+      const highlightMaterial = new THREE.MeshPhongMaterial({
+        color: 0x9b8cff,
+        transparent: true,
+        opacity: 0.9,
+        emissive: 0x6ee7f5,
+        emissiveIntensity: 0.3
+      });
+      element.children[0].material = highlightMaterial;
+      speakWord(word, () => {
+        element.children[0].material = element.userData.originalMaterial;
+      });
+    } else {
+      // 2D cell
+      element.classList.add('active');
+      speakWord(word, () => element.classList.remove('active'));
+    }
+  };
+
+  const clearActive = () => {
+    // Clear 2D highlights
+    document.querySelectorAll('.cell.active').forEach(el => el.classList.remove('active'));
+    
+    // Clear 3D highlights
+    wordButtons.forEach(button => {
+      if (button.userData && button.userData.originalMaterial) {
+        button.children[0].material = button.userData.originalMaterial;
+      }
+    });
+  };
+
+  const stopSpeech = (silentCancel=false) => {
+    speaking = false;
+    speechSynthesis.cancel();
+    if (!silentCancel) clearActive();
+  };
+
+  const showError = () => {
+    stopSpeech(true);
+    if (!modal.open) modal.showModal();
+    const u = new SpeechSynthesisUtterance('Neehee');
+    const v = cachedVoice || pickDutchVoice();
+    if (v) u.voice = v;
+    u.lang = 'nl-NL';
+    u.rate = 1.0; u.pitch = .9;
+    speechSynthesis.speak(u);
+  };
+  
+  closeModal.addEventListener('click', () => { 
+    if (modal.open) modal.close(); 
+    input.focus(); 
+    input.select(); 
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const check = analyzeWord(input.value);
+    if (!check.ok) { showError(); return; }
+    const variants = buildVariants(check.word, check.groups, check.uniqueGroups);
+    renderGrid(variants, check.uniqueGroups.length);
+    playSequence(variants);
+  });
+
+  btnSpeak.addEventListener('click', () => {
+    let words;
+    if (canvasContainer.style.display !== 'none') {
+      words = wordButtons.map(b => b.userData.word);
+    } else {
+      words = [...grid.querySelectorAll('.cell')].map(x => x.textContent);
+    }
+    if (words.length) playSequence(words);
+  });
+
+  btnStop.addEventListener('click', () => stopSpeech());
+})();
+</script>
+</body>
+</html>
