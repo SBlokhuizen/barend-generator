@@ -39,7 +39,7 @@
     max-width:880px;
     display:grid;
     gap:22px;
-    align-content:center; /* helps vertical centering inside the grid */
+    align-content:center;
     margin:0;
   }
 
@@ -54,14 +54,72 @@
     backdrop-filter: blur(10px);
   }
 
-  .title{
+  .title {
     font-weight:800;
     letter-spacing:.3px;
     font-size: clamp(36px, 2.4vw, 30px);
-    background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
-    -webkit-background-clip:text;background-clip:text;color:transparent;
     margin:0 0 8px 0;
+    display: flex;
+    align-items: center;
+    background: var(--accent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
+
+  .title-text {
+    background: none;
+    -webkit-background-clip: inherit;
+    background-clip: inherit;
+    color: inherit;
+  }
+
+  .morphing-letter {
+    position: relative;
+    display: inline-block;
+    width: 0.6em;
+    overflow: hidden;
+  }
+
+  .letter-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .letter-a, .letter-e {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateY(-77.5%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: var(--accent);
+    transition: all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+
+  .letter-a { opacity: 1; transform: translateY(-77.5%) scale(1); }
+  .letter-e { opacity: 0; transform: translateY(-77.5%) scale(0.3); }
+
+  /* Morphing states */
+  .morph-state-barend .pos1 .letter-a { opacity: 1; transform: translateY(-77.5%) scale(1) ; }
+  .morph-state-barend .pos1 .letter-e { opacity: 0; transform: translateY(-77.5%) scale(0.3) ; }
+  .morph-state-barend .pos2 .letter-a { opacity: 0; transform: translateY(-77.5%) scale(0.3) ; }
+  .morph-state-barend .pos2 .letter-e { opacity: 1; transform: translateY(-77.5%) scale(1); }
+
+  .morph-state-barand .pos1 .letter-a { opacity: 1; transform: translateY(-77.5%) scale(1) ; }
+  .morph-state-barand .pos1 .letter-e { opacity: 0; transform: translateY(-77.5%) scale(0.3) ; }
+  .morph-state-barand .pos2 .letter-a { opacity: 1; transform: translateY(-77.5%) scale(1) ; }
+  .morph-state-barand .pos2 .letter-e { opacity: 0; transform: translateY(-77.5%) scale(0.3) ; }
+
+  .morph-state-berand .pos1 .letter-a { opacity: 0; transform: translateY(-77.5%) scale(0.3) ; }
+  .morph-state-berand .pos1 .letter-e { opacity: 1; transform: translateY(-77.5%) scale(1) ; }
+  .morph-state-berand .pos2 .letter-a { opacity: 1; transform: translateY(-77.5%) scale(1) ; }
+  .morph-state-berand .pos2 .letter-e { opacity: 0; transform: translateY(-77.5%) scale(0.3) ; }
+
+  .morph-state-berend .pos1 .letter-a { opacity: 0; transform: translateY(-77.5%) scale(0.3) ; }
+  .morph-state-berend .pos1 .letter-e { opacity: 1; transform: translateY(-77.5%) scale(1) ; }
+  .morph-state-berend .pos2 .letter-a { opacity: 0; transform: translateY(-77.5%) scale(0.3) ; }
+  .morph-state-berend .pos2 .letter-e { opacity: 1; transform: translateY(-77.5%) scale(1) ; }
 
   /* Primary controls in a row */
   form{
@@ -197,8 +255,24 @@
 </head>
 <body>
   <div class="wrap" role="main">
+      <h1 id="title" class="title">
+        <span class="title-text">B</span>
+        <div class="morphing-letter pos1">
+          <div class="letter-container">
+            <span class="letter-a">a</span>
+            <span class="letter-e">e</span>
+          </div>
+        </div>
+        <span class="title-text">r</span>
+        <div class="morphing-letter pos2">
+          <div class="letter-container">
+            <span class="letter-a">a</span>
+            <span class="letter-e">e</span>
+          </div>
+        </div>
+        <span class="title-text">nd Generator</span>
+      </h1>
     <header class="card" aria-labelledby="title">
-      <h1 id="title" class="title">Barend Generator</h1>
       <form id="scramble-form" autocomplete="off" novalidate>
         <input id="word" name="word" type="text" spellcheck="false" placeholder="bijv. Barend" maxlength="48" />
         <button type="submit" class="btn primary" id="generate">Genereren</button>
@@ -207,7 +281,7 @@
       </form>
     </header>
 
-    <section class="card" aria-live="polite">
+    <section id="output-card" class="card" aria-live="polite" style="display:none;">
       <div id="grid" class="grid" aria-hidden="false"></div>
       <div id="canvas-container" style="display:none;">
         <canvas id="three-canvas" role="img" aria-label="3D knoppen canvas"></canvas>
@@ -233,13 +307,36 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (() => {
+  // Morphing title animation
+  const title = document.getElementById('title');
+  const morphStates = ['morph-state-barend', 'morph-state-barand', 'morph-state-berand', 'morph-state-berend'];
+  let currentMorphState = 0;
+  
+  function morphTitle() {
+    // Remove current state
+    title.classList.remove(morphStates[currentMorphState]);
+    
+    // Move to next state
+    currentMorphState = (currentMorphState + 1) % morphStates.length;
+    
+    // Add new state
+    title.classList.add(morphStates[currentMorphState]);
+  }
+  
+  // Initialize with first state
+  title.classList.add(morphStates[currentMorphState]);
+  
+  // Start morphing animation
+  setInterval(morphTitle, 2000);
+
   const BUTTON_DEPTH = 0.28;
-  const TEXT_Z_OFFSET = 0.08; // Increased from 0.035 to make text clearly above button
+  const TEXT_Z_OFFSET = 0.08;
   const vowelGroups = ['aa','ee','ii','ie','oo','uu','oe','eu','ui','ij','ei','ai','au','ou','a','e','i','o','u'];
 
   const form = document.getElementById('scramble-form');
   const input = document.getElementById('word');
   const grid = document.getElementById('grid');
+  const outputCard = document.getElementById('output-card');
   const canvasContainer = document.getElementById('canvas-container');
   const canvas = document.getElementById('three-canvas');
   const dimensionInfo = document.getElementById('dimension-info');
@@ -274,8 +371,8 @@
     scene.add(dir);
 
     let isRot = false;
-    let rotX = 0; // Set initial rotation X to 0
-    let rotY = Math.PI / 2; // Set initial rotation Y to π/2
+    let rotX = 0;
+    let rotY = Math.PI / 2;
     let camDist = 8;
     let lastTouch = null, lastPinch = null;
 
@@ -334,7 +431,6 @@
       camera.position.z = Math.sin(rotY) * Math.cos(rotX) * camDist;
       camera.lookAt(0,0,0);
 
-      // Ensure text meshes remain fixed relative to their button (no billboarding, no per-frame scaling)
       for (let i=0;i<wordButtons.length;i++){
         const btn = wordButtons[i];
         if (!btn || !btn.userData) continue;
@@ -367,7 +463,6 @@
     });
   }
 
-  // geometry + text helpers
   function createRoundedButtonGeometry(w=1.9,h=1.2,depth=BUTTON_DEPTH,r=0.16){
     const hw = w/2, hh = h/2, radius = Math.min(r, hw, hh);
     const shape = new THREE.Shape();
@@ -454,7 +549,6 @@
     g.add(rim);
 
     const { textMesh } = makeFittedTextMesh(word, 1.6, 0.78);
-    // Use the increased text z-offset
     textMesh.position.z = (BUTTON_DEPTH / 2) + TEXT_Z_OFFSET;
     textMesh.userData = { isText:true, word };
     g.add(textMesh);
@@ -539,7 +633,6 @@
     }
   }
 
-  // speech helpers & analysis
   let cachedVoice = null;
   const pickDutchVoice = () => {
     const list = speechSynthesis.getVoices() || [];
@@ -666,6 +759,9 @@
     e.preventDefault();
     const check = analyzeWord(input.value);
     if (!check.ok) { showError(); return; }
+
+    outputCard.style.display = 'block';
+    
     const variants = buildVariants(check.word, check.groups, check.uniqueGroups);
     renderGrid(variants, check.uniqueGroups.length);
     playSequence(variants);
@@ -680,7 +776,6 @@
 
   btnStop.addEventListener('click', () => stopSpeech());
 
-  // ensure input focus
   input.setAttribute('autofocus','true');
 })();
 </script>
