@@ -564,7 +564,7 @@
 
   const analyzeWord = (raw) => {
     const word = (raw||'').trim();
-    if (!/^[A-Za-z]+$/.test(word)) return { ok:false };
+    if (!/^[A-Za-z]+( [A-Za-z]+)*$/.test(word)) return { ok:false };
     const groups = findVowelGroups(word);
     const uniqueGroups = [...new Set(groups.map(g=>g.group))];
     if (uniqueGroups.length < 2) return { ok:false };
