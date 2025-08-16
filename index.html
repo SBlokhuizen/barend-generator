@@ -566,34 +566,53 @@
     return g;
   }
 
-  function generate3DCubePositions(){
-    const pos = []; const spacing = 3;
-    for (let x=0;x<3;x++) for (let y=0;y<3;y++) for (let z=0;z<3;z++)
-      pos.push({ x:(x-1)*spacing, y:(y-1)*spacing, z:(z-1)*spacing });
-    return pos;
-  }
-
-  function generateHypercubePositions(dimensions, size){
-    const positions = []; const spacing = 2.5;
-    for (let i=0;i<size;i++){
-      let coords=[]; let t=i;
-      for (let d=0; d<dimensions; d++){ coords.push(t % dimensions); t = Math.floor(t/dimensions); }
-      let x=0,y=0,z=0;
-      if (dimensions >= 4){
-        const w = coords[3] || 0;
-        x = (coords[0] - (dimensions-1)/2) * spacing + w * 0.8;
-        y = (coords[1] - (dimensions-1)/2) * spacing + w * 0.4;
-        z = (coords[2] - (dimensions-1)/2) * spacing + w * 0.6;
-        for (let d=4; d<dimensions && d<coords.length; d++){
-          const factor = 0.3 / (d - 2);
-          x += (coords[d] - (dimensions-1)/2) * factor * Math.cos(d);
-          y += (coords[d] - (dimensions-1)/2) * factor * Math.sin(d);
-          z += (coords[d] - (dimensions-1)/2) * factor * Math.cos(d * 1.5);
-        }
+  function generatePositions(dimensions, size) {
+      if (dimensions <= 3) {
+          dimensions = 3;
       }
-      positions.push({ x,y,z });
-    }
-    return positions;
+
+      const positions = [];
+      const pointSpacing = 2.5; 
+      const cubeMargin = 5.0; 
+
+      const sideLength = Math.ceil(Math.pow(size, 1 / dimensions));
+
+      const cubeWidth = (sideLength - 1) * pointSpacing;
+      const gridSpacing = cubeWidth + cubeMargin; 
+
+      for (let i = 0; i < size; i++) {
+          const coords = [];
+          let temp_i = i;
+          for (let d = 0; d < dimensions; d++) {
+              coords.push(temp_i % sideLength);
+              temp_i = Math.floor(temp_i / sideLength);
+          }
+
+          const centerOffset = (sideLength - 1) / 2.0;
+
+          const localX = (coords[0] - centerOffset) * pointSpacing;
+          const localY = (coords[1] - centerOffset) * pointSpacing;
+          const localZ = (coords[2] - centerOffset) * pointSpacing;
+
+          let gridOffsetX = dimensions > 3 ? (coords[3] - centerOffset) * gridSpacing : 0;
+          let gridOffsetY = dimensions > 4 ? (coords[4] - centerOffset) * gridSpacing : 0;
+          let gridOffsetZ = dimensions > 5 ? (coords[5] - centerOffset) * gridSpacing : 0;
+
+          if (dimensions > 6) {
+              for (let d = 6; d < dimensions; d++) {
+                  const factor = 0.5 / (d - 5); 
+                  gridOffsetX += (coords[d] - centerOffset) * gridSpacing * factor * Math.cos(d);
+                  gridOffsetY += (coords[d] - centerOffset) * gridSpacing * factor * Math.sin(d);
+              }
+          }
+
+          positions.push({
+              x: localX + gridOffsetX,
+              y: localY + gridOffsetY,
+              z: localZ + gridOffsetZ,
+          });
+      }
+      return positions;
   }
 
   function render3DVisualization(words, numDimensions){
@@ -601,7 +620,7 @@
     wordButtons.forEach(b => scene.remove(b));
     wordButtons = [];
 
-    let positions = (numDimensions === 3) ? generate3DCubePositions() : generateHypercubePositions(numDimensions, words.length);
+    let positions = generatePositions(numDimensions, words.length);
     dimensionInfo.textContent = (numDimensions === 3) ? `3D Kubus (${words.length} varianten)` : `${numDimensions}D Hyperkubus (${words.length} varianten)`;
 
     words.forEach((w,i) => {
