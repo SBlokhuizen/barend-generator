@@ -691,27 +691,104 @@
     });
   }
 
-  function fitText(el){
-    let s = 32; el.style.fontSize = s + 'px'; el.style.whiteSpace='nowrap';
-    while ((el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight) && s > 10){ s -= 1; el.style.fontSize = s + 'px'; }
+// --- Fit text inside cell ---
+function fitText(el) {
+  const maxFontSize = 32; // starting size
+  const minFontSize = 10; // smallest allowed
+  let fontSize = maxFontSize;
+  el.style.fontSize = fontSize + 'px';
+  el.style.whiteSpace = 'nowrap';
+  el.style.overflow = 'hidden';
+  el.style.textOverflow = 'ellipsis';
+
+  const parentWidth = el.clientWidth;
+  const parentHeight = el.clientHeight;
+
+  while ((el.scrollWidth > parentWidth || el.scrollHeight > parentHeight) && fontSize > minFontSize) {
+    fontSize -= 1;
+    el.style.fontSize = fontSize + 'px';
   }
 
-  function renderGrid(words, N){
-    if (!settings.disable3d && N >= 3){
-      grid.style.display = 'none'; canvasContainer.style.display = 'block';
-      if (!scene) initThreeJS();
-      render3DVisualization(words, N);
-    } else {
-      canvasContainer.style.display = 'none'; grid.style.display = 'grid';
-      grid.innerHTML = ''; grid.style.gridTemplateColumns = `repeat(${Math.min(N, 6)}, 1fr)`;
-      words.forEach((w,i) => {
+  el.style.display = 'flex';
+  el.style.alignItems = 'center';
+  el.style.justifyContent = 'center';
+  el.style.textAlign = 'center';
+}
+
+// --- Virtualized Grid Rendering with fixed 2 columns ---
+function renderVirtualizedGrid(words) {
+  const columns = 2; // always 2 wide
+  canvasContainer.style.display = 'none';
+  grid.style.display = 'grid';
+  grid.innerHTML = '';
+  grid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+
+  const rowHeight = 72; // approximate, tune as needed
+  const buffer = 4;
+  const totalRows = Math.ceil(words.length / columns);
+  grid.style.position = 'relative';
+  grid.style.height = totalRows * rowHeight + 'px';
+
+  const pool = {};
+
+  function renderVisible() {
+    const scrollTop = grid.scrollTop;
+    const clientHeight = grid.clientHeight;
+    const firstRow = Math.max(0, Math.floor(scrollTop / rowHeight) - buffer);
+    const lastRow = Math.min(totalRows, Math.ceil((scrollTop + clientHeight) / rowHeight) + buffer);
+    const newStart = firstRow * columns;
+    const newEnd = Math.min(words.length, lastRow * columns);
+
+    // remove offscreen
+    for (let k in pool) {
+      const i = parseInt(k);
+      if (i < newStart || i >= newEnd) {
+        grid.removeChild(pool[i]);
+        delete pool[i];
+      }
+    }
+
+    // add visible
+    for (let i = newStart; i < newEnd; i++) {
+      if (!pool[i]) {
         const cell = document.createElement('div');
-        cell.className = 'cell'; cell.id = 'w'+i; cell.textContent = w;
-        cell.addEventListener('click', () => speakSingle(w, cell));
-        grid.appendChild(cell); fitText(cell);
-      });
+        cell.className = 'cell';
+        cell.textContent = words[i];
+        cell.style.position = 'absolute';
+        cell.style.top = Math.floor(i / columns) * rowHeight + 'px';
+        cell.style.left = (i % columns) * (100 / columns) + '%';
+        cell.style.width = (100 / columns) + '%';
+        cell.style.height = rowHeight + 'px';
+        cell.addEventListener('click', () => speakSingle(words[i], cell));
+        grid.appendChild(cell);
+
+        fitText(cell); // ensure text fits inside
+        pool[i] = cell;
+      }
     }
   }
+
+  grid.addEventListener('scroll', renderVisible);
+  renderVisible();
+
+  grid._scrollToIndex = function scrollToIndex(idx) {
+    const targetRow = Math.floor(idx / columns);
+    const y = targetRow * rowHeight;
+    grid.scrollTo({ top: y, behavior: 'smooth' });
+  };
+}
+
+// --- Dispatcher ---
+function renderGrid(words, N) {
+  if (!settings.disable3d && N >= 3) {
+    grid.style.display = 'none';
+    canvasContainer.style.display = 'block';
+    if (!scene) initThreeJS();
+    render3DVisualization(words, N);
+  } else {
+    renderVirtualizedGrid(words); // always 2xN
+  }
+}
 
   // --- Speech Synthesis ---
   let cachedVoice = null;
@@ -742,24 +819,22 @@
 
   const stopSpeech = (silent=false) => { speaking=false; speechSynthesis.cancel(); if(!silent) clearActive(); };
 
-  const playSequence = (words) => {
-    stopSpeech(true); speaking = true;
-    const step = (idx) => {
-      if (!speaking || idx >= words.length) { speaking=false; clearActive(); return; }
-      clearActive();
-      if (canvasContainer.style.display !== 'none'){
-        if (wordButtons[idx]){
-          const button = wordButtons[idx];
-          const highlightMaterial = new THREE.MeshPhongMaterial({ color:0x9b8cff, transparent:true, opacity:0.95, emissive:0x6ee7f5, emissiveIntensity:0.35 });
-          button.children[0].material = highlightMaterial;
-        }
-      } else {
-        const cell = document.getElementById('w'+idx); if (cell) cell.classList.add('active');
-      }
-      speakWord(words[idx], () => step(idx+1));
-    };
-    step(0);
+const playSequence = (words) => {
+  stopSpeech(true); speaking = true;
+  const step = (idx) => {
+    if (!speaking || idx >= words.length) { speaking=false; clearActive(); return; }
+    clearActive();
+    if (canvasContainer.style.display !== 'none') {
+      // highlight 3D
+    } else {
+      if (grid._scrollToIndex) grid._scrollToIndex(idx);
+      const cell = document.querySelector(`.cell:nth-child(${idx+1})`);
+      if (cell) cell.classList.add('active');
+    }
+    speakWord(words[idx], () => step(idx+1));
   };
+  step(0);
+};
 
   const speakSingle = (word, element) => {
     stopSpeech(true); clearActive();
