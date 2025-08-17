@@ -394,8 +394,8 @@
     <div class="modal-head"><div id="options-modal-title" class="modal-title">Instellingen</div></div>
     <div class="modal-body">
       <div class="option-row">
-        <label for="disable-3d">3D weergave uitschakelen</label>
-        <input type="checkbox" id="disable-3d" class="toggle-switch">
+        <label for="enable-3d">3D weergave inschakelen</label>
+        <input type="checkbox" id="enable-3d" class="toggle-switch">
       </div>
       <div class="option-row">
         <label for="pitch-slider">Toonhoogte</label>
@@ -414,53 +414,53 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (() => {
-  // Morphing title animation
-  const title = document.getElementById('title');
-  const morphStates = ['morph-state-barend', 'morph-state-barand', 'morph-state-berand', 'morph-state-berend'];
-  let currentMorphState = 0;
-  function morphTitle() {
-    title.classList.remove(morphStates[currentMorphState]);
-    currentMorphState = (currentMorphState + 1) % morphStates.length;
-    title.classList.add(morphStates[currentMorphState]);
-  }
-  title.classList.add(morphStates[currentMorphState]);
-  setInterval(morphTitle, 2000);
+  // Morphing title animation
+  const title = document.getElementById('title');
+  const morphStates = ['morph-state-barend', 'morph-state-barand', 'morph-state-berand', 'morph-state-berend'];
+  let currentMorphState = 0;
+  function morphTitle() {
+    title.classList.remove(morphStates[currentMorphState]);
+    currentMorphState = (currentMorphState + 1) % morphStates.length;
+    title.classList.add(morphStates[currentMorphState]);
+  }
+  title.classList.add(morphStates[currentMorphState]);
+  setInterval(morphTitle, 2000);
 
-  // Constants & DOM Elements
-  const BUTTON_DEPTH = 0.28;
-  const TEXT_Z_OFFSET = 0.08;
-  const vowelGroups = ['aa','ee','ii','ie','oo','uu','oe','eu','ui','ij','ei','ai','au','ou','a','e','i','o','u'];
+  // Constants & DOM Elements
+  const BUTTON_DEPTH = 0.28;
+  const TEXT_Z_OFFSET = 0.08;
+  const vowelGroups = ['aa','ee','ii','ie','oo','uu','oe','eu','ui','ij','ei','ai','au','ou','a','e','i','o','u'];
 
-  const form = document.getElementById('scramble-form');
-  const input = document.getElementById('word');
-  const grid = document.getElementById('grid');
-  const outputCard = document.getElementById('output-card');
-  const canvasContainer = document.getElementById('canvas-container');
-  const canvas = document.getElementById('three-canvas');
-  const dimensionInfo = document.getElementById('dimension-info');
-  const btnSpeak = document.getElementById('speak');
-  const btnStop = document.getElementById('stop');
-  
-  // Modals
-  const modal = document.getElementById('modal');
-  const closeModal = document.getElementById('close-modal');
-  const optionsBtn = document.getElementById('options-btn');
-  const optionsModal = document.getElementById('options-modal');
-  const closeOptionsModal = document.getElementById('close-options-modal');
-  
-  // Options Controls
-  const disable3dCheckbox = document.getElementById('disable-3d');
-  const pitchSlider = document.getElementById('pitch-slider');
-  const rateSlider = document.getElementById('rate-slider');
-  const pitchValueSpan = document.getElementById('pitch-value');
-  const rateValueSpan = document.getElementById('rate-value');
+  const form = document.getElementById('scramble-form');
+  const input = document.getElementById('word');
+  const grid = document.getElementById('grid');
+  const outputCard = document.getElementById('output-card');
+  const canvasContainer = document.getElementById('canvas-container');
+  const canvas = document.getElementById('three-canvas');
+  const dimensionInfo = document.getElementById('dimension-info');
+  const btnSpeak = document.getElementById('speak');
+  const btnStop = document.getElementById('stop');
+  
+  // Modals
+  const modal = document.getElementById('modal');
+  const closeModal = document.getElementById('close-modal');
+  const optionsBtn = document.getElementById('options-btn');
+  const optionsModal = document.getElementById('options-modal');
+  const closeOptionsModal = document.getElementById('close-options-modal');
+  
+  // Options Controls
+  const enable3dCheckbox = document.getElementById('enable-3d');
+  const pitchSlider = document.getElementById('pitch-slider');
+  const rateSlider = document.getElementById('rate-slider');
+  const pitchValueSpan = document.getElementById('pitch-value');
+  const rateValueSpan = document.getElementById('rate-value');
 
-  // App State
-  let scene, camera, renderer;
-  let wordButtons = [];
-  let speaking = false;
-  let raycaster, mouse;
-  let settings = {};
+  // App State
+  let scene, camera, renderer;
+  let wordButtons = [];
+  let speaking = false;
+  let raycaster, mouse;
+  let settings = {};
   let totalCombinations = 0;
   let currentPage = 1;
   const itemsPerPage = 100;
@@ -473,232 +473,232 @@
   const prevPageBtn = document.getElementById('prev-page');
   const nextPageBtn = document.getElementById('next-page');
 
-  // --- Settings Management ---
-  const defaultSettings = { disable3d: false, pitch: 1.0, rate: 1.00 };
+  // --- Settings Management ---
+  const defaultSettings = { enable3d: false, pitch: 1.0, rate: 1.00 };
 
-  function saveSettings() {
-    settings.disable3d = disable3dCheckbox.checked;
-    settings.pitch = parseFloat(pitchSlider.value);
-    settings.rate = parseFloat(rateSlider.value);
-    localStorage.setItem('barendGenSettings', JSON.stringify(settings));
-  }
+  function saveSettings() {
+    settings.enable3d = enable3dCheckbox.checked;
+    settings.pitch = parseFloat(pitchSlider.value);
+    settings.rate = parseFloat(rateSlider.value);
+    localStorage.setItem('barendGenSettings', JSON.stringify(settings));
+  }
 
-  function updateSliderValues() {
-    pitchValueSpan.textContent = parseFloat(pitchSlider.value).toFixed(2);
-    rateValueSpan.textContent = parseFloat(rateSlider.value).toFixed(2);
-  }
+  function updateSliderValues() {
+    pitchValueSpan.textContent = parseFloat(pitchSlider.value).toFixed(2);
+    rateValueSpan.textContent = parseFloat(rateSlider.value).toFixed(2);
+  }
 
-  function loadSettings() {
-    const saved = localStorage.getItem('barendGenSettings');
-    settings = saved ? JSON.parse(saved) : { ...defaultSettings };
-    settings = { ...defaultSettings, ...settings }; // Ensure all keys exist
-    disable3dCheckbox.checked = settings.disable3d;
-    pitchSlider.value = settings.pitch;
-    rateSlider.value = settings.rate;
-    updateSliderValues();
-  }
-  
-  // --- Three.js Initialization & Controls ---
-  function initThreeJS(){
-    if (scene) return;
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0f1226);
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / Math.max(1, canvas.clientHeight), 0.1, 1000);
-    camera.position.set(0,0,8);
-    camera.lookAt(0,0,0);
-    const ambientLight = new THREE.AmbientLight(0x6ee7f5, 0.45);
-    scene.add(ambientLight);
-    const dir = new THREE.DirectionalLight(0x9b8cff, 0.9);
-    dir.position.set(5,10,5);
-    dir.castShadow = true;
-    scene.add(dir);
-    let isRot = false, rotX = 0, rotY = Math.PI / 2, camDist = 8;
-    let lastTouch = null, lastPinch = null;
-    const getDist = (a,b) => Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
-    const handleRot = (dx,dy,s=0.01) => { rotY += dx * s; rotX += dy * s; rotX = Math.max(-Math.PI/2, Math.min(Math.PI/2, rotX)); };
-    const handleZoom = (d,s=0.01) => { camDist += d * s; camDist = Math.max(3, Math.min(20, camDist)); };
-    canvas.addEventListener('mousedown', e => { isRot = true; lastTouch = {x:e.clientX,y:e.clientY}; });
-    window.addEventListener('mouseup', () => { isRot = false; lastTouch = null; });
-    canvas.addEventListener('mousemove', e => {
-      if (!isRot || !lastTouch) return;
-      handleRot(e.clientX - lastTouch.x, e.clientY - lastTouch.y, 0.012);
-      lastTouch = {x:e.clientX,y:e.clientY};
-    });
-    canvas.addEventListener('wheel', e => { e.preventDefault(); handleZoom(e.deltaY, 0.015); }, { passive:false });
-    canvas.addEventListener('touchstart', e => {
-      if (e.touches.length === 1) { isRot = true; lastTouch = {x:e.touches[0].clientX,y:e.touches[0].clientY}; lastPinch = null; }
-      if (e.touches.length === 2) { isRot = false; lastTouch = null; lastPinch = getDist(e.touches[0], e.touches[1]); }
-    }, { passive:false });
-    canvas.addEventListener('touchmove', e => {
-      e.preventDefault();
-      if (e.touches.length === 1 && isRot && lastTouch) {
-        handleRot(e.touches[0].clientX - lastTouch.x, e.touches[0].clientY - lastTouch.y, 0.015);
-        lastTouch = {x:e.touches[0].clientX,y:e.touches[0].clientY};
-      } else if (e.touches.length === 2 && lastPinch !== null) {
-        const d = getDist(e.touches[0], e.touches[1]);
-        handleZoom(lastPinch - d, 0.02);
-        lastPinch = d;
-      }
-    }, { passive:false });
-    canvas.addEventListener('touchend', e => {
-      if (e.touches.length === 0) { isRot = false; lastTouch = null; lastPinch = null; }
-      else if (e.touches.length === 1) { isRot = true; lastTouch = {x:e.touches[0].clientX,y:e.touches[0].clientY}; lastPinch = null; }
-    }, { passive:false });
-    const resize = () => {
-      const w = canvas.clientWidth, h = Math.max(2, canvas.clientHeight);
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      renderer.setPixelRatio(dpr);
-      renderer.setSize(w,h,false);
-      camera.aspect = w/h;
-      camera.updateProjectionMatrix();
-    };
-    new ResizeObserver(resize).observe(canvasContainer);
-    resize();
-    raycaster = new THREE.Raycaster();
-    mouse = new THREE.Vector2();
-    const animate = () => {
-      requestAnimationFrame(animate);
-      camera.position.x = Math.cos(rotY) * Math.cos(rotX) * camDist;
-      camera.position.y = Math.sin(rotX) * camDist;
-      camera.position.z = Math.sin(rotY) * Math.cos(rotX) * camDist;
-      camera.lookAt(0,0,0);
-      renderer.render(scene, camera);
-    };
-    animate();
-    const handleClick = (clientX, clientY) => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(wordButtons, true);
-      if (intersects.length > 0){
-        let obj = intersects[0].object;
-        while (obj && !obj.onClick && obj.parent) obj = obj.parent;
-        if (obj && obj.onClick) obj.onClick();
-      }
-    };
-    canvas.addEventListener('click', e => handleClick(e.clientX, e.clientY));
-    canvas.addEventListener('touchend', e => {
-      if (e.changedTouches && e.changedTouches.length) handleClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-    });
-  }
-  
-  // --- 3D Object Creation ---
-  function createRoundedButtonGeometry(w=1.9,h=1.2,depth=BUTTON_DEPTH,r=0.16){
-    const hw = w/2, hh = h/2, radius = Math.min(r, hw, hh);
-    const shape = new THREE.Shape();
-    shape.moveTo(-hw + radius, -hh);
-    shape.lineTo(hw - radius, -hh);
-    shape.quadraticCurveTo(hw, -hh, hw, -hh + radius);
-    shape.lineTo(hw, hh - radius);
-    shape.quadraticCurveTo(hw, hh, hw - radius, hh);
-    shape.lineTo(-hw + radius, hh);
-    shape.quadraticCurveTo(-hw, hh, -hw, hh - radius);
-    shape.lineTo(-hw, -hh + radius);
-    shape.quadraticCurveTo(-hw, -hh, -hw + radius, -hh);
-    const extrude = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.06, bevelSegments: 6, curveSegments: 32 });
-    if (extrude.center) extrude.center();
-    return extrude;
-  }
-  function makeFittedTextMesh(word, planeW=1.6, planeH=0.78){
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const baseW = 1024, baseH = 512;
-    const tex = document.createElement('canvas');
-    tex.width = Math.floor(baseW * dpr);
-    tex.height = Math.floor(baseH * dpr);
-    const ctx = tex.getContext('2d', { alpha:true });
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    const pad = 28, maxW = baseW - pad*2, maxH = baseH - pad*2;
-    let fs = 120; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    while (fs > 10){
-      ctx.font = `700 ${fs}px Inter, system-ui, sans-serif`;
-      if (ctx.measureText(word).width <= maxW && (fs*1.1) <= maxH) break;
-      fs -= 2;
-    }
-    ctx.clearRect(0,0,baseW,baseH);
-    ctx.shadowColor = 'rgba(110,231,245,0.14)';
-    ctx.shadowBlur = 6;
-    ctx.fillStyle = '#e8ebff';
-    ctx.font = `700 ${fs}px Inter, system-ui, sans-serif`;
-    ctx.fillText(word, baseW/2, baseH/2);
-    const texture = new THREE.CanvasTexture(tex);
-    texture.anisotropy = 4; texture.minFilter = THREE.LinearFilter; texture.needsUpdate = true;
-    const mat = new THREE.MeshBasicMaterial({ map:texture, transparent:true, side:THREE.DoubleSide });
-    const geo = new THREE.PlaneGeometry(planeW, planeH);
-    return new THREE.Mesh(geo, mat);
-  }
-  function createWordButton(word, position, index){
-    const g = new THREE.Group();
-    const geom = createRoundedButtonGeometry(1.9,1.2,BUTTON_DEPTH,0.18);
-    const baseMat = new THREE.MeshPhysicalMaterial({ color:0x161a36, metalness:0.05, roughness:0.6, clearcoat:0.6, clearcoatRoughness:0.4, opacity:0.98, transparent:true });
-    const btn = new THREE.Mesh(geom, baseMat);
-    btn.castShadow = true; btn.receiveShadow = true;
-    g.add(btn);
-    const textMesh = makeFittedTextMesh(word, 1.6, 0.78);
-    textMesh.position.z = (BUTTON_DEPTH / 2) + TEXT_Z_OFFSET;
-    g.add(textMesh);
-    g.position.set(position.x, position.y, position.z);
-    g.userData = { word, index, baseMaterial: baseMat, textMesh, buttonMesh: btn };
-    g.onClick = () => speakSingle(word, g);
-    return g;
-  }
-  
-  // --- Rendering Logic ---
-  function generatePositions(dimensions, size) {
-      if (dimensions <= 3) dimensions = 3;
-      const positions = [];
-      const pointSpacing = 2.5, cubeMargin = 5.0; 
-      const sideLength = Math.ceil(Math.pow(size, 1 / dimensions));
-      const cubeWidth = (sideLength - 1) * pointSpacing;
-      const gridSpacing = cubeWidth + cubeMargin; 
-      for (let i = 0; i < size; i++) {
-          const coords = []; let temp_i = i;
-          for (let d = 0; d < dimensions; d++) {
-              coords.push(temp_i % sideLength); temp_i = Math.floor(temp_i / sideLength);
-          }
-          const centerOffset = (sideLength - 1) / 2.0;
-          const localX = (coords[0] - centerOffset) * pointSpacing;
-          const localY = (coords[1] - centerOffset) * pointSpacing;
-          const localZ = (coords[2] - centerOffset) * pointSpacing;
-          let gridOffsetX = dimensions > 3 ? (coords[3] - centerOffset) * gridSpacing : 0;
-          let gridOffsetY = dimensions > 4 ? (coords[4] - centerOffset) * gridSpacing : 0;
-          let gridOffsetZ = dimensions > 5 ? (coords[5] - centerOffset) * gridSpacing : 0;
-          positions.push({ x: localX + gridOffsetX, y: localY + gridOffsetY, z: localZ + gridOffsetZ });
-      }
-      return positions;
-  }
-  function fitText(el) {
-   const maxFontSize = 32; const minFontSize = 10;
-   let fontSize = maxFontSize;
-   el.style.fontSize = fontSize + 'px';
-   el.style.whiteSpace = 'nowrap';
-   el.style.overflow = 'hidden';
-   el.style.textOverflow = 'ellipsis';
-   const parentWidth = el.clientWidth;
-   const parentHeight = el.clientHeight;
-   while ((el.scrollWidth > parentWidth || el.scrollHeight > parentHeight) && fontSize > minFontSize) {
-    fontSize -= 1;
-    el.style.fontSize = fontSize + 'px';
-   }
-   el.style.display = 'flex';
-   el.style.alignItems = 'center';
-   el.style.justifyContent = 'center';
-   el.style.textAlign = 'center';
- }
+  function loadSettings() {
+    const saved = localStorage.getItem('barendGenSettings');
+    settings = saved ? JSON.parse(saved) : { ...defaultSettings };
+    settings = { ...defaultSettings, ...settings }; // Ensure all keys exist
+    enable3dCheckbox.checked = settings.enable3d;
+    pitchSlider.value = settings.pitch;
+    rateSlider.value = settings.rate;
+    updateSliderValues();
+  }
+  
+  // --- Three.js Initialization & Controls ---
+  function initThreeJS(){
+    if (scene) return;
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0f1226);
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / Math.max(1, canvas.clientHeight), 0.1, 1000);
+    camera.position.set(0,0,8);
+    camera.lookAt(0,0,0);
+    const ambientLight = new THREE.AmbientLight(0x6ee7f5, 0.45);
+    scene.add(ambientLight);
+    const dir = new THREE.DirectionalLight(0x9b8cff, 0.9);
+    dir.position.set(5,10,5);
+    dir.castShadow = true;
+    scene.add(dir);
+    let isRot = false, rotX = 0, rotY = Math.PI / 2, camDist = 8;
+    let lastTouch = null, lastPinch = null;
+    const getDist = (a,b) => Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+    const handleRot = (dx,dy,s=0.01) => { rotY += dx * s; rotX += dy * s; rotX = Math.max(-Math.PI/2, Math.min(Math.PI/2, rotX)); };
+    const handleZoom = (d,s=0.01) => { camDist += d * s; camDist = Math.max(3, Math.min(20, camDist)); };
+    canvas.addEventListener('mousedown', e => { isRot = true; lastTouch = {x:e.clientX,y:e.clientY}; });
+    window.addEventListener('mouseup', () => { isRot = false; lastTouch = null; });
+    canvas.addEventListener('mousemove', e => {
+      if (!isRot || !lastTouch) return;
+      handleRot(e.clientX - lastTouch.x, e.clientY - lastTouch.y, 0.012);
+      lastTouch = {x:e.clientX,y:e.clientY};
+    });
+    canvas.addEventListener('wheel', e => { e.preventDefault(); handleZoom(e.deltaY, 0.015); }, { passive:false });
+    canvas.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) { isRot = true; lastTouch = {x:e.touches[0].clientX,y:e.touches[0].clientY}; lastPinch = null; }
+      if (e.touches.length === 2) { isRot = false; lastTouch = null; lastPinch = getDist(e.touches[0], e.touches[1]); }
+    }, { passive:false });
+    canvas.addEventListener('touchmove', e => {
+      e.preventDefault();
+      if (e.touches.length === 1 && isRot && lastTouch) {
+        handleRot(e.touches[0].clientX - lastTouch.x, e.touches[0].clientY - lastTouch.y, 0.015);
+        lastTouch = {x:e.touches[0].clientX,y:e.touches[0].clientY};
+      } else if (e.touches.length === 2 && lastPinch !== null) {
+        const d = getDist(e.touches[0], e.touches[1]);
+        handleZoom(lastPinch - d, 0.02);
+        lastPinch = d;
+      }
+    }, { passive:false });
+    canvas.addEventListener('touchend', e => {
+      if (e.touches.length === 0) { isRot = false; lastTouch = null; lastPinch = null; }
+      else if (e.touches.length === 1) { isRot = true; lastTouch = {x:e.touches[0].clientX,y:e.touches[0].clientY}; lastPinch = null; }
+    }, { passive:false });
+    const resize = () => {
+      const w = canvas.clientWidth, h = Math.max(2, canvas.clientHeight);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      renderer.setPixelRatio(dpr);
+      renderer.setSize(w,h,false);
+      camera.aspect = w/h;
+      camera.updateProjectionMatrix();
+    };
+    new ResizeObserver(resize).observe(canvasContainer);
+    resize();
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+    const animate = () => {
+      requestAnimationFrame(animate);
+      camera.position.x = Math.cos(rotY) * Math.cos(rotX) * camDist;
+      camera.position.y = Math.sin(rotX) * camDist;
+      camera.position.z = Math.sin(rotY) * Math.cos(rotX) * camDist;
+      camera.lookAt(0,0,0);
+      renderer.render(scene, camera);
+    };
+    animate();
+    const handleClick = (clientX, clientY) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(wordButtons, true);
+      if (intersects.length > 0){
+        let obj = intersects[0].object;
+        while (obj && !obj.onClick && obj.parent) obj = obj.parent;
+        if (obj && obj.onClick) obj.onClick();
+      }
+    };
+    canvas.addEventListener('click', e => handleClick(e.clientX, e.clientY));
+    canvas.addEventListener('touchend', e => {
+      if (e.changedTouches && e.changedTouches.length) handleClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    });
+  }
+  
+  // --- 3D Object Creation ---
+  function createRoundedButtonGeometry(w=1.9,h=1.2,depth=BUTTON_DEPTH,r=0.16){
+    const hw = w/2, hh = h/2, radius = Math.min(r, hw, hh);
+    const shape = new THREE.Shape();
+    shape.moveTo(-hw + radius, -hh);
+    shape.lineTo(hw - radius, -hh);
+    shape.quadraticCurveTo(hw, -hh, hw, -hh + radius);
+    shape.lineTo(hw, hh - radius);
+    shape.quadraticCurveTo(hw, hh, hw - radius, hh);
+    shape.lineTo(-hw + radius, hh);
+    shape.quadraticCurveTo(-hw, hh, -hw, hh - radius);
+    shape.lineTo(-hw, -hh + radius);
+    shape.quadraticCurveTo(-hw, -hh, -hw + radius, -hh);
+    const extrude = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.06, bevelSegments: 6, curveSegments: 32 });
+    if (extrude.center) extrude.center();
+    return extrude;
+  }
+  function makeFittedTextMesh(word, planeW=1.6, planeH=0.78){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const baseW = 1024, baseH = 512;
+    const tex = document.createElement('canvas');
+    tex.width = Math.floor(baseW * dpr);
+    tex.height = Math.floor(baseH * dpr);
+    const ctx = tex.getContext('2d', { alpha:true });
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    const pad = 28, maxW = baseW - pad*2, maxH = baseH - pad*2;
+    let fs = 120; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    while (fs > 10){
+      ctx.font = `700 ${fs}px Inter, system-ui, sans-serif`;
+      if (ctx.measureText(word).width <= maxW && (fs*1.1) <= maxH) break;
+      fs -= 2;
+    }
+    ctx.clearRect(0,0,baseW,baseH);
+    ctx.shadowColor = 'rgba(110,231,245,0.14)';
+    ctx.shadowBlur = 6;
+    ctx.fillStyle = '#e8ebff';
+    ctx.font = `700 ${fs}px Inter, system-ui, sans-serif`;
+    ctx.fillText(word, baseW/2, baseH/2);
+    const texture = new THREE.CanvasTexture(tex);
+    texture.anisotropy = 4; texture.minFilter = THREE.LinearFilter; texture.needsUpdate = true;
+    const mat = new THREE.MeshBasicMaterial({ map:texture, transparent:true, side:THREE.DoubleSide });
+    const geo = new THREE.PlaneGeometry(planeW, planeH);
+    return new THREE.Mesh(geo, mat);
+  }
+  function createWordButton(word, position, index){
+    const g = new THREE.Group();
+    const geom = createRoundedButtonGeometry(1.9,1.2,BUTTON_DEPTH,0.18);
+    const baseMat = new THREE.MeshPhysicalMaterial({ color:0x161a36, metalness:0.05, roughness:0.6, clearcoat:0.6, clearcoatRoughness:0.4, opacity:0.98, transparent:true });
+    const btn = new THREE.Mesh(geom, baseMat);
+    btn.castShadow = true; btn.receiveShadow = true;
+    g.add(btn);
+    const textMesh = makeFittedTextMesh(word, 1.6, 0.78);
+    textMesh.position.z = (BUTTON_DEPTH / 2) + TEXT_Z_OFFSET;
+    g.add(textMesh);
+    g.position.set(position.x, position.y, position.z);
+    g.userData = { word, index, baseMaterial: baseMat, textMesh, buttonMesh: btn };
+    g.onClick = () => speakSingle(word, g);
+    return g;
+  }
+  
+  // --- Rendering Logic ---
+  function generatePositions(dimensions, size) {
+      if (dimensions <= 3) dimensions = 3;
+      const positions = [];
+      const pointSpacing = 2.5, cubeMargin = 5.0; 
+      const sideLength = Math.ceil(Math.pow(size, 1 / dimensions));
+      const cubeWidth = (sideLength - 1) * pointSpacing;
+      const gridSpacing = cubeWidth + cubeMargin; 
+      for (let i = 0; i < size; i++) {
+          const coords = []; let temp_i = i;
+          for (let d = 0; d < dimensions; d++) {
+              coords.push(temp_i % sideLength); temp_i = Math.floor(temp_i / sideLength);
+          }
+          const centerOffset = (sideLength - 1) / 2.0;
+          const localX = (coords[0] - centerOffset) * pointSpacing;
+          const localY = (coords[1] - centerOffset) * pointSpacing;
+          const localZ = (coords[2] - centerOffset) * pointSpacing;
+          let gridOffsetX = dimensions > 3 ? (coords[3] - centerOffset) * gridSpacing : 0;
+          let gridOffsetY = dimensions > 4 ? (coords[4] - centerOffset) * gridSpacing : 0;
+          let gridOffsetZ = dimensions > 5 ? (coords[5] - centerOffset) * gridSpacing : 0;
+          positions.push({ x: localX + gridOffsetX, y: localY + gridOffsetY, z: localZ + gridOffsetZ });
+      }
+      return positions;
+  }
+  function fitText(el) {
+   const maxFontSize = 32; const minFontSize = 10;
+   let fontSize = maxFontSize;
+   el.style.fontSize = fontSize + 'px';
+   el.style.whiteSpace = 'nowrap';
+   el.style.overflow = 'hidden';
+   el.style.textOverflow = 'ellipsis';
+   const parentWidth = el.clientWidth;
+   const parentHeight = el.clientHeight;
+   while ((el.scrollWidth > parentWidth || el.scrollHeight > parentHeight) && fontSize > minFontSize) {
+    fontSize -= 1;
+    el.style.fontSize = fontSize + 'px';
+   }
+   el.style.display = 'flex';
+   el.style.alignItems = 'center';
+   el.style.justifyContent = 'center';
+   el.style.textAlign = 'center';
+  }
  function renderGrid(words, N) {
-  if (!settings.disable3d && N >= 3 && words.length <= itemsPerPage) {
-    grid.style.display = 'none';
-    canvasContainer.style.display = 'block';
-    if (!scene) initThreeJS();
+  if (settings.enable3d && N >= 3 && words.length <= itemsPerPage) {
+    grid.style.display = 'none';
+    canvasContainer.style.display = 'block';
+    if (!scene) initThreeJS();
     const startIndex = (currentPage - 1) * itemsPerPage;
-    render3DVisualization(words.map((word, i) => ({ word, index: startIndex + i })), N);
-  } else {
+    render3DVisualization(words.map((word, i) => ({ word, index: startIndex + i })), N);
+  } else {
     const globalStartIndex = (currentPage - 1) * itemsPerPage;
-    renderVirtualizedGrid(words.map((word, i) => ({word, index: globalStartIndex + i})));
-  }
+    renderVirtualizedGrid(words.map((word, i) => ({word, index: globalStartIndex + i})));
+  }
  }
  function renderVirtualizedGrid(wordObjects) {
     const columns = 2; const gap = 8;
@@ -776,62 +776,62 @@
     });
  }
 
-  // --- Speech Synthesis ---
-  let cachedVoice = null;
-  const pickDutchVoice = () => {
-    const list = speechSynthesis.getVoices() || [];
-    cachedVoice = list.find(v => /^nl(-|$)/i.test(v.lang)) || list.find(v => /dutch|nederlands/i.test(v.name)) || list[0] || null;
-    return cachedVoice;
-  };
-  speechSynthesis.onvoiceschanged = pickDutchVoice;
-  const speakWord = (text, onend) => {
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = settings.rate; u.pitch = settings.pitch; u.volume = 1.0; u.lang = 'nl-NL';
-    const v = cachedVoice || pickDutchVoice();
-    if (v) u.voice = v;
-    u.onend = onend;
-    speechSynthesis.speak(u);
-  };
-  const clearActive = () => {
-    document.querySelectorAll('.cell.active').forEach(el => el.classList.remove('active'));
-    wordButtons.forEach(button => {
-      if (button.userData && button.userData.baseMaterial) {
-        button.children[0].material = button.userData.baseMaterial;
-      }
-    });
-  };
-  const stopSpeech = (silent=false) => { speaking=false; speechSynthesis.cancel(); if(!silent) clearActive(); };
+  // --- Speech Synthesis ---
+  let cachedVoice = null;
+  const pickDutchVoice = () => {
+    const list = speechSynthesis.getVoices() || [];
+    cachedVoice = list.find(v => /^nl(-|$)/i.test(v.lang)) || list.find(v => /dutch|nederlands/i.test(v.name)) || list[0] || null;
+    return cachedVoice;
+  };
+  speechSynthesis.onvoiceschanged = pickDutchVoice;
+  const speakWord = (text, onend) => {
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = settings.rate; u.pitch = settings.pitch; u.volume = 1.0; u.lang = 'nl-NL';
+    const v = cachedVoice || pickDutchVoice();
+    if (v) u.voice = v;
+    u.onend = onend;
+    speechSynthesis.speak(u);
+  };
+  const clearActive = () => {
+    document.querySelectorAll('.cell.active').forEach(el => el.classList.remove('active'));
+    wordButtons.forEach(button => {
+      if (button.userData && button.userData.baseMaterial) {
+        button.children[0].material = button.userData.baseMaterial;
+      }
+    });
+  };
+  const stopSpeech = (silent=false) => { speaking=false; speechSynthesis.cancel(); if(!silent) clearActive(); };
  const speakSingle = (word, element) => {
-    stopSpeech(true); clearActive();
-    if (element.userData && element.userData.baseMaterial){
-      const highlightMaterial = new THREE.MeshPhongMaterial({ color:0x9b8cff, transparent:true, opacity:0.95, emissive:0x6ee7f5, emissiveIntensity:0.4 });
-      const original = element.userData.baseMaterial;
-      element.children[0].material = highlightMaterial;
-      speakWord(word, () => { if (element && element.children && element.children[0]) element.children[0].material = original; });
-    } else {
-      element.classList.add('active');
-      speakWord(word, () => element.classList.remove('active'));
-    }
-  };
+    stopSpeech(true); clearActive();
+    if (element.userData && element.userData.baseMaterial){
+      const highlightMaterial = new THREE.MeshPhongMaterial({ color:0x9b8cff, transparent:true, opacity:0.95, emissive:0x6ee7f5, emissiveIntensity:0.4 });
+      const original = element.userData.baseMaterial;
+      element.children[0].material = highlightMaterial;
+      speakWord(word, () => { if (element && element.children && element.children[0]) element.children[0].material = original; });
+    } else {
+      element.classList.add('active');
+      speakWord(word, () => element.classList.remove('active'));
+    }
+  };
 
-  // --- Word Processing Logic ---
-  const findVowelGroups = (word) => {
-    const lower = word.toLowerCase(); const matches = []; let i=0;
-    while (i < lower.length){
-      let found = null;
-      for (const vg of vowelGroups) if (lower.startsWith(vg, i)) { found = vg; break; }
-      if (found){ matches.push({ group: found, index: i, length: found.length }); i += found.length; } else i++;
-    }
-    return matches;
-  };
-  const analyzeWord = (raw) => {
-    const word = (raw||'').trim();
-    if (!/^[A-Za-z\s]+$/.test(word)) return { ok:false };
-    const groups = findVowelGroups(word);
-    const uniqueGroups = [...new Set(groups.map(g=>g.group))];
-    if (uniqueGroups.length < 2) return { ok:false };
-    return { ok:true, word, groups, uniqueGroups };
-  };
+  // --- Word Processing Logic ---
+  const findVowelGroups = (word) => {
+    const lower = word.toLowerCase(); const matches = []; let i=0;
+    while (i < lower.length){
+      let found = null;
+      for (const vg of vowelGroups) if (lower.startsWith(vg, i)) { found = vg; break; }
+      if (found){ matches.push({ group: found, index: i, length: found.length }); i += found.length; } else i++;
+    }
+    return matches;
+  };
+  const analyzeWord = (raw) => {
+    const word = (raw||'').trim();
+    if (!/^[A-Za-z\s]+$/.test(word)) return { ok:false };
+    const groups = findVowelGroups(word);
+    const uniqueGroups = [...new Set(groups.map(g=>g.group))];
+    if (uniqueGroups.length < 2) return { ok:false };
+    return { ok:true, word, groups, uniqueGroups };
+  };
 
  function updatePaginationControls() {
     const totalPages = Math.ceil(totalCombinations / itemsPerPage);
@@ -909,7 +909,7 @@
             return;
         }
         const globalIndex = startIndex + idx;
-        if (!settings.disable3d && canvasContainer.style.display !== 'none') {
+        if (settings.enable3d && canvasContainer.style.display !== 'none') {
             const button = wordButtons.find(b => b.userData.index === globalIndex);
             if (button) {
                 clearActive();
@@ -933,18 +933,18 @@
     step(0);
  }
 
-  const showError = () => {
-    stopSpeech(true);
-    if (!modal.open) modal.showModal();
-    const u = new SpeechSynthesisUtterance('Neehee');
-    const v = cachedVoice || pickDutchVoice();
-    if (v) u.voice = v;
-    u.lang = 'nl-NL'; u.rate = 1; u.pitch = 0.9;
-    speechSynthesis.speak(u);
-  };
-  
-  // --- Event Listeners & Initialization ---
-  closeModal.addEventListener('click', () => { if (modal.open) modal.close(); input.focus(); input.select(); });
+  const showError = () => {
+    stopSpeech(true);
+    if (!modal.open) modal.showModal();
+    const u = new SpeechSynthesisUtterance('Neehee');
+    const v = cachedVoice || pickDutchVoice();
+    if (v) u.voice = v;
+    u.lang = 'nl-NL'; u.rate = 1; u.pitch = 0.9;
+    speechSynthesis.speak(u);
+  };
+  
+  // --- Event Listeners & Initialization ---
+  closeModal.addEventListener('click', () => { if (modal.open) modal.close(); input.focus(); input.select(); });
 
  form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -1027,14 +1027,14 @@
     pageInput.select();
  });
 
-  optionsBtn.addEventListener('click', () => optionsModal.showModal());
-  closeOptionsModal.addEventListener('click', () => optionsModal.close());
-  disable3dCheckbox.addEventListener('change', saveSettings);
-  pitchSlider.addEventListener('input', () => { updateSliderValues(); saveSettings(); });
-  rateSlider.addEventListener('input', () => { updateSliderValues(); saveSettings(); });
+  optionsBtn.addEventListener('click', () => optionsModal.showModal());
+  closeOptionsModal.addEventListener('click', () => optionsModal.close());
+  enable3dCheckbox.addEventListener('change', saveSettings);
+  pitchSlider.addEventListener('input', () => { updateSliderValues(); saveSettings(); });
+  rateSlider.addEventListener('input', () => { updateSliderValues(); saveSettings(); });
 
-  input.setAttribute('autofocus','true');
-  loadSettings();
+  input.setAttribute('autofocus','true');
+  loadSettings();
 })();
 </script>
 </body>
