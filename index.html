@@ -715,31 +715,37 @@ function fitText(el) {
   el.style.textAlign = 'center';
 }
 
-// --- Virtualized Grid Rendering with fixed 2 columns ---
+// --- Virtualized Grid Rendering with fixed 2 columns and spacing ---
 function renderVirtualizedGrid(words) {
   const columns = 2; // always 2 wide
-  canvasContainer.style.display = 'none';
-  grid.style.display = 'grid';
-  grid.innerHTML = '';
-  grid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+  const gap = 8; // horizontal + vertical space between buttons
 
-  const rowHeight = 72; // approximate, tune as needed
+  canvasContainer.style.display = 'none';
+  grid.style.display = 'block'; // stop using grid-template since we're absolute-positioning
+  grid.innerHTML = '';
+
+  const rowHeight = 72; 
   const buffer = 4;
+
+  // cell width calculation considering gaps
+  const gridWidth = grid.clientWidth;
+  const cellWidth = (gridWidth - (columns - 1) * gap) / columns;
+
   const totalRows = Math.ceil(words.length / columns);
   grid.style.position = 'relative';
-  grid.style.height = totalRows * rowHeight + 'px';
+  grid.style.height = totalRows * rowHeight + (totalRows - 1) * gap + 'px';
 
   const pool = {};
 
   function renderVisible() {
     const scrollTop = grid.scrollTop;
     const clientHeight = grid.clientHeight;
-    const firstRow = Math.max(0, Math.floor(scrollTop / rowHeight) - buffer);
-    const lastRow = Math.min(totalRows, Math.ceil((scrollTop + clientHeight) / rowHeight) + buffer);
+    const rowSize = rowHeight + gap;
+    const firstRow = Math.max(0, Math.floor(scrollTop / rowSize) - buffer);
+    const lastRow = Math.min(totalRows, Math.ceil((scrollTop + clientHeight) / rowSize) + buffer);
     const newStart = firstRow * columns;
     const newEnd = Math.min(words.length, lastRow * columns);
 
-    // remove offscreen
     for (let k in pool) {
       const i = parseInt(k);
       if (i < newStart || i >= newEnd) {
@@ -748,21 +754,25 @@ function renderVirtualizedGrid(words) {
       }
     }
 
-    // add visible
     for (let i = newStart; i < newEnd; i++) {
       if (!pool[i]) {
+        const row = Math.floor(i / columns);
+        const col = i % columns;
+
         const cell = document.createElement('div');
         cell.className = 'cell';
         cell.textContent = words[i];
         cell.style.position = 'absolute';
-        cell.style.top = Math.floor(i / columns) * rowHeight + 'px';
-        cell.style.left = (i % columns) * (100 / columns) + '%';
-        cell.style.width = (100 / columns) + '%';
+        cell.style.top = row * (rowHeight + gap) + 'px';
+        cell.style.left = col * (cellWidth + gap) + 'px';
+        cell.style.width = cellWidth + 'px';
         cell.style.height = rowHeight + 'px';
+        cell.style.boxSizing = 'border-box';
+
         cell.addEventListener('click', () => speakSingle(words[i], cell));
         grid.appendChild(cell);
 
-        fitText(cell); // ensure text fits inside
+        fitText(cell);
         pool[i] = cell;
       }
     }
@@ -773,8 +783,14 @@ function renderVirtualizedGrid(words) {
 
   grid._scrollToIndex = function scrollToIndex(idx) {
     const targetRow = Math.floor(idx / columns);
-    const y = targetRow * rowHeight;
-    grid.scrollTo({ top: y, behavior: 'smooth' });
+    const rowSize = rowHeight + gap;
+    const y = targetRow * rowSize;
+    const viewportHeight = grid.clientHeight;
+    const offset = (viewportHeight / 2) - (rowHeight / 2);
+    grid.scrollTo({
+      top: y - offset,
+      behavior: 'smooth'
+    });
   };
 }
 
