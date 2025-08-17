@@ -160,6 +160,9 @@
     white-space:nowrap;
     flex:0 0 auto;
     font-size:18px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
   }
   .btn:active{transform:translateY(1px)}
   .btn.primary{
@@ -170,6 +173,7 @@
     color:#dbe7ff;background:rgba(255,255,255,.04);
     border:1px solid rgba(255,255,255,.06);
   }
+  .btn.ghost svg { vertical-align: middle; }
   .btn.stop{
     color:#33000b;background:linear-gradient(135deg,#ff97aa,var(--danger));
     box-shadow:0 10px 30px rgba(255,77,109,.12);
@@ -180,6 +184,29 @@
     display:grid;
     gap:14px;
   }
+  
+  #grid {
+    max-height: clamp(320px, 60vh, 600px);
+    overflow-y: auto;
+    padding-right: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
+  }
+  #grid::-webkit-scrollbar {
+      width: 8px;
+  }
+  #grid::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+  }
+  #grid::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+  }
+  #grid::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+  }
+
 
   .cell{
     border-radius:14px;
@@ -250,6 +277,46 @@
   .modal-body{padding:14px 16px;color:#dfe5ff}
   .modal-actions{padding:12px 16px;display:flex;justify-content:flex-end;background:#0e1230}
   .kbd{font:600 12px ui-monospace,Menlo,Monaco,monospace;background:#0e1230;border:1px solid rgba(255,255,255,.12);padding:2px 6px;border-radius:6px;color:#b8c0de}
+  
+  /* Options Modal Styles */
+  .option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .option-row:last-child { border-bottom: none; }
+  .option-row label { flex-grow: 1; }
+  .option-row input[type="range"] { flex: 0 1 140px; }
+  .slider-value { font-weight: 600; min-width: 32px; text-align: right; color: var(--muted); }
+
+  .toggle-switch {
+    appearance: none;
+    width: 40px;
+    height: 22px;
+    background: #333863;
+    border-radius: 22px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+  }
+  .toggle-switch::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.2s ease;
+  }
+  .toggle-switch:checked { background: var(--accent-3); }
+  .toggle-switch:checked::before { transform: translateX(18px); }
+
 
   @media (max-width:680px){
     .wrap{width:calc(100% - 24px)}
@@ -284,6 +351,11 @@
         <button type="submit" class="btn primary" id="generate">Genereren</button>
         <button type="button" class="btn ghost" id="speak">Opnieuw</button>
         <button type="button" class="btn stop" id="stop">Stop</button>
+        <button type="button" class="btn ghost" id="options-btn" aria-label="Instellingen">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
+            </svg>
+        </button>
       </form>
     </header>
 
@@ -302,12 +374,33 @@
     </section>
   </div>
 
-  <dialog id="modal" aria-modal="true" role="dialog">
-    <div class="modal-head"><div class="modal-title">NEEHEE</div></div>
+  <dialog id="modal" aria-modal="true" role="dialog" aria-labelledby="error-modal-title">
+    <div class="modal-head"><div id="error-modal-title" class="modal-title">NEEHEE</div></div>
     <div class="modal-body">
       <p>Het woord moet minstens twee verschillende klinkergroepen bevatten. Geldige groepen: <span class="kbd">a aa e ee i ie o oo u uu oe eu ui ij ei ai au ou</span>.</p>
     </div>
     <div class="modal-actions"><button class="btn primary" id="close-modal">OK</button></div>
+  </dialog>
+
+  <dialog id="options-modal" aria-modal="true" role="dialog" aria-labelledby="options-modal-title">
+    <div class="modal-head"><div id="options-modal-title" class="modal-title">Instellingen</div></div>
+    <div class="modal-body">
+      <div class="option-row">
+        <label for="disable-3d">3D weergave uitschakelen</label>
+        <input type="checkbox" id="disable-3d" class="toggle-switch">
+      </div>
+      <div class="option-row">
+        <label for="pitch-slider">Toonhoogte</label>
+        <input type="range" id="pitch-slider" min="0" max="2" step="0.1">
+        <span id="pitch-value" class="slider-value"></span>
+      </div>
+      <div class="option-row">
+        <label for="rate-slider">Snelheid</label>
+        <input type="range" id="rate-slider" min="0.1" max="10" step="0.1">
+        <span id="rate-value" class="slider-value"></span>
+      </div>
+    </div>
+    <div class="modal-actions"><button class="btn primary" id="close-options-modal">Sluiten</button></div>
   </dialog>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -319,22 +412,15 @@
   let currentMorphState = 0;
   
   function morphTitle() {
-    // Remove current state
     title.classList.remove(morphStates[currentMorphState]);
-    
-    // Move to next state
     currentMorphState = (currentMorphState + 1) % morphStates.length;
-    
-    // Add new state
     title.classList.add(morphStates[currentMorphState]);
   }
   
-  // Initialize with first state
   title.classList.add(morphStates[currentMorphState]);
-  
-  // Start morphing animation
   setInterval(morphTitle, 2000);
 
+  // Constants & DOM Elements
   const BUTTON_DEPTH = 0.28;
   const TEXT_Z_OFFSET = 0.08;
   const vowelGroups = ['aa','ee','ii','ie','oo','uu','oe','eu','ui','ij','ei','ai','au','ou','a','e','i','o','u'];
@@ -348,14 +434,54 @@
   const dimensionInfo = document.getElementById('dimension-info');
   const btnSpeak = document.getElementById('speak');
   const btnStop = document.getElementById('stop');
+  
+  // Modals
   const modal = document.getElementById('modal');
   const closeModal = document.getElementById('close-modal');
+  const optionsBtn = document.getElementById('options-btn');
+  const optionsModal = document.getElementById('options-modal');
+  const closeOptionsModal = document.getElementById('close-options-modal');
+  
+  // Options Controls
+  const disable3dCheckbox = document.getElementById('disable-3d');
+  const pitchSlider = document.getElementById('pitch-slider');
+  const rateSlider = document.getElementById('rate-slider');
+  const pitchValueSpan = document.getElementById('pitch-value');
+  const rateValueSpan = document.getElementById('rate-value');
 
+  // App State
   let scene, camera, renderer;
   let wordButtons = [];
   let speaking = false;
   let raycaster, mouse;
+  let settings = {};
 
+  // --- Settings Management ---
+  const defaultSettings = { disable3d: false, pitch: 1.0, rate: 1.00 };
+
+  function saveSettings() {
+    settings.disable3d = disable3dCheckbox.checked;
+    settings.pitch = parseFloat(pitchSlider.value);
+    settings.rate = parseFloat(rateSlider.value);
+    localStorage.setItem('barendGenSettings', JSON.stringify(settings));
+  }
+
+  function updateSliderValues() {
+    pitchValueSpan.textContent = parseFloat(pitchSlider.value).toFixed(2);
+    rateValueSpan.textContent = parseFloat(rateSlider.value).toFixed(2);
+  }
+
+  function loadSettings() {
+    const saved = localStorage.getItem('barendGenSettings');
+    settings = saved ? JSON.parse(saved) : { ...defaultSettings };
+    settings = { ...defaultSettings, ...settings }; // Ensure all keys exist
+    disable3dCheckbox.checked = settings.disable3d;
+    pitchSlider.value = settings.pitch;
+    rateSlider.value = settings.rate;
+    updateSliderValues();
+  }
+  
+  // --- Three.js Initialization & Controls ---
   function initThreeJS(){
     if (scene) return;
     scene = new THREE.Scene();
@@ -376,10 +502,7 @@
     dir.castShadow = true;
     scene.add(dir);
 
-    let isRot = false;
-    let rotX = 0;
-    let rotY = Math.PI / 2;
-    let camDist = 8;
+    let isRot = false, rotX = 0, rotY = Math.PI / 2, camDist = 8;
     let lastTouch = null, lastPinch = null;
 
     const getDist = (a,b) => Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
@@ -423,8 +546,7 @@
       camera.aspect = w/h;
       camera.updateProjectionMatrix();
     };
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvasContainer);
+    new ResizeObserver(resize).observe(canvasContainer);
     resize();
 
     raycaster = new THREE.Raycaster();
@@ -436,17 +558,6 @@
       camera.position.y = Math.sin(rotX) * camDist;
       camera.position.z = Math.sin(rotY) * Math.cos(rotX) * camDist;
       camera.lookAt(0,0,0);
-
-      for (let i=0;i<wordButtons.length;i++){
-        const btn = wordButtons[i];
-        if (!btn || !btn.userData) continue;
-        const tm = btn.userData.textMesh;
-        if (tm){
-          tm.rotation.set(0,0,0);
-          tm.scale.set(1,1,1);
-        }
-      }
-
       renderer.render(scene, camera);
     };
     animate();
@@ -468,7 +579,8 @@
       if (e.changedTouches && e.changedTouches.length) handleClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
     });
   }
-
+  
+  // --- 3D Object Creation ---
   function createRoundedButtonGeometry(w=1.9,h=1.2,depth=BUTTON_DEPTH,r=0.16){
     const hw = w/2, hh = h/2, radius = Math.min(r, hw, hh);
     const shape = new THREE.Shape();
@@ -482,12 +594,7 @@
     shape.lineTo(-hw, -hh + radius);
     shape.quadraticCurveTo(-hw, -hh, -hw + radius, -hh);
     const extrude = new THREE.ExtrudeGeometry(shape, {
-      depth,
-      bevelEnabled: true,
-      bevelThickness: 0.06,
-      bevelSize: 0.06,
-      bevelSegments: 6,
-      curveSegments: 32
+      depth, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.06, bevelSegments: 6, curveSegments: 32
     });
     if (extrude.center) extrude.center();
     return extrude;
@@ -502,19 +609,11 @@
     const ctx = tex.getContext('2d', { alpha:true });
     ctx.setTransform(dpr,0,0,dpr,0,0);
 
-    const pad = 28;
-    const maxW = baseW - pad*2;
-    const maxH = baseH - pad*2;
-
-    let fs = 120;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    const pad = 28, maxW = baseW - pad*2, maxH = baseH - pad*2;
+    let fs = 120; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     while (fs > 10){
-      ctx.clearRect(0,0,baseW,baseH);
       ctx.font = `700 ${fs}px Inter, system-ui, sans-serif`;
-      const w = ctx.measureText(word).width;
-      const h = fs * 1.1;
-      if (w <= maxW && h <= maxH) break;
+      if (ctx.measureText(word).width <= maxW && (fs*1.1) <= maxH) break;
       fs -= 2;
     }
 
@@ -526,20 +625,14 @@
     ctx.fillText(word, baseW/2, baseH/2);
 
     const texture = new THREE.CanvasTexture(tex);
-    texture.anisotropy = 4;
-    texture.minFilter = THREE.LinearFilter;
-    texture.needsUpdate = true;
-
-    const mat = new THREE.MeshBasicMaterial({ map:texture, transparent:true, side:THREE.DoubleSide, depthTest:true, depthWrite:true });
+    texture.anisotropy = 4; texture.minFilter = THREE.LinearFilter; texture.needsUpdate = true;
+    const mat = new THREE.MeshBasicMaterial({ map:texture, transparent:true, side:THREE.DoubleSide });
     const geo = new THREE.PlaneGeometry(planeW, planeH);
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.renderOrder = 999;
-    return { textMesh: mesh, fontSize: fs };
+    return new THREE.Mesh(geo, mat);
   }
 
   function createWordButton(word, position, index){
     const g = new THREE.Group();
-
     const geom = createRoundedButtonGeometry(1.9,1.2,BUTTON_DEPTH,0.18);
     const baseMat = new THREE.MeshPhysicalMaterial({
       color:0x161a36, metalness:0.05, roughness:0.6, clearcoat:0.6, clearcoatRoughness:0.4, opacity:0.98, transparent:true
@@ -548,69 +641,38 @@
     btn.castShadow = true; btn.receiveShadow = true;
     g.add(btn);
 
-    const rim = new THREE.Mesh(geom.clone(), new THREE.MeshStandardMaterial({
-      color:0x1b2148, metalness:0.3, roughness:0.9, opacity:0.35, transparent:true
-    }));
-    rim.scale.set(1.02,1.02,1.02);
-    g.add(rim);
-
-    const { textMesh } = makeFittedTextMesh(word, 1.6, 0.78);
+    const textMesh = makeFittedTextMesh(word, 1.6, 0.78);
     textMesh.position.z = (BUTTON_DEPTH / 2) + TEXT_Z_OFFSET;
-    textMesh.userData = { isText:true, word };
     g.add(textMesh);
 
     g.position.set(position.x, position.y, position.z);
     g.userData = { word, index, baseMaterial: baseMat, textMesh, buttonMesh: btn };
-
     g.onClick = () => speakSingle(word, g);
     return g;
   }
-
+  
+  // --- Rendering Logic ---
   function generatePositions(dimensions, size) {
-      if (dimensions <= 3) {
-          dimensions = 3;
-      }
-
+      if (dimensions <= 3) dimensions = 3;
       const positions = [];
-      const pointSpacing = 2.5; 
-      const cubeMargin = 5.0; 
-
+      const pointSpacing = 2.5, cubeMargin = 5.0; 
       const sideLength = Math.ceil(Math.pow(size, 1 / dimensions));
-
       const cubeWidth = (sideLength - 1) * pointSpacing;
       const gridSpacing = cubeWidth + cubeMargin; 
 
       for (let i = 0; i < size; i++) {
-          const coords = [];
-          let temp_i = i;
+          const coords = []; let temp_i = i;
           for (let d = 0; d < dimensions; d++) {
-              coords.push(temp_i % sideLength);
-              temp_i = Math.floor(temp_i / sideLength);
+              coords.push(temp_i % sideLength); temp_i = Math.floor(temp_i / sideLength);
           }
-
           const centerOffset = (sideLength - 1) / 2.0;
-
           const localX = (coords[0] - centerOffset) * pointSpacing;
           const localY = (coords[1] - centerOffset) * pointSpacing;
           const localZ = (coords[2] - centerOffset) * pointSpacing;
-
           let gridOffsetX = dimensions > 3 ? (coords[3] - centerOffset) * gridSpacing : 0;
           let gridOffsetY = dimensions > 4 ? (coords[4] - centerOffset) * gridSpacing : 0;
           let gridOffsetZ = dimensions > 5 ? (coords[5] - centerOffset) * gridSpacing : 0;
-
-          if (dimensions > 6) {
-              for (let d = 6; d < dimensions; d++) {
-                  const factor = 0.5 / (d - 5); 
-                  gridOffsetX += (coords[d] - centerOffset) * gridSpacing * factor * Math.cos(d);
-                  gridOffsetY += (coords[d] - centerOffset) * gridSpacing * factor * Math.sin(d);
-              }
-          }
-
-          positions.push({
-              x: localX + gridOffsetX,
-              y: localY + gridOffsetY,
-              z: localZ + gridOffsetZ,
-          });
+          positions.push({ x: localX + gridOffsetX, y: localY + gridOffsetY, z: localZ + gridOffsetZ });
       }
       return positions;
   }
@@ -619,15 +681,12 @@
     initThreeJS();
     wordButtons.forEach(b => scene.remove(b));
     wordButtons = [];
-
     let positions = generatePositions(numDimensions, words.length);
     dimensionInfo.textContent = (numDimensions === 3) ? `3D Kubus (${words.length} varianten)` : `${numDimensions}D Hyperkubus (${words.length} varianten)`;
-
     words.forEach((w,i) => {
       if (i < positions.length){
         const btn = createWordButton(w, positions[i], i);
-        scene.add(btn);
-        wordButtons.push(btn);
+        scene.add(btn); wordButtons.push(btn);
       }
     });
   }
@@ -638,87 +697,34 @@
   }
 
   function renderGrid(words, N){
-    if (N === 3 || N >= 4){
-      grid.style.display = 'none';
-      canvasContainer.style.display = 'block';
+    if (!settings.disable3d && N >= 3){
+      grid.style.display = 'none'; canvasContainer.style.display = 'block';
       if (!scene) initThreeJS();
       render3DVisualization(words, N);
     } else {
-      canvasContainer.style.display = 'none';
-      grid.style.display = 'grid';
-      grid.innerHTML = '';
-      grid.style.gridTemplateColumns = `repeat(${N}, 1fr)`;
+      canvasContainer.style.display = 'none'; grid.style.display = 'grid';
+      grid.innerHTML = ''; grid.style.gridTemplateColumns = `repeat(${Math.min(N, 6)}, 1fr)`;
       words.forEach((w,i) => {
         const cell = document.createElement('div');
         cell.className = 'cell'; cell.id = 'w'+i; cell.textContent = w;
         cell.addEventListener('click', () => speakSingle(w, cell));
-        grid.appendChild(cell);
-        fitText(cell);
+        grid.appendChild(cell); fitText(cell);
       });
     }
   }
 
+  // --- Speech Synthesis ---
   let cachedVoice = null;
   const pickDutchVoice = () => {
     const list = speechSynthesis.getVoices() || [];
-    const byLang = list.find(v => /^nl(-|$)/i.test(v.lang));
-    const byName = list.find(v => /dutch|nederlands/i.test(v.name));
-    cachedVoice = byLang || byName || list.find(v => /^nl/i.test(v.lang)) || list[0] || null;
+    cachedVoice = list.find(v => /^nl(-|$)/i.test(v.lang)) || list.find(v => /dutch|nederlands/i.test(v.name)) || list[0] || null;
     return cachedVoice;
   };
   speechSynthesis.onvoiceschanged = pickDutchVoice;
 
-  const findVowelGroups = (word) => {
-    const lower = word.toLowerCase();
-    const matches = []; let i=0;
-    while (i < lower.length){
-      let found = null;
-      for (const vg of vowelGroups) if (lower.startsWith(vg, i)) { found = vg; break; }
-      if (found){ matches.push({ group: found, index: i, length: found.length }); i += found.length; }
-      else i++;
-    }
-    return matches;
-  };
-
-  const analyzeWord = (raw) => {
-    const word = (raw||'').trim();
-    if (!/^[A-Za-z]+( [A-Za-z]+)*$/.test(word)) return { ok:false };
-    const groups = findVowelGroups(word);
-    const uniqueGroups = [...new Set(groups.map(g=>g.group))];
-    if (uniqueGroups.length < 2) return { ok:false };
-    return { ok:true, word, groups, uniqueGroups };
-  };
-
-  const generateAllCombinations = (uniqueGroups, numPositions) => {
-    const combos=[]; const total = Math.pow(uniqueGroups.length, numPositions);
-    for (let i=0;i<total;i++){
-      const combo=[]; let temp=i;
-      for (let pos=0; pos<numPositions; pos++){ combo.push(uniqueGroups[temp % uniqueGroups.length]); temp = Math.floor(temp / uniqueGroups.length); }
-      combos.push(combo);
-    }
-    return combos;
-  };
-
-  const buildVariants = (word, groups, uniqueGroups) => {
-    const numVowelGroups = groups.length;
-    const combos = generateAllCombinations(uniqueGroups, numVowelGroups);
-    const variants = [];
-    for (const combo of combos){
-      let res = '', pos = 0;
-      for (let i=0;i<groups.length;i++){
-        const group = groups[i];
-        res += word.slice(pos, group.index) + combo[i];
-        pos = group.index + group.length;
-      }
-      res += word.slice(pos);
-      variants.push(res);
-    }
-    return variants;
-  };
-
   const speakWord = (text, onend) => {
     const u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.95; u.pitch = 1.0; u.volume = 1.0; u.lang = 'nl-NL';
+    u.rate = settings.rate; u.pitch = settings.pitch; u.volume = 1.0; u.lang = 'nl-NL';
     const v = cachedVoice || pickDutchVoice();
     if (v) u.voice = v;
     u.onend = onend;
@@ -768,6 +774,50 @@
     }
   };
 
+  // --- Word Processing Logic ---
+  const findVowelGroups = (word) => {
+    const lower = word.toLowerCase(); const matches = []; let i=0;
+    while (i < lower.length){
+      let found = null;
+      for (const vg of vowelGroups) if (lower.startsWith(vg, i)) { found = vg; break; }
+      if (found){ matches.push({ group: found, index: i, length: found.length }); i += found.length; } else i++;
+    }
+    return matches;
+  };
+
+  const analyzeWord = (raw) => {
+    const word = (raw||'').trim();
+    if (!/^[A-Za-z\s]+$/.test(word)) return { ok:false };
+    const groups = findVowelGroups(word);
+    const uniqueGroups = [...new Set(groups.map(g=>g.group))];
+    if (uniqueGroups.length < 2) return { ok:false };
+    return { ok:true, word, groups, uniqueGroups };
+  };
+
+  const generateAllCombinations = (uniqueGroups, numPositions) => {
+    const combos=[]; const total = Math.pow(uniqueGroups.length, numPositions);
+    for (let i=0;i<total;i++){
+      const combo=[]; let temp=i;
+      for (let pos=0; pos<numPositions; pos++){ combo.push(uniqueGroups[temp % uniqueGroups.length]); temp = Math.floor(temp / uniqueGroups.length); }
+      combos.push(combo);
+    }
+    return combos;
+  };
+
+  const buildVariants = (word, groups, uniqueGroups) => {
+    const combos = generateAllCombinations(uniqueGroups, groups.length);
+    return combos.map(combo => {
+      let res = '', pos = 0;
+      for (let i=0;i<groups.length;i++){
+        const group = groups[i];
+        res += word.slice(pos, group.index) + combo[i];
+        pos = group.index + group.length;
+      }
+      res += word.slice(pos);
+      return res;
+    });
+  };
+
   const showError = () => {
     stopSpeech(true);
     if (!modal.open) modal.showModal();
@@ -777,31 +827,37 @@
     u.lang = 'nl-NL'; u.rate = 1; u.pitch = 0.9;
     speechSynthesis.speak(u);
   };
-
+  
+  // --- Event Listeners & Initialization ---
   closeModal.addEventListener('click', () => { if (modal.open) modal.close(); input.focus(); input.select(); });
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const check = analyzeWord(input.value);
     if (!check.ok) { showError(); return; }
-
     outputCard.style.display = 'block';
-    
     const variants = buildVariants(check.word, check.groups, check.uniqueGroups);
     renderGrid(variants, check.uniqueGroups.length);
     playSequence(variants);
   });
 
   btnSpeak.addEventListener('click', () => {
-    let words = [];
-    if (canvasContainer.style.display !== 'none') words = wordButtons.map(b => b.userData.word);
-    else words = [...grid.querySelectorAll('.cell')].map(x => x.textContent);
+    let words = (canvasContainer.style.display !== 'none') 
+      ? wordButtons.map(b => b.userData.word)
+      : [...grid.querySelectorAll('.cell')].map(x => x.textContent);
     if (words.length) playSequence(words);
   });
 
   btnStop.addEventListener('click', () => stopSpeech());
 
+  optionsBtn.addEventListener('click', () => optionsModal.showModal());
+  closeOptionsModal.addEventListener('click', () => optionsModal.close());
+  disable3dCheckbox.addEventListener('change', saveSettings);
+  pitchSlider.addEventListener('input', () => { updateSliderValues(); saveSettings(); });
+  rateSlider.addEventListener('input', () => { updateSliderValues(); saveSettings(); });
+
   input.setAttribute('autofocus','true');
+  loadSettings();
 })();
 </script>
 </body>
