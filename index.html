@@ -360,6 +360,7 @@
     </header>
 
     <section id="output-card" class="card" aria-live="polite" style="display:none;">
+      <div id="combo-count" style="margin-top:8px;font-weight:600;color:var(--muted);"></div>
       <div id="grid" class="grid" aria-hidden="false"></div>
       <div id="canvas-container" style="display:none;">
         <canvas id="three-canvas" role="img" aria-label="3D knoppen canvas"></canvas>
@@ -682,7 +683,7 @@
     wordButtons.forEach(b => scene.remove(b));
     wordButtons = [];
     let positions = generatePositions(numDimensions, words.length);
-    dimensionInfo.textContent = (numDimensions === 3) ? `3D Kubus (${words.length} varianten)` : `${numDimensions}D Hyperkubus (${words.length} varianten)`;
+    dimensionInfo.textContent = (numDimensions === 3) ? `3D Kubus` : `${numDimensions}D Hyperkubus`;
     words.forEach((w,i) => {
       if (i < positions.length){
         const btn = createWordButton(w, positions[i], i);
@@ -922,6 +923,8 @@ const playSequence = (words) => {
   // --- Event Listeners & Initialization ---
   closeModal.addEventListener('click', () => { if (modal.open) modal.close(); input.focus(); input.select(); });
 
+  const comboCount = document.getElementById('combo-count');
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const check = analyzeWord(input.value);
@@ -929,6 +932,7 @@ const playSequence = (words) => {
     outputCard.style.display = 'block';
     const variants = buildVariants(check.word, check.groups, check.uniqueGroups);
     renderGrid(variants, check.uniqueGroups.length);
+    comboCount.textContent = `${variants.length} combinaties gegenereerd.`;
     playSequence(variants);
   });
 
