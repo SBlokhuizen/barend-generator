@@ -1940,9 +1940,25 @@ const speakSingle = (word, element) => {
     languageSelect.innerHTML = '';
 
     uniqueLangs.forEach(voice => {
+        // Skip any voices that don't have a valid lang property
+        if (!voice || !voice.lang) {
+            return;
+        }
+
         const option = document.createElement('option');
         option.value = voice.lang;
-        const langName = langDisplayNames.of(voice.lang.split('-')[0]) || voice.lang;
+        let langName;
+
+        try {
+            // This is the line that was causing the error
+            langName = langDisplayNames.of(voice.lang.split('-')[0]);
+        } catch (e) {
+            // If an error is caught, it means the language code is invalid.
+            // We'll just use the raw code as a fallback display name.
+            console.warn(`Invalid language code found: "${voice.lang}"`);
+            langName = voice.lang;
+        }
+        
         option.textContent = `${langName} (${voice.lang})`;
         languageSelect.appendChild(option);
     });
