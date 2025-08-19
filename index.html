@@ -443,6 +443,47 @@
     padding: 12px 16px 16px 16px;
     background: rgba(0,0,0,0.1);
   }
+  
+  /* Barendroom Animation Styles */
+  #barendroom-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: linear-gradient(to top, #6dd5ed, #2193b0);
+    opacity: 0; animation: fadeIn 1s forwards;
+    overflow: hidden; cursor: pointer;
+  }
+  .barendroom-popup {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    background: rgba(255,255,255,0.9);
+    color: #2193b0; border-radius: 24px;
+    padding: 30px 50px; text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    animation: popUp 1s 0.5s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .barendroom-popup h2 { font-size: 48px; margin: 0; }
+  .barendroom-popup p { font-size: 20px; margin: 10px 0 0; }
+  .cloud {
+    position: absolute;
+    background: radial-gradient(circle, white 60%, rgba(255,255,255,0) 100%);
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: moveCloud 20s linear infinite;
+  }
+  .cloud.c1 { width: 200px; height: 60px; top: 10%; left: -250px; }
+  .cloud.c2 { width: 300px; height: 90px; top: 25%; left: -350px; animation-duration: 25s; animation-delay: -5s;}
+  .cloud.c3 { width: 150px; height: 45px; top: 60%; left: -200px; animation-duration: 18s; animation-delay: -10s;}
+  .confetti {
+    position: absolute; width: 10px; height: 20px;
+    background: #f00; opacity: 0.8;
+    animation: fall 5s linear infinite;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes popUp { from { transform: translate(-50%, -50%) scale(0.5); } to { transform: translate(-50%, -50%) scale(1); } }
+  @keyframes moveCloud { from { transform: translateX(0); } to { transform: translateX(calc(100vw + 400px)); } }
+  @keyframes fall {
+    from { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+    to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
 
 
   @media (max-width:680px){
@@ -669,6 +710,8 @@
   const itemsPerPage = 100;
   let currentAnalysis = {};
   let currentPlaybackId = null;
+  const wordlist = new Set();
+  let wordlistLoaded = false;
 
   // DOM Refs for dynamic elements
   const comboCount = document.getElementById('combo-count');
@@ -678,6 +721,79 @@
   const nextPageBtn = document.getElementById('next-page');
 
   const shareBtn = document.getElementById('share-btn');
+
+  // --- Barendroom Feature ---
+  async function loadWordlist() {
+    try {
+      const response = await fetch('wordlist.txt');
+      if (!response.ok) {
+        console.error('Wordlist not found or failed to load.');
+        return;
+      }
+      const text = await response.text();
+      text.split('\n').forEach(word => {
+        if (word) wordlist.add(word.trim().toLowerCase());
+      });
+      wordlistLoaded = true;
+      console.log(`Wordlist loaded with ${wordlist.size} words.`);
+    } catch (e) {
+      console.error('Error loading wordlist:', e);
+    }
+  }
+
+  function checkAllWordsExist(analysis) {
+    if (!wordlistLoaded || wordlist.size === 0) return false;
+    const count = Math.pow(analysis.uniqueGroups.length, analysis.groups.length);
+    // Let's not check astronomically large numbers of words
+    if (count > 50000) return false; 
+    for(let i=0; i < count; i++) {
+        const variant = buildNthVariant(i, analysis);
+        if (!wordlist.has(variant.toLowerCase())) {
+            return false;
+        }
+    }
+    return true;
+  }
+
+  function showBarendroomAnimation() {
+    const overlay = document.createElement('div');
+    overlay.id = 'barendroom-overlay';
+    
+    const popup = document.createElement('div');
+    popup.className = 'barendroom-popup';
+    popup.innerHTML = `<h2>Gefeliciteerd!</h2><p>Je hebt een <strong>Barendroom</strong> gevonden!</p>`;
+    
+    overlay.appendChild(popup);
+    
+    // Clouds
+    for (let i = 1; i <= 3; i++) {
+        const cloud = document.createElement('div');
+        cloud.className = `cloud c${i}`;
+        overlay.appendChild(cloud);
+    }
+
+    // Confetti
+    const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f', '#9b59b6', '#1abc9c'];
+    for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = `${Math.random() * 100}vw`;
+        confetti.style.top = `${-20 - Math.random() * 80}vh`; // Start above screen
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        confetti.style.animationDelay = `${Math.random() * 5}s`;
+        confetti.style.animationDuration = `${3 + Math.random() * 3}s`;
+        overlay.appendChild(confetti);
+    }
+
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', () => {
+        overlay.style.animation = 'fadeOut 1s forwards';
+        overlay.addEventListener('animationend', () => overlay.remove());
+    });
+  }
+
 
   // --- Settings Management ---
   const defaultAllowedVowels = TWO_LETTER_VOWELS.reduce((acc, vg) => ({ ...acc, [vg]: true }), {});
@@ -1140,7 +1256,7 @@ const speakSingle = (word, element) => {
     nextPageBtn.disabled = currentPage >= totalPages;
     prevPageBtn.style.opacity = prevPageBtn.disabled ? 0.4 : 1;
     nextPageBtn.style.opacity = nextPageBtn.disabled ? 0.4 : 1;
- }
+   }
 
   function buildNthVariant(n, analysis) {
     const { word, groups, uniqueGroups } = analysis;
@@ -1310,11 +1426,17 @@ const speakSingle = (word, element) => {
   });
 
   function proceedWithGeneration() {
-    outputCard.style.display = 'block';
     currentAnalysis = window._pendingAnalysis;
     totalCombinations = Math.pow(currentAnalysis.uniqueGroups.length, currentAnalysis.groups.length);
-    displayPage(1);
-    playCurrentPage();
+    
+    if (checkAllWordsExist(currentAnalysis)) {
+        showBarendroomAnimation();
+        outputCard.style.display = 'none';
+    } else {
+        outputCard.style.display = 'block';
+        displayPage(1);
+        playCurrentPage();
+    }
     window._pendingAnalysis = null;
   }
 
@@ -1519,6 +1641,7 @@ const speakSingle = (word, element) => {
 
   // --- Final Initialization ---
   input.setAttribute('autofocus','true');
+  loadWordlist();
   populateVowelOptions();
   initializeFromUrl();
   populateLanguageOptions();
