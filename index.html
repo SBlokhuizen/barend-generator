@@ -706,6 +706,9 @@
         <input type="range" id="rate-slider" min="0.1" max="10" step="0.1">
         <span id="rate-value" class="slider-value"></span>
       </div>
+      <div class="option-row">
+        <button type="button" class="btn ghost" id="reset-settings-btn" style="padding: 8px 16px; font-size: 14px; width: 100%;">Instellingen resetten</button>
+      </div>
     </div>
     <div class="modal-actions"><button class="btn primary" id="close-options-modal">Sluiten</button></div>
   </dialog>
@@ -764,6 +767,7 @@
   const vowelGroupGrid = document.getElementById('vowel-group-grid');
   const vowelsSelectAllBtn = document.getElementById('vowels-all');
   const vowelsSelectNoneBtn = document.getElementById('vowels-none');
+  const resetSettingsBtn = document.getElementById('reset-settings-btn');
 
   // App State
   let scene, camera, renderer;
@@ -1236,6 +1240,7 @@ function startBouncingAnimation(originalCells) {
     settings.allowedVowelGroups = { ...defaultAllowedVowels, ...(settings.allowedVowelGroups || {}) };
     
     enable3dCheckbox.checked = settings.enable3d;
+    languageSelect.value = settings.language;
     pitchSlider.value = settings.pitch;
     rateSlider.value = settings.rate;
     vowelOptionsDetails.open = settings.vowelOptionsExpanded;
@@ -1253,7 +1258,7 @@ function startBouncingAnimation(originalCells) {
 
   function loadSettings() {
     const saved = localStorage.getItem('barendGenSettings');
-    const loadedSettings = saved ? JSON.parse(saved) : { ...defaultSettings };
+    const loadedSettings = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultSettings));
     applySettings(loadedSettings);
   }
   
@@ -1903,6 +1908,13 @@ const speakSingle = (word, element) => {
   languageSelect.addEventListener('change', saveSettings);
   pitchSlider.addEventListener('input', () => { updateSliderValues(); saveSettings(); });
   rateSlider.addEventListener('input', () => { updateSliderValues(); saveSettings(); });
+
+  resetSettingsBtn.addEventListener('click', () => {
+    // Apply default settings directly to the UI
+    applySettings(JSON.parse(JSON.stringify(defaultSettings)));
+    // Save these default settings to localStorage
+    saveSettings();
+  });
 
   vowelOptionsDetails.addEventListener('toggle', saveSettings);
   vowelsSelectAllBtn.addEventListener('click', () => {
