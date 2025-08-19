@@ -876,7 +876,6 @@ function startBarendroomSequence(analysis) {
       grid.style.display = 'grid'; 
       grid.innerHTML = '';
 
-      // --- THIS IS THE FIX ---
       // Explicitly set two columns to match the normal layout.
       grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
       
@@ -1135,10 +1134,13 @@ function startBouncingAnimation(originalCells) {
         popup.appendChild(returnBtn);
         overlay.appendChild(popup);
         
-        returnBtn.addEventListener('click', () => {
+        returnBtn.addEventListener('click', () => {
             cancelAnimationFrame(barendroomAnimationId);
             barendroomAnimationId = null;
             document.body.removeChild(overlay);
+            
+            outputCard.style.display = 'block';
+            displayPage(1);
         });
     }
 
