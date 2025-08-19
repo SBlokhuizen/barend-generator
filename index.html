@@ -4,6 +4,15 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Barend Generator</title>
+
+<meta name="description" content="Generate and listen to all vowel combinations of a word. Create your own Barendogram!">
+<link rel="icon" type="image/jpeg" href="barend_icon.jpeg">
+<meta property="og:title" content="Barend Generator">
+<meta property="og:description" content="Generate and listen to all vowel combinations of a word.">
+<meta property="og:image" content="https://sblokhuizen.github.io/barend/barend.jpeg">
+<meta property="og:url" content="https://sblokhuizen.github.io/barend/">
+<meta property="og:type" content="website">
+
 <style>
   :root{
     --bg:#0f1226;
@@ -952,7 +961,7 @@
    el.style.justifyContent = 'center';
    el.style.textAlign = 'center';
   }
- function renderGrid(words, N) {
+function renderGrid(words, N) {
   if (settings.enable3d && N >= 3 && words.length <= itemsPerPage) {
     grid.style.display = 'none';
     canvasContainer.style.display = 'block';
@@ -963,8 +972,8 @@
     const globalStartIndex = (currentPage - 1) * itemsPerPage;
     renderVirtualizedGrid(words.map((word, i) => ({word, index: globalStartIndex + i})));
   }
- }
- function renderVirtualizedGrid(wordObjects) {
+}
+function renderVirtualizedGrid(wordObjects) {
     const columns = 2; const gap = 8;
     canvasContainer.style.display = 'none';
     grid.style.display = 'block';
@@ -1024,8 +1033,8 @@
         const offset = (viewportHeight / 2) - (rowHeight / 2);
         grid.scrollTo({ top: y - offset, behavior: 'smooth' });
     };
- }
- function render3DVisualization(wordObjects, numDimensions) {
+}
+  function render3DVisualization(wordObjects, numDimensions) {
     initThreeJS();
     wordButtons.forEach(b => scene.remove(b));
     wordButtons = [];
@@ -1038,7 +1047,7 @@
             wordButtons.push(btn);
         }
     });
- }
+  }
 
   // --- Speech Synthesis ---
   let cachedVoice = null;
@@ -1070,7 +1079,7 @@
       speechSynthesis.cancel();
       if (!silent) clearActive();
   };
- const speakSingle = (word, element) => {
+const speakSingle = (word, element) => {
     stopSpeech(true); clearActive();
     if (element.userData && element.userData.baseMaterial){
       const highlightMaterial = new THREE.MeshPhongMaterial({ color:0x9b8cff, transparent:true, opacity:0.95, emissive:0x6ee7f5, emissiveIntensity:0.4 });
@@ -1215,7 +1224,7 @@
         speakWord(wordsOnPage[idx], () => step(idx + 1));
     };
     step(0);
- }
+}
 
   const showError = () => {
     stopSpeech(true);
@@ -1290,27 +1299,27 @@
     playCurrentPage();
  });
 
- btnSpeak.addEventListener('click', () => {
+  btnSpeak.addEventListener('click', () => {
     if(totalCombinations > 0) playCurrentPage();
- });
+  });
 
- btnStop.addEventListener('click', () => stopSpeech());
+  btnStop.addEventListener('click', () => stopSpeech());
 
- prevPageBtn.addEventListener('click', () => {
+  prevPageBtn.addEventListener('click', () => {
     if (currentPage > 1) {
         stopSpeech();
         displayPage(currentPage - 1);
     }
- });
+  });
 
- nextPageBtn.addEventListener('click', () => {
+  nextPageBtn.addEventListener('click', () => {
     const totalPages = Math.ceil(totalCombinations / itemsPerPage);
     if (currentPage < totalPages) {
         stopSpeech();
         displayPage(currentPage + 1);
     }
- });
- 
+  });
+  
  pageIndicator.addEventListener('click', () => {
     if(document.getElementById('page-input')) return;
 
