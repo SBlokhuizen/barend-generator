@@ -485,6 +485,72 @@
     to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
   }
 
+  /* New 2D Barendroom Animation Styles */
+  #barendroom-2d-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background-color: var(--bg);
+      overflow: hidden;
+  }
+
+  #trace-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+  }
+
+  .bouncing-cell {
+      position: fixed;
+      border-radius:14px;
+      padding:16px;
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08);
+      text-align:center;
+      font-weight:900;
+      font-size: clamp(18px, 3.2vw, 32px);
+      letter-spacing:.6px;
+      line-height:1.1;
+      white-space: nowrap;
+      will-change: transform;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      color: var(--text);
+  }
+
+  .barendroom-congrats-popup {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 24px 32px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      z-index: 10001;
+      border: 1px solid rgba(110,231,245,.35);
+      animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .barendroom-congrats-popup h2 {
+      font-size: 32px;
+      margin: 0 0 12px 0;
+      background: var(--accent);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+  }
+
+  .barendroom-congrats-popup p {
+      font-size: 18px;
+      margin-bottom: 24px;
+      color: var(--muted);
+  }
 
   @media (max-width:680px){
     .wrap{width:calc(100% - 24px)}
@@ -712,6 +778,7 @@
   let currentPlaybackId = null;
   const wordlist = new Set();
   let wordlistLoaded = false;
+  let barendroomAnimationId = null;
 
   // DOM Refs for dynamic elements
   const comboCount = document.getElementById('combo-count');
@@ -755,45 +822,322 @@
     return true;
   }
 
-  function showBarendroomAnimation() {
-    const overlay = document.createElement('div');
-    overlay.id = 'barendroom-overlay';
-    
-    const popup = document.createElement('div');
-    popup.className = 'barendroom-popup';
-    popup.innerHTML = `<h2>Gefeliciteerd!</h2><p>Je hebt een <strong>Barendroom</strong> gevonden!</p>`;
-    
-    overlay.appendChild(popup);
-    
-    // Clouds
-    for (let i = 1; i <= 3; i++) {
-        const cloud = document.createElement('div');
-        cloud.className = `cloud c${i}`;
-        overlay.appendChild(cloud);
-    }
+  function playBarendroomAndAnimate(cellsToPlay) {
+    stopSpeech(true); // Stop any previous speech
 
-    // Confetti
-    const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f', '#9b59b6', '#1abc9c'];
-    for (let i = 0; i < 100; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti';
-        confetti.style.left = `${Math.random() * 100}vw`;
-        confetti.style.top = `${-20 - Math.random() * 80}vh`; // Start above screen
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-        confetti.style.animationDelay = `${Math.random() * 5}s`;
-        confetti.style.animationDuration = `${3 + Math.random() * 3}s`;
-        overlay.appendChild(confetti);
-    }
+    const playbackId = Date.now();
+    currentPlaybackId = playbackId;
+    speaking = true;
 
-    document.body.appendChild(overlay);
+    const step = (idx) => {
+        // Check if playback was cancelled by the user
+        if (currentPlaybackId !== playbackId || !speaking) {
+            clearActive();
+            if (currentPlaybackId === null) speaking = false; // Reset state if stopped
+            return;
+        }
 
-    overlay.addEventListener('click', () => {
-        overlay.style.animation = 'fadeOut 1s forwards';
-        overlay.addEventListener('animationend', () => overlay.remove());
-    });
-  }
+        // Check if all words have been spoken
+        if (idx >= cellsToPlay.length) {
+            clearActive();
+            speaking = false;
+            
+            // All words spoken, now start the bouncing animation
+            startBouncingAnimation(cellsToPlay); 
+            return;
+        }
 
+        const cell = cellsToPlay[idx];
+        const word = cell.textContent;
+
+        // Highlight the current cell and ensure it's visible
+        clearActive();
+        cell.classList.add('active');
+        cell.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+
+        // Speak the word, then move to the next one
+        speakWord(word, () => step(idx + 1));
+    };
+
+    // Start the sequence from the first word
+    step(0);
+ }
+
+function startBarendroomSequence(analysis) {
+      const allWords = [];
+      const count = Math.pow(analysis.uniqueGroups.length, analysis.groups.length);
+      for (let i = 0; i < count; i++) {
+          allWords.push(buildNthVariant(i, analysis));
+      }
+      
+      // Setup the UI to display all words in a scrollable grid
+      outputCard.style.display = 'block';
+      canvasContainer.style.display = 'none';
+      grid.style.display = 'grid'; 
+      grid.innerHTML = '';
+
+      // --- THIS IS THE FIX ---
+      // Explicitly set two columns to match the normal layout.
+      grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+      
+      // Reset any virtualization styles and hide pagination
+      grid.style.position = 'static';
+      grid.style.height = 'auto';
+      grid.onscroll = null;
+      paginationControls.style.display = 'none';
+      comboCount.textContent = `${count.toLocaleString('nl-NL')} Barendroom woorden`;
+
+      const originalCells = [];
+      allWords.forEach((word, index) => {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.textContent = word;
+          cell.dataset.index = index;
+          grid.appendChild(cell);
+          fitText(cell);
+          originalCells.push(cell);
+      });
+      
+      // Instead of animating immediately, start the speech sequence
+      playBarendroomAndAnimate(originalCells);
+  }
+
+function startBouncingAnimation(originalCells) {
+        const overlay = document.createElement('div');
+        overlay.id = 'barendroom-2d-overlay';
+        
+        const canvas = document.createElement('canvas');
+        canvas.id = 'trace-canvas';
+        overlay.appendChild(canvas);
+        
+        document.body.appendChild(overlay);
+        
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // --- CHANGE 1 of 2: Removed translucent fillStyle from here ---
+        
+        const bouncingButtons = originalCells.map(cell => {
+            const rect = cell.getBoundingClientRect();
+            overlay.appendChild(cell);
+            
+            cell.classList.add('bouncing-cell');
+            cell.classList.remove('cell', 'active');
+            cell.style.width = `${rect.width}px`;
+            cell.style.height = `${rect.height}px`;
+            cell.style.left = '0px';
+            cell.style.top = '0px';
+            cell.style.cursor = 'grab';
+            
+            return { el: cell, x: rect.left, y: rect.top, vx: Math.random() * 8 - 4, vy: Math.random() * -10 - 5, width: rect.width, height: rect.height, trace: [], isDragged: false };
+        });
+
+        outputCard.style.display = 'none';
+
+        // --- Physics & Interaction Variables ---
+        let draggedButton = null;
+        let dragOffsetX = 0, dragOffsetY = 0;
+        let lastPos = { x: 0, y: 0 };
+        const velocityHistory = [];
+        const MAX_HISTORY = 5;
+
+        const gravity = 0.3;
+        const friction = 0.995;
+        const bounceFactor = 0.8;
+        const restitution = 0.65;
+        const maxTraceLength = 20;
+        const MAX_SPEED = 40;
+
+        // --- Confetti Variables ---
+        const confetti = [];
+        const CONFETTI_COUNT = 150;
+        const confettiColors = ['#6ee7f5', '#9b8cff', '#4ade80', '#ff4d6d'];
+
+        for (let i = 0; i < CONFETTI_COUNT; i++) {
+            confetti.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                width: Math.random() * 6 + 4,
+                height: Math.random() * 12 + 8,
+                vx: Math.random() * 2 - 1,
+                vy: Math.random() * 2 + 2,
+                rotation: Math.random() * Math.PI * 2,
+                rotationSpeed: (Math.random() - 0.5) * 0.1,
+                color: confettiColors[Math.floor(Math.random() * confettiColors.length)]
+            });
+        }
+
+        function animate() {
+            // --- CHANGE 2 of 2: Clear canvas with a solid color for crisp animations ---
+            ctx.fillStyle = '#0f1226'; // Match the page background color from CSS (--bg)
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // --- Confetti Animation Logic ---
+            confetti.forEach(c => {
+                c.x += c.vx;
+                c.y += c.vy;
+                c.rotation += c.rotationSpeed;
+
+                if (c.y > canvas.height + 20) {
+                    c.x = Math.random() * canvas.width;
+                    c.y = -20;
+                }
+
+                ctx.save();
+                ctx.translate(c.x + c.width / 2, c.y + c.height / 2);
+                ctx.rotate(c.rotation);
+                ctx.fillStyle = c.color;
+                ctx.fillRect(-c.width / 2, -c.height / 2, c.width, c.height);
+                ctx.restore();
+            });
+
+            bouncingButtons.forEach(btn => {
+                if (!btn.isDragged) {
+                    btn.vy += gravity;
+                    btn.vx *= friction;
+                    btn.vy *= friction;
+                    btn.x += btn.vx;
+                    btn.y += btn.vy;
+
+                    if (btn.y + btn.height > window.innerHeight) { btn.y = window.innerHeight - btn.height; btn.vy *= -bounceFactor; }
+                    if (btn.x + btn.width > window.innerWidth) { btn.x = window.innerWidth - btn.width; btn.vx *= -bounceFactor; }
+                    if (btn.x < 0) { btn.x = 0; btn.vx *= -bounceFactor; }
+                    if (btn.y < 0) { btn.y = 0; btn.vy *= -bounceFactor; }
+                }
+            });
+            
+            for (let i = 0; i < bouncingButtons.length; i++) {
+                for (let j = i + 1; j < bouncingButtons.length; j++) {
+                    const btn1 = bouncingButtons[i];
+                    const btn2 = bouncingButtons[j];
+
+                    const dx = (btn1.x + btn1.width / 2) - (btn2.x + btn2.width / 2);
+                    const dy = (btn1.y + btn1.height / 2) - (btn2.y + btn2.height / 2);
+                    const combinedHalfWidths = (btn1.width + btn2.width) / 2;
+                    const combinedHalfHeights = (btn1.height + btn2.height) / 2;
+                    const overlapX = combinedHalfWidths - Math.abs(dx);
+                    const overlapY = combinedHalfHeights - Math.abs(dy);
+
+                    if (overlapX > 0 && overlapY > 0) {
+                        if (overlapX < overlapY) {
+                            const nx = (dx > 0) ? 1 : -1;
+                            btn1.x += overlapX * nx / 2;
+                            btn2.x -= overlapX * nx / 2;
+                            const rvx = btn2.vx - btn1.vx;
+                            const impulse = -(1 + restitution) * rvx * nx;
+                            btn1.vx -= impulse / 2;
+                            btn2.vx += impulse / 2;
+                        } else {
+                            const ny = (dy > 0) ? 1 : -1;
+                            btn1.y += overlapY * ny / 2;
+                            btn2.y -= overlapY * ny / 2;
+                            const rvy = btn2.vy - btn1.vy;
+                            const impulse = -(1 + restitution) * rvy * ny;
+                            btn1.vy -= impulse / 2;
+                            btn2.vy += impulse / 2;
+                        }
+                    }
+                }
+            }
+
+            bouncingButtons.forEach(btn => {
+                const speed = Math.sqrt(btn.vx * btn.vx + btn.vy * btn.vy);
+                if (speed > MAX_SPEED) {
+                    btn.vx = (btn.vx / speed) * MAX_SPEED;
+                    btn.vy = (btn.vy / speed) * MAX_SPEED;
+                }
+
+                btn.el.style.transform = `translate(${btn.x}px, ${btn.y}px)`;
+                btn.trace.push({ x: btn.x + btn.width / 2, y: btn.y + btn.height / 2 });
+                if (btn.trace.length > maxTraceLength) btn.trace.shift();
+
+                if (btn.trace.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(btn.trace[0].x, btn.trace[0].y);
+                    for (let k = 1; k < btn.trace.length; k++) ctx.lineTo(btn.trace[k].x, btn.trace[k].y);
+                    const grad = ctx.createLinearGradient(btn.trace[0].x, btn.trace[0].y, btn.trace[btn.trace.length-1].x, btn.trace[btn.trace.length-1].y);
+                    grad.addColorStop(0, 'rgba(110, 231, 245, 0)');
+                    grad.addColorStop(1, 'rgba(155, 140, 255, 0.7)');
+                    ctx.strokeStyle = grad; ctx.lineWidth = 2; ctx.stroke();
+                }
+            });
+            
+            barendroomAnimationId = requestAnimationFrame(animate);
+        }
+        
+        const handleStart = (clientX, clientY) => {
+            for (let i = bouncingButtons.length - 1; i >= 0; i--) {
+                const btn = bouncingButtons[i];
+                if (clientX >= btn.x && clientX <= btn.x + btn.width &&
+                    clientY >= btn.y && clientY <= btn.y + btn.height) {
+                    draggedButton = btn;
+                    stopSpeech(true);
+                    speakWord(draggedButton.el.textContent);
+                    draggedButton.isDragged = true;
+                    draggedButton.el.style.cursor = 'grabbing';
+                    draggedButton.el.style.zIndex = 1000;
+                    dragOffsetX = clientX - btn.x;
+                    dragOffsetY = clientY - btn.y;
+                    lastPos = { x: clientX, y: clientY };
+                    velocityHistory.length = 0;
+                    break;
+                }
+            }
+        };
+
+        const handleMove = (clientX, clientY) => {
+            if (draggedButton) {
+                draggedButton.x = clientX - dragOffsetX;
+                draggedButton.y = clientY - dragOffsetY;
+                const vx = clientX - lastPos.x;
+                const vy = clientY - lastPos.y;
+                velocityHistory.push({ vx, vy });
+                if (velocityHistory.length > MAX_HISTORY) velocityHistory.shift();
+                lastPos = { x: clientX, y: clientY };
+            }
+        };
+
+        const handleEnd = () => {
+            if (draggedButton) {
+                draggedButton.isDragged = false;
+                draggedButton.el.style.cursor = 'grab';
+                draggedButton.el.style.zIndex = 1;
+                if (velocityHistory.length > 0) {
+                    const avg = velocityHistory.reduce((acc, v) => ({ vx: acc.vx + v.vx, vy: acc.vy + v.vy }), { vx: 0, vy: 0 });
+                    draggedButton.vx = avg.vx / velocityHistory.length;
+                    draggedButton.vy = avg.vy / velocityHistory.length;
+                }
+                draggedButton = null;
+            }
+        };
+
+        overlay.addEventListener('mousedown', e => handleStart(e.clientX, e.clientY));
+        overlay.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
+        window.addEventListener('mouseup', handleEnd);
+        overlay.addEventListener('touchstart', e => { e.preventDefault(); handleStart(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+        overlay.addEventListener('touchmove', e => { e.preventDefault(); if (draggedButton && e.touches.length) handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+        window.addEventListener('touchend', handleEnd);
+
+        animate();
+        
+        const popup = document.createElement('div');
+        popup.className = 'barendroom-congrats-popup';
+        
+        const returnBtn = document.createElement('button');
+        returnBtn.className = 'btn primary';
+        returnBtn.textContent = 'Terug naar de app';
+        
+        popup.innerHTML = `<h2>Gefeliciteerd!</h2><p>Je hebt een Barendroom gevonden!</p>`;
+        popup.appendChild(returnBtn);
+        overlay.appendChild(popup);
+        
+        returnBtn.addEventListener('click', () => {
+            cancelAnimationFrame(barendroomAnimationId);
+            barendroomAnimationId = null;
+            document.body.removeChild(overlay);
+        });
+    }
 
   // --- Settings Management ---
   const defaultAllowedVowels = TWO_LETTER_VOWELS.reduce((acc, vg) => ({ ...acc, [vg]: true }), {});
@@ -1426,19 +1770,22 @@ const speakSingle = (word, element) => {
   });
 
   function proceedWithGeneration() {
-    currentAnalysis = window._pendingAnalysis;
-    totalCombinations = Math.pow(currentAnalysis.uniqueGroups.length, currentAnalysis.groups.length);
-    
-    if (checkAllWordsExist(currentAnalysis)) {
-        showBarendroomAnimation();
-        outputCard.style.display = 'none';
-    } else {
-        outputCard.style.display = 'block';
-        displayPage(1);
-        playCurrentPage();
-    }
-    window._pendingAnalysis = null;
-  }
+        currentAnalysis = window._pendingAnalysis;
+        totalCombinations = Math.pow(currentAnalysis.uniqueGroups.length, currentAnalysis.groups.length);
+        
+        const isBarendroom = checkAllWordsExist(currentAnalysis);
+
+        if (isBarendroom) {
+            // A Barendroom has its own special presentation sequence
+            startBarendroomSequence(currentAnalysis);
+        } else {
+            // Standard generation with pagination and speech
+            outputCard.style.display = 'block';
+            displayPage(1);
+            playCurrentPage();
+        }
+        window._pendingAnalysis = null;
+    }
 
   function showWarningModal(check) {
     const numGroups = check.uniqueGroups.length;
