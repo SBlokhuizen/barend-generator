@@ -1123,6 +1123,9 @@ function startBouncingAnimation(originalCells) {
         
         const popup = document.createElement('div');
         popup.className = 'barendroom-congrats-popup';
+        popup.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+        });
         
         const returnBtn = document.createElement('button');
         returnBtn.className = 'btn primary';
