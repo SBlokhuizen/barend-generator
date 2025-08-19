@@ -465,7 +465,7 @@
   <dialog id="modal" aria-modal="true" role="dialog" aria-labelledby="error-modal-title">
     <div class="modal-head"><div id="error-modal-title" class="modal-title">NEEHEE</div></div>
     <div class="modal-body">
-      <p>Het woord moet minstens twee verschillende klinkergroepen bevatten. Geldige groepen: <span class="kbd">a aa e ee i ie o oo u uu oe eu ui ij ei ai au ou</span>.</p>
+      <p>Het woord moet minstens twee verschillende klinkergroepen bevatten. Geldige groepen: <span class="kbd" id="valid-vowels-list"></span>.</p>
     </div>
     <div class="modal-actions"><button class="btn primary" id="close-modal">OK</button></div>
   </dialog>
@@ -476,6 +476,10 @@
       <div class="option-row">
         <label for="enable-3d">3D weergave inschakelen</label>
         <input type="checkbox" id="enable-3d" class="toggle-switch">
+      </div>
+      <div class="option-row">
+        <label for="simple-vowels">Klinkergroepen los beschouwen</label>
+        <input type="checkbox" id="simple-vowels" class="toggle-switch">
       </div>
       <div class="option-row">
         <label for="pitch-slider">Toonhoogte</label>
@@ -509,7 +513,8 @@
   // Constants & DOM Elements
   const BUTTON_DEPTH = 0.28;
   const TEXT_Z_OFFSET = 0.08;
-  const vowelGroups = ['aa','ee','ii','ie','oo','uu','oe','eu','ui','ij','ei','ai','au','ou','a','e','i','o','u'];
+  const complexVowelGroups = ['aa','ee','ii','ie','oo','uu','oe','eu','ui','ij','ei','ai','au','ou','a','e','i','o','u'];
+  const simpleVowelGroups = ['a','e','i','o','u'];
 
   const form = document.getElementById('scramble-form');
   const input = document.getElementById('word');
@@ -527,9 +532,11 @@
   const optionsBtn = document.getElementById('options-btn');
   const optionsModal = document.getElementById('options-modal');
   const closeOptionsModal = document.getElementById('close-options-modal');
+  const validVowelsList = document.getElementById('valid-vowels-list');
   
   // Options Controls
   const enable3dCheckbox = document.getElementById('enable-3d');
+  const simpleVowelsCheckbox = document.getElementById('simple-vowels');
   const pitchSlider = document.getElementById('pitch-slider');
   const rateSlider = document.getElementById('rate-slider');
   const pitchValueSpan = document.getElementById('pitch-value');
@@ -560,10 +567,11 @@
   const shareLinkBtn = document.getElementById('share-link-btn');
 
   // --- Settings Management ---
-  const defaultSettings = { enable3d: false, pitch: 1.0, rate: 1.00 };
+  const defaultSettings = { enable3d: false, useSimpleVowels: false, pitch: 1.0, rate: 1.00 };
 
   function saveSettings() {
     settings.enable3d = enable3dCheckbox.checked;
+    settings.useSimpleVowels = simpleVowelsCheckbox.checked;
     settings.pitch = parseFloat(pitchSlider.value);
     settings.rate = parseFloat(rateSlider.value);
     localStorage.setItem('barendGenSettings', JSON.stringify(settings));
@@ -574,14 +582,21 @@
     rateValueSpan.textContent = parseFloat(rateSlider.value).toFixed(2);
   }
 
+  function updateValidVowelsDisplay() {
+      const activeVowels = settings.useSimpleVowels ? simpleVowelGroups : complexVowelGroups;
+      validVowelsList.textContent = activeVowels.join(' ');
+  }
+
   function loadSettings() {
     const saved = localStorage.getItem('barendGenSettings');
     settings = saved ? JSON.parse(saved) : { ...defaultSettings };
     settings = { ...defaultSettings, ...settings }; // Ensure all keys exist
     enable3dCheckbox.checked = settings.enable3d;
+    simpleVowelsCheckbox.checked = settings.useSimpleVowels;
     pitchSlider.value = settings.pitch;
     rateSlider.value = settings.rate;
     updateSliderValues();
+    updateValidVowelsDisplay();
   }
   
   // --- Three.js Initialization & Controls ---
@@ -907,6 +922,7 @@
 
   // --- Word Processing Logic ---
   const findVowelGroups = (word) => {
+    const vowelGroups = settings.useSimpleVowels ? simpleVowelGroups : complexVowelGroups;
     const lower = word.toLowerCase(); const matches = []; let i=0;
     while (i < lower.length){
       let found = null;
@@ -1037,7 +1053,7 @@
         speakWord(wordsOnPage[idx], () => step(idx + 1));
     };
     step(0);
-  }
+ }
 
   const showError = () => {
     stopSpeech(true);
@@ -1181,6 +1197,10 @@
   optionsBtn.addEventListener('click', () => optionsModal.showModal());
   closeOptionsModal.addEventListener('click', () => optionsModal.close());
   enable3dCheckbox.addEventListener('change', saveSettings);
+  simpleVowelsCheckbox.addEventListener('change', () => {
+      saveSettings();
+      updateValidVowelsDisplay();
+  });
   pitchSlider.addEventListener('input', () => { updateSliderValues(); saveSettings(); });
   rateSlider.addEventListener('input', () => { updateSliderValues(); saveSettings(); });
 
