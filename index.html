@@ -320,7 +320,7 @@
   .modal-head{padding:14px 16px;background:linear-gradient(90deg, rgba(255,77,109,.18), rgba(110,231,245,.06));display:flex;align-items:center}
   .modal-title{font-size:18px;font-weight:900;color:#fff}
   .modal-body{padding:14px 16px;color:#dfe5ff}
-  .modal-actions{padding:12px 16px;display:flex;justify-content:flex-end;background:#0e1230}
+  .modal-actions{padding:12px 16px;display:flex;justify-content:flex-end;gap:8px;background:#0e1230}
   .kbd{font:600 12px ui-monospace,Menlo,Monaco,monospace;background:#0e1230;border:1px solid rgba(255,255,255,.12);padding:2px 6px;border-radius:6px;color:#b8c0de}
   
   /* Options Modal Styles */
@@ -551,6 +551,17 @@
     <div class="modal-actions"><button class="btn primary" id="close-modal">OK</button></div>
   </dialog>
 
+  <dialog id="warning-modal" aria-modal="true" role="dialog" aria-labelledby="warning-modal-title">
+    <div class="modal-head"><div id="warning-modal-title" class="modal-title">Waarschuwing</div></div>
+    <div class="modal-body">
+      <p id="warning-modal-text"></p>
+    </div>
+    <div class="modal-actions">
+        <button class="btn ghost" id="confirm-cancel">Annuleren</button>
+        <button class="btn primary" id="confirm-proceed">Doorgaan</button>
+    </div>
+  </dialog>
+
   <dialog id="options-modal" aria-modal="true" role="dialog" aria-labelledby="options-modal-title">
     <div class="modal-head"><div id="options-modal-title" class="modal-title">Instellingen</div></div>
     <div class="modal-body">
@@ -630,6 +641,10 @@
   const optionsModal = document.getElementById('options-modal');
   const closeOptionsModal = document.getElementById('close-options-modal');
   const validVowelsList = document.getElementById('valid-vowels-list');
+  const warningModal = document.getElementById('warning-modal');
+  const warningModalText = document.getElementById('warning-modal-text');
+  const confirmProceedBtn = document.getElementById('confirm-proceed');
+  const confirmCancelBtn = document.getElementById('confirm-cancel');
   
   // Options Controls
   const enable3dCheckbox = document.getElementById('enable-3d');
@@ -1294,18 +1309,51 @@ const speakSingle = (word, element) => {
     }
   });
 
- form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const check = analyzeWord(input.value);
-    if (!check.ok) { showError(); return; }
-    
+  function proceedWithGeneration() {
     outputCard.style.display = 'block';
-    currentAnalysis = check;
-    totalCombinations = Math.pow(check.uniqueGroups.length, check.groups.length);
-    
+    currentAnalysis = window._pendingAnalysis;
+    totalCombinations = Math.pow(currentAnalysis.uniqueGroups.length, currentAnalysis.groups.length);
     displayPage(1);
     playCurrentPage();
- });
+    window._pendingAnalysis = null;
+  }
+
+  function showWarningModal(check) {
+    const numGroups = check.uniqueGroups.length;
+    const estimatedTotal = Math.pow(numGroups, check.groups.length);
+    const warningMessage = `Je staat op het punt een ${numGroups}D hyperkubus te genereren met ${estimatedTotal.toLocaleString('nl-NL')} combinaties in 3D-modus. Dit kan erg traag zijn of de browser laten crashen. Weet je het zeker?`;
+    warningModalText.textContent = warningMessage;
+    warningModal.showModal();
+    window._pendingAnalysis = check;
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const check = analyzeWord(input.value);
+    if (!check.ok) {
+        showError();
+        return;
+    }
+
+    if (settings.enable3d && check.uniqueGroups.length > 3) {
+        showWarningModal(check);
+    } else {
+        window._pendingAnalysis = check;
+        proceedWithGeneration();
+    }
+  });
+
+  confirmProceedBtn.addEventListener('click', () => {
+    warningModal.close();
+    if(window._pendingAnalysis) {
+        proceedWithGeneration();
+    }
+  });
+
+  confirmCancelBtn.addEventListener('click', () => {
+    warningModal.close();
+    window._pendingAnalysis = null;
+  });
 
   btnSpeak.addEventListener('click', () => {
     if(totalCombinations > 0) playCurrentPage();
