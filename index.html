@@ -558,6 +558,10 @@
         <label for="enable-3d">3D weergave inschakelen</label>
         <input type="checkbox" id="enable-3d" class="toggle-switch">
       </div>
+      <div class="option-row">
+        <label for="language-select">Spraaktaal</label>
+        <select id="language-select" style="background: #0e1230; color: var(--text); border: 1px solid rgba(255,255,255,.12); border-radius: 6px; padding: 4px 8px; flex: 0 1 172px;"></select>
+      </div>
       <details id="vowel-options-details" class="option-group">
         <summary class="option-row">
             <span>Toegestane Tweeklanken</span>
@@ -629,6 +633,7 @@
   
   // Options Controls
   const enable3dCheckbox = document.getElementById('enable-3d');
+  const languageSelect = document.getElementById('language-select');
   const pitchSlider = document.getElementById('pitch-slider');
   const rateSlider = document.getElementById('rate-slider');
   const pitchValueSpan = document.getElementById('pitch-value');
@@ -661,7 +666,7 @@
 
   // --- Settings Management ---
   const defaultAllowedVowels = TWO_LETTER_VOWELS.reduce((acc, vg) => ({ ...acc, [vg]: true }), {});
-  const defaultSettings = { enable3d: false, allowedVowelGroups: { ...defaultAllowedVowels }, vowelOptionsExpanded: false, pitch: 1.0, rate: 1.00 };
+  const defaultSettings = { enable3d: false, language: 'nl-NL', allowedVowelGroups: { ...defaultAllowedVowels }, vowelOptionsExpanded: false, pitch: 1.0, rate: 1.00 };
   const DEFAULT_VOWEL_MASK = (1 << TWO_LETTER_VOWELS.length) - 1; // All true -> 16383
 
   function compressSettings(settingsToCompress) {
@@ -726,6 +731,7 @@
 
   function saveSettings() {
     settings.enable3d = enable3dCheckbox.checked;
+    settings.language = languageSelect.value;
     settings.pitch = parseFloat(pitchSlider.value);
     settings.rate = parseFloat(rateSlider.value);
     settings.vowelOptionsExpanded = vowelOptionsDetails.open;
@@ -1050,21 +1056,22 @@ function renderVirtualizedGrid(wordObjects) {
   }
 
   // --- Speech Synthesis ---
-  let cachedVoice = null;
-  const pickDutchVoice = () => {
-    const list = speechSynthesis.getVoices() || [];
-    cachedVoice = list.find(v => /^nl(-|$)/i.test(v.lang)) || list.find(v => /dutch|nederlands/i.test(v.name)) || list[0] || null;
-    return cachedVoice;
-  };
-  speechSynthesis.onvoiceschanged = pickDutchVoice;
-  const speakWord = (text, onend) => {
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = settings.rate; u.pitch = settings.pitch; u.volume = 1.0; u.lang = 'nl-NL';
-    const v = cachedVoice || pickDutchVoice();
-    if (v) u.voice = v;
-    u.onend = onend;
-    speechSynthesis.speak(u);
-  };
+    const speakWord = (text, onend) => {
+        const u = new SpeechSynthesisUtterance(text);
+        u.rate = settings.rate;
+        u.pitch = settings.pitch;
+        u.volume = 1.0;
+        u.lang = settings.language || 'nl-NL';
+
+        const voices = speechSynthesis.getVoices() || [];
+        const preferredVoice = voices.find(v => v.lang === u.lang);
+        if (preferredVoice) {
+            u.voice = preferredVoice;
+        }
+
+        u.onend = onend;
+        speechSynthesis.speak(u);
+    };
   const clearActive = () => {
     document.querySelectorAll('.cell.active').forEach(el => el.classList.remove('active'));
     wordButtons.forEach(button => {
@@ -1112,7 +1119,7 @@ const speakSingle = (word, element) => {
     return { ok:true, word, groups, uniqueGroups };
   };
 
- function updatePaginationControls() {
+  function updatePaginationControls() {
     const totalPages = Math.ceil(totalCombinations / itemsPerPage);
     prevPageBtn.disabled = currentPage <= 1;
     nextPageBtn.disabled = currentPage >= totalPages;
@@ -1120,7 +1127,7 @@ const speakSingle = (word, element) => {
     nextPageBtn.style.opacity = nextPageBtn.disabled ? 0.4 : 1;
  }
 
- function buildNthVariant(n, analysis) {
+  function buildNthVariant(n, analysis) {
     const { word, groups, uniqueGroups } = analysis;
     const base = uniqueGroups.length;
     let comboVowels = [];
@@ -1137,9 +1144,9 @@ const speakSingle = (word, element) => {
     }
     result += word.slice(pos);
     return result;
- }
+  }
 
- function displayPage(page) {
+  function displayPage(page) {
     const totalPages = Math.ceil(totalCombinations / itemsPerPage);
     if (page < 1 || page > totalPages) return;
     currentPage = page;
@@ -1165,9 +1172,9 @@ const speakSingle = (word, element) => {
         paginationControls.style.display = 'none';
     }
     updatePaginationControls();
- }
+  }
 
- function playCurrentPage() {
+  function playCurrentPage() {
     stopSpeech(true);
 
     const playbackId = Date.now();
@@ -1230,8 +1237,9 @@ const speakSingle = (word, element) => {
     stopSpeech(true);
     if (!modal.open) modal.showModal();
     const u = new SpeechSynthesisUtterance('Neehee');
-    const v = cachedVoice || pickDutchVoice();
-    if (v) u.voice = v;
+    const voices = speechSynthesis.getVoices() || [];
+    const dutchVoice = voices.find(v => /^nl(-|$)/i.test(v.lang)) || voices.find(v => /dutch|nederlands/i.test(v.name));
+    if (dutchVoice) u.voice = dutchVoice;
     u.lang = 'nl-NL'; u.rate = 1; u.pitch = 0.9;
     speechSynthesis.speak(u);
   };
@@ -1370,6 +1378,7 @@ const speakSingle = (word, element) => {
   optionsBtn.addEventListener('click', () => optionsModal.showModal());
   closeOptionsModal.addEventListener('click', () => optionsModal.close());
   enable3dCheckbox.addEventListener('change', saveSettings);
+  languageSelect.addEventListener('change', saveSettings);
   pitchSlider.addEventListener('input', () => { updateSliderValues(); saveSettings(); });
   rateSlider.addEventListener('input', () => { updateSliderValues(); saveSettings(); });
 
@@ -1402,10 +1411,40 @@ const speakSingle = (word, element) => {
       });
   }
 
+  function populateLanguageOptions() {
+    const voices = speechSynthesis.getVoices();
+    if (!voices.length) return;
+
+    const langDisplayNames = new Intl.DisplayNames(['nl'], { type: 'language' });
+    const uniqueLangs = [...new Map(voices.map(v => [v.lang, v])).values()]
+        .sort((a,b) => a.lang.localeCompare(b.lang));
+
+    const savedLang = settings.language;
+    languageSelect.innerHTML = '';
+
+    uniqueLangs.forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice.lang;
+        const langName = langDisplayNames.of(voice.lang.split('-')[0]) || voice.lang;
+        option.textContent = `${langName} (${voice.lang})`;
+        languageSelect.appendChild(option);
+    });
+
+    if ([...languageSelect.options].some(o => o.value === savedLang)) {
+        languageSelect.value = savedLang;
+    } else {
+        const dutchVoice = uniqueLangs.find(v => v.lang.startsWith('nl'));
+        if(dutchVoice) languageSelect.value = dutchVoice.lang;
+    }
+    settings.language = languageSelect.value;
+  }
+  speechSynthesis.onvoiceschanged = populateLanguageOptions;
+
+
   function initializeFromUrl() {
       const urlParams = new URLSearchParams(window.location.search);
       const wordFromUrl = urlParams.get('word');
-      const settingsFromUrl = urlParams.get('s'); // Use shorter 's' parameter
+      const settingsFromUrl = urlParams.get('s');
 
       if (settingsFromUrl) {
           try {
@@ -1434,6 +1473,7 @@ const speakSingle = (word, element) => {
   input.setAttribute('autofocus','true');
   populateVowelOptions();
   initializeFromUrl();
+  populateLanguageOptions();
 
 })();
 </script>
