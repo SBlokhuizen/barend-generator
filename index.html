@@ -482,16 +482,6 @@
     </svg>
   </button>
 
-  <dialog id="share-modal" aria-modal="true" role="dialog" aria-labelledby="share-modal-title">
-    <div class="modal-head"><div id="share-modal-title" class="modal-title">Delen</div></div>
-    <div class="modal-body">
-      <div class="grid" style="grid-template-columns: 1fr; margin-top: 16px;">
-          <button class="btn primary" id="share-link-btn">🔗 Deel Link</button>
-      </div>
-      <small id="export-status" style="display: none; text-align: center; margin-top: 12px; color: var(--muted);"></small>
-    </div>
-    <div class="modal-actions"><button class="btn primary" id="close-share-modal">Sluiten</button></div>
-  </dialog>
   <div class="wrap" role="main">
       <h1 id="title" class="title">
         <span class="title-text">B</span>
@@ -659,13 +649,59 @@
   const nextPageBtn = document.getElementById('next-page');
 
   const shareBtn = document.getElementById('share-btn');
-  const shareModal = document.getElementById('share-modal');
-  const closeShareModal = document.getElementById('close-share-modal');
-  const shareLinkBtn = document.getElementById('share-link-btn');
 
   // --- Settings Management ---
   const defaultAllowedVowels = TWO_LETTER_VOWELS.reduce((acc, vg) => ({ ...acc, [vg]: true }), {});
   const defaultSettings = { enable3d: false, allowedVowelGroups: { ...defaultAllowedVowels }, vowelOptionsExpanded: false, pitch: 1.0, rate: 1.00 };
+  const DEFAULT_VOWEL_MASK = (1 << TWO_LETTER_VOWELS.length) - 1; // All true -> 16383
+
+  function compressSettings(settingsToCompress) {
+      const compressed = {};
+      const defaults = defaultSettings;
+
+      if (settingsToCompress.enable3d !== defaults.enable3d) {
+          compressed.d = settingsToCompress.enable3d ? 1 : 0;
+      }
+      if (settingsToCompress.vowelOptionsExpanded !== defaults.vowelOptionsExpanded) {
+          compressed.e = settingsToCompress.vowelOptionsExpanded ? 1 : 0;
+      }
+      if (settingsToCompress.pitch !== defaults.pitch) {
+          compressed.p = settingsToCompress.pitch;
+      }
+      if (settingsToCompress.rate !== defaults.rate) {
+          compressed.r = settingsToCompress.rate;
+      }
+
+      let mask = 0;
+      TWO_LETTER_VOWELS.forEach((vowel, index) => {
+          if (settingsToCompress.allowedVowelGroups[vowel]) {
+              mask |= (1 << index);
+          }
+      });
+
+      if (mask !== DEFAULT_VOWEL_MASK) {
+          compressed.v = mask;
+      }
+      return compressed;
+  }
+
+  function decompressSettings(compressed) {
+      const decompressed = JSON.parse(JSON.stringify(defaultSettings)); // Deep copy
+
+      if (compressed.d !== undefined) decompressed.enable3d = compressed.d === 1;
+      if (compressed.e !== undefined) decompressed.vowelOptionsExpanded = compressed.e === 1;
+      if (compressed.p !== undefined) decompressed.pitch = compressed.p;
+      if (compressed.r !== undefined) decompressed.rate = compressed.r;
+      
+      const mask = compressed.v !== undefined ? compressed.v : DEFAULT_VOWEL_MASK;
+      const allowed = {};
+      TWO_LETTER_VOWELS.forEach((vowel, index) => {
+          allowed[vowel] = (mask & (1 << index)) !== 0;
+      });
+      decompressed.allowedVowelGroups = allowed;
+
+      return decompressed;
+  }
 
   function getActiveVowelGroups() {
       const allowed = Object.entries(settings.allowedVowelGroups || {})
@@ -700,11 +736,9 @@
     rateValueSpan.textContent = parseFloat(rateSlider.value).toFixed(2);
   }
 
-  function loadSettings() {
-    const saved = localStorage.getItem('barendGenSettings');
-    settings = saved ? JSON.parse(saved) : { ...defaultSettings };
+  function applySettings(newSettings) {
+    settings = { ...defaultSettings, ...newSettings };
     settings.allowedVowelGroups = { ...defaultAllowedVowels, ...(settings.allowedVowelGroups || {}) };
-    settings = { ...defaultSettings, ...settings };
     
     enable3dCheckbox.checked = settings.enable3d;
     pitchSlider.value = settings.pitch;
@@ -720,6 +754,12 @@
 
     updateSliderValues();
     updateValidVowelsDisplay();
+  }
+
+  function loadSettings() {
+    const saved = localStorage.getItem('barendGenSettings');
+    const loadedSettings = saved ? JSON.parse(saved) : { ...defaultSettings };
+    applySettings(loadedSettings);
   }
   
   // --- Three.js Initialization & Controls ---
@@ -1190,45 +1230,51 @@
   // --- Event Listeners & Initialization ---
   closeModal.addEventListener('click', () => { if (modal.open) modal.close(); input.focus(); input.select(); });
 
-  shareBtn.addEventListener('click', () => {
-      if (currentAnalysis && currentAnalysis.ok) {
-          shareModal.showModal();
-      } else {
-          input.animate([
-              { transform: 'translateX(0)' }, { transform: 'translateX(-5px)' },
-              { transform: 'translateX(5px)' }, { transform: 'translateX(0)' }
-          ], { duration: 300, easing: 'ease-in-out' });
-          input.focus();
-      }
-  });
-  closeShareModal.addEventListener('click', () => shareModal.close());
+  shareBtn.addEventListener('click', async () => {
+    if (!currentAnalysis || !currentAnalysis.ok) {
+        input.animate([
+            { transform: 'translateX(0)' }, { transform: 'translateX(-5px)' },
+            { transform: 'translateX(5px)' }, { transform: 'translateX(0)' }
+        ], { duration: 300, easing: 'ease-in-out' });
+        input.focus();
+        return;
+    }
 
-  shareLinkBtn.addEventListener('click', async () => {
-      const wordToShare = input.value.trim();
-      if (!wordToShare) return;
+    const wordToShare = input.value.trim();
+    if (!wordToShare) return;
 
-      const shareUrl = `https://sblokhuizen.github.io/barend/?word=${encodeURIComponent(wordToShare)}`;
-      const shareData = {
-          title: 'Barend Generator',
-          text: `Bekijk het Barendogram voor "${wordToShare}"`,
-          url: shareUrl,
-      };
+    const compressed = compressSettings(settings);
+    const baseUrl = window.location.origin + window.location.pathname;
+    let shareUrl = `${baseUrl}?word=${encodeURIComponent(wordToShare)}`;
+    
+    if (Object.keys(compressed).length > 0) {
+        const settingsString = JSON.stringify(compressed);
+        const encodedSettings = btoa(settingsString);
+        shareUrl += `&s=${encodeURIComponent(encodedSettings)}`;
+    }
+    
+    const shareData = {
+        title: 'Barend Generator',
+        text: `Bekijk het Barendogram voor "${wordToShare}"`,
+        url: shareUrl,
+    };
 
-      if (navigator.share && navigator.canShare(shareData)) {
-          try {
-              await navigator.share(shareData);
-          } catch (err) {
-              console.error('Share failed:', err);
-          }
-      } else {
-          try {
-              await navigator.clipboard.writeText(shareUrl);
-              shareLinkBtn.textContent = '✅ Gekopieerd!';
-              setTimeout(() => { shareLinkBtn.textContent = '🔗 Deel Link'; }, 2000);
-          } catch (err) {
-              alert('Kon de link niet naar het klembord kopiëren.');
-          }
-      }
+    if (navigator.share && navigator.canShare(shareData)) {
+        try {
+            await navigator.share(shareData);
+        } catch (err) {
+            console.error('Share failed:', err);
+        }
+    } else {
+        try {
+            await navigator.clipboard.writeText(shareUrl);
+            const originalIcon = shareBtn.innerHTML;
+            shareBtn.innerHTML = '✅';
+            setTimeout(() => { shareBtn.innerHTML = originalIcon; }, 2000);
+        } catch (err) {
+            alert('Kon de link niet naar het klembord kopiëren.');
+        }
+    }
   });
 
  form.addEventListener('submit', (e) => {
@@ -1350,6 +1396,23 @@
   function initializeFromUrl() {
       const urlParams = new URLSearchParams(window.location.search);
       const wordFromUrl = urlParams.get('word');
+      const settingsFromUrl = urlParams.get('s'); // Use shorter 's' parameter
+
+      if (settingsFromUrl) {
+          try {
+              const decodedSettings = atob(decodeURIComponent(settingsFromUrl));
+              const compressed = JSON.parse(decodedSettings);
+              const fullSettings = decompressSettings(compressed);
+              applySettings(fullSettings);
+              localStorage.setItem('barendGenSettings', JSON.stringify(fullSettings));
+          } catch (e) {
+              console.error("Failed to parse settings from URL, loading defaults.", e);
+              loadSettings();
+          }
+      } else {
+          loadSettings();
+      }
+
       if (wordFromUrl) {
           input.value = wordFromUrl;
           setTimeout(() => {
@@ -1361,7 +1424,6 @@
   // --- Final Initialization ---
   input.setAttribute('autofocus','true');
   populateVowelOptions();
-  loadSettings();
   initializeFromUrl();
 
 })();
