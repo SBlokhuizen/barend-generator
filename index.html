@@ -1004,26 +1004,15 @@ function startBouncingAnimation(originalCells) {
         ctx.fillStyle = '#0f1226';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // --- Confetti Animation Logic ---
+        // --- Confetti Animation Logic (Original behavior) ---
         confetti.forEach(c => {
-            // Also apply gravity to confetti for a more integrated feel
-            c.vy += gravity.y * 0.2;
-            c.vx += gravity.x * 0.2;
-
             c.x += c.vx;
             c.y += c.vy;
             c.rotation += c.rotationSpeed;
-            
-            // Reset confetti if it flies too far off-screen
-            const margin = 50;
-            if (c.y > canvas.height + margin || c.y < -margin || c.x > canvas.width + margin || c.x < -margin) {
-                if (Math.abs(gravity.x) > Math.abs(gravity.y)) { // horizontal gravity
-                    c.y = Math.random() * canvas.height;
-                    c.x = gravity.x > 0 ? -margin : canvas.width + margin;
-                } else { // vertical gravity
-                    c.x = Math.random() * canvas.width;
-                    c.y = gravity.y > 0 ? -margin : canvas.height + margin;
-                }
+
+            if (c.y > canvas.height + 20) {
+                c.x = Math.random() * canvas.width;
+                c.y = -20;
             }
 
             ctx.save();
@@ -1036,7 +1025,7 @@ function startBouncingAnimation(originalCells) {
 
         bouncingButtons.forEach(btn => {
             if (!btn.isDragged) {
-                // Apply the dynamic gravity vector
+                // Apply the dynamic gravity vector to buttons only
                 btn.vx += gravity.x;
                 btn.vy += gravity.y;
 
@@ -1194,6 +1183,7 @@ function startBouncingAnimation(originalCells) {
         displayPage(1);
     });
 }
+
 
   // --- Settings Management ---
   const defaultAllowedVowels = TWO_LETTER_VOWELS.reduce((acc, vg) => ({ ...acc, [vg]: true }), {});
