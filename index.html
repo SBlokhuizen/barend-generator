@@ -4,7 +4,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Barend Generator</title>
-
 <meta name="description" content="Creeër je eigen Barendogram!">
 <link rel="icon" type="image/jpeg" href="barend_icon.jpeg">
 <meta property="og:title" content="Barend Generator">
@@ -12,7 +11,6 @@
 <meta property="og:image" content="https://sblokhuizen.github.io/barend/barend.jpeg">
 <meta property="og:url" content="https://sblokhuizen.github.io/barend/">
 <meta property="og:type" content="website">
-
 <style>
   :root{
     --bg:#0f1226;
@@ -48,7 +46,6 @@
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
   }
-
   .wrap{
     width: min(880px, calc(100% - 48px));
     max-width:880px;
@@ -57,7 +54,6 @@
     align-content:center;
     margin:0;
   }
-
   .card{
     background:
       linear-gradient(135deg, rgba(110,231,245,.08), rgba(155,140,255,.06)) padding-box,
@@ -68,7 +64,6 @@
     padding:18px;
     backdrop-filter: blur(10px);
   }
-
   .title {
     font-weight:800;
     letter-spacing:.3px;
@@ -81,26 +76,22 @@
     background-clip: text;
     color: transparent;
   }
-
   .title-text {
     background: none;
     -webkit-background-clip: inherit;
     background-clip: inherit;
     color: inherit;
   }
-
   .morphing-letter {
     position: relative;
     display: inline-block;
     width: 0.6em;
     overflow: hidden;
   }
-
   .letter-container {
     position: relative;
     display: inline-block;
   }
-
   .letter-a, .letter-e {
     position: absolute;
     top: 0;
@@ -111,31 +102,25 @@
     color: var(--accent);
     transition: all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
   }
-
   .letter-a { opacity: 1; transform: translateY(var(--morph-y-offset)) scale(1); }
   .letter-e { opacity: 0; transform: translateY(var(--morph-y-offset)) scale(0.3); }
-
   /* Morphing states */
   .morph-state-barend .pos1 .letter-a { opacity: 1; transform: translateY(var(--morph-y-offset)) scale(1) ; }
   .morph-state-barend .pos1 .letter-e { opacity: 0; transform: translateY(var(--morph-y-offset)) scale(0.3) ; }
   .morph-state-barend .pos2 .letter-a { opacity: 0; transform: translateY(var(--morph-y-offset)) scale(0.3) ; }
   .morph-state-barend .pos2 .letter-e { opacity: 1; transform: translateY(var(--morph-y-offset)) scale(1); }
-
   .morph-state-barand .pos1 .letter-a { opacity: 1; transform: translateY(var(--morph-y-offset)) scale(1) ; }
   .morph-state-barand .pos1 .letter-e { opacity: 0; transform: translateY(var(--morph-y-offset)) scale(0.3) ; }
   .morph-state-barand .pos2 .letter-a { opacity: 1; transform: translateY(var(--morph-y-offset)) scale(1) ; }
   .morph-state-barand .pos2 .letter-e { opacity: 0; transform: translateY(var(--morph-y-offset)) scale(0.3) ; }
-
   .morph-state-berand .pos1 .letter-a { opacity: 0; transform: translateY(var(--morph-y-offset)) scale(0.3) ; }
   .morph-state-berand .pos1 .letter-e { opacity: 1; transform: translateY(var(--morph-y-offset)) scale(1) ; }
   .morph-state-berand .pos2 .letter-a { opacity: 1; transform: translateY(var(--morph-y-offset)) scale(1) ; }
   .morph-state-berand .pos2 .letter-e { opacity: 0; transform: translateY(var(--morph-y-offset)) scale(0.3) ; }
-
   .morph-state-berend .pos1 .letter-a { opacity: 0; transform: translateY(var(--morph-y-offset)) scale(0.3) ; }
   .morph-state-berend .pos1 .letter-e { opacity: 1; transform: translateY(var(--morph-y-offset)) scale(1) ; }
   .morph-state-berend .pos2 .letter-a { opacity: 0; transform: translateY(var(--morph-y-offset)) scale(0.3) ; }
   .morph-state-berend .pos2 .letter-e { opacity: 1; transform: translateY(var(--morph-y-offset)) scale(1) ; }
-
   /* Primary controls in a row */
   form{
     display:flex;
@@ -160,7 +145,6 @@
     border-color: var(--accent);
     box-shadow: 0 0 0 6px rgba(110,231,245,.08);
   }
-
   .btn{
     appearance:none;border:0;cursor:pointer;
     padding:20px 32px;border-radius:12px;
@@ -205,7 +189,6 @@
     right: 24px;
     z-index: 100;
   }
-
   #grid {
     max-height: clamp(320px, 60vh, 600px);
     overflow-y: auto;
@@ -252,7 +235,6 @@
     padding: 0 8px;
     white-space: nowrap;
   }
-
   .cell{
     border-radius:14px;
     padding:16px;
@@ -295,7 +277,23 @@
     border-color: rgba(255, 77, 109, .65);
     box-shadow: 0 0 0 6px rgba(255, 77, 109, .08), inset 0 0 40px rgba(255, 77, 109, .06);
   }
-
+  .cell.shake {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  }
+  .cell.bounce {
+    animation: bounce 0.5s ease both;
+  }
+  @keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+  }
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-15px); }
+    60% { transform: translateY(-7px); }
+  }
   /* 3D */
   #canvas-container {
     height: clamp(320px, 60vh, 600px);
@@ -305,7 +303,6 @@
     background: linear-gradient(135deg, rgba(0,0,0,0.25), rgba(0,0,0,0.08));
   }
   #three-canvas { width:100%; height:100%; display:block; touch-action:none; background:transparent; }
-
   .canvas-overlay {
     position:absolute; top:12px; left:12px; right:12px;
     display:flex; justify-content:space-between; align-items:flex-start;
@@ -318,14 +315,12 @@
   }
   .desktop-hint{display:block} .mobile-hint{display:none}
   @media (max-width:768px){ .desktop-hint{display:none} .mobile-hint{display:block} }
-
   .dimension-info{
     background: rgba(110,231,245,0.08);
     border:1px solid rgba(110,231,245,0.22);
     padding:8px 12px; border-radius:12px; font-size:13px; font-weight:600;
     color:#dcecff; backdrop-filter:blur(4px);
   }
-
   dialog::backdrop{background:linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,.65))}
   dialog{border:0;border-radius:16px;padding:0;overflow:hidden;background:linear-gradient(180deg,#1b1f45,#131736);color:var(--text);box-shadow:var(--shadow)}
   .modal-head{padding:14px 16px;background:linear-gradient(90deg, rgba(255,77,109,.18), rgba(110,231,245,.06));display:flex;align-items:center}
@@ -347,7 +342,6 @@
   .option-row label, .option-row > span { flex-grow: 1; }
   .option-row input[type="range"] { flex: 0 1 140px; }
   .slider-value { font-weight: 600; min-width: 32px; text-align: right; color: var(--muted); }
-
   .toggle-switch {
     appearance: none;
     width: 40px;
@@ -372,7 +366,6 @@
   }
   .toggle-switch:checked { background: var(--accent-3); }
   .toggle-switch:checked::before { transform: translateX(18px); }
-
   /* New styles for vowel group settings */
   .option-group {
     padding: 0;
@@ -495,7 +488,6 @@
     from { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
     to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
   }
-
   /* New 2D Barendroom Animation Styles */
   #barendroom-2d-overlay {
       position: fixed;
@@ -504,7 +496,6 @@
       background-color: var(--bg);
       overflow: hidden;
   }
-
   #trace-canvas {
       position: absolute;
       inset: 0;
@@ -512,7 +503,6 @@
       height: 100%;
       pointer-events: none;
   }
-
   .bouncing-cell {
       position: fixed;
       border-radius:14px;
@@ -532,7 +522,6 @@
       box-sizing: border-box;
       color: var(--text);
   }
-
   .barendroom-congrats-popup {
       position: absolute;
       top: 50%;
@@ -548,7 +537,6 @@
       animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       transition: transform 0.3s ease, opacity 0.3s ease;
   }
-
   .barendroom-congrats-popup h2 {
       font-size: 32px;
       margin: 0 0 12px 0;
@@ -557,13 +545,11 @@
       background-clip: text;
       color: transparent;
   }
-
   .barendroom-congrats-popup p {
       font-size: 18px;
       margin-bottom: 24px;
       color: var(--muted);
   }
-
   .barendroom-popup-actions {
       display: flex;
       gap: 12px;
@@ -574,8 +560,6 @@
       padding: 10px 20px;
       font-size: 14px;
   }
-
-
   @media (max-width:680px){
     .wrap{width:calc(100% - 24px)}
     form{gap:8px}
@@ -589,12 +573,10 @@
       width: 100%;
       gap: 8px;
     }
-
     .form-actions .btn {
       flex-grow: 1;
       flex-basis: 0;
     }
-
     .form-actions #options-btn {
       flex-grow: 0;
     }
@@ -621,7 +603,6 @@
       <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
     </svg>
   </button>
-
   <div class="wrap" role="main">
       <h1 id="title" class="title">
         <span class="title-text">B</span>
@@ -650,7 +631,6 @@
         </div>
       </form>
     </header>
-
   <section id="output-card" class="card" aria-live="polite" style="display:none;">
       <div id="info-bar">
           <div id="combo-count"></div>
@@ -673,7 +653,6 @@
       </div>
   </section>
   </div>
-
   <dialog id="modal" aria-modal="true" role="dialog" aria-labelledby="error-modal-title">
     <div class="modal-head"><div id="error-modal-title" class="modal-title">NEEHEE</div></div>
     <div class="modal-body">
@@ -681,7 +660,6 @@
     </div>
     <div class="modal-actions"><button class="btn primary" id="close-modal">OK</button></div>
   </dialog>
-
   <dialog id="warning-modal" aria-modal="true" role="dialog" aria-labelledby="warning-modal-title">
     <div class="modal-head"><div id="warning-modal-title" class="modal-title">Waarschuwing</div></div>
     <div class="modal-body">
@@ -692,7 +670,6 @@
         <button class="btn primary" id="confirm-proceed">Doorgaan</button>
     </div>
   </dialog>
-
   <dialog id="options-modal" aria-modal="true" role="dialog" aria-labelledby="options-modal-title">
     <div class="modal-head"><div id="options-modal-title" class="modal-title">Instellingen</div></div>
     <div class="modal-body">
@@ -701,7 +678,7 @@
         <input type="checkbox" id="enable-3d" class="toggle-switch">
       </div>
        <div class="option-row">
-        <label for="enable-validation-highlight">Woordvalidatie markering</label>
+        <label for="enable-validation-highlight">Barendroom Validatie</label>
         <input type="checkbox" id="enable-validation-highlight" class="toggle-switch">
       </div>
       <div class="option-row">
@@ -740,7 +717,6 @@
     </div>
     <div class="modal-actions"><button class="btn primary" id="close-options-modal">Sluiten</button></div>
   </dialog>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (() => {
@@ -756,12 +732,17 @@
   title.classList.add(morphStates[currentMorphState]);
   setInterval(morphTitle, 2000);
 
+  // Audio elements for validation
+  const correctSound = new Audio('correct.mp3');
+  const wrongSound = new Audio('wrong.mp3');
+  correctSound.preload = 'auto';
+  wrongSound.preload = 'auto';
+
   // Constants & DOM Elements
   const BUTTON_DEPTH = 0.28;
   const TEXT_Z_OFFSET = 0.08;
   const TWO_LETTER_VOWELS = ['aa','ee','ii','ie','oo','uu','oe','eu','ui','ij','ei','ai','au','ou'];
   const ONE_LETTER_VOWELS = ['a','e','i','o','u'];
-
   const form = document.getElementById('scramble-form');
   const input = document.getElementById('word');
   const grid = document.getElementById('grid');
@@ -797,7 +778,6 @@
   const vowelsSelectAllBtn = document.getElementById('vowels-all');
   const vowelsSelectNoneBtn = document.getElementById('vowels-none');
   const resetSettingsBtn = document.getElementById('reset-settings-btn');
-
   // App State
   let scene, camera, renderer;
   let wordButtons = [];
@@ -813,16 +793,13 @@
   const wordlist = new Set();
   let wordlistLoaded = false;
   let barendroomAnimationId = null;
-
   // DOM Refs for dynamic elements
   const comboCount = document.getElementById('combo-count');
   const paginationControls = document.getElementById('pagination-controls');
   const pageIndicator = document.getElementById('page-indicator');
   const prevPageBtn = document.getElementById('prev-page');
   const nextPageBtn = document.getElementById('next-page');
-
   const shareBtn = document.getElementById('share-btn');
-
   // --- Barendroom Feature ---
   async function loadWordlist() {
     try {
@@ -841,7 +818,6 @@
       console.error('Error loading wordlist:', e);
     }
   }
-
   function checkAllWordsExist(analysis) {
     if (!wordlistLoaded || wordlist.size === 0) return false;
     const count = Math.pow(analysis.uniqueGroups.length, analysis.groups.length);
@@ -855,45 +831,87 @@
     }
     return true;
   }
+function playBarendroomAndAnimate(cellsToPlay) {
+    stopSpeech(true);
+    const playbackId = Date.now();
+    currentPlaybackId = playbackId;
+    speaking = true;
 
-  function playBarendroomAndAnimate(cellsToPlay) {
-    stopSpeech(true); // Stop any previous speech
+    const executeValidationPass = (onComplete) => {
+        let index = 0;
+        const step = () => {
+            if (currentPlaybackId !== playbackId) {
+                cellsToPlay.forEach(c => c.classList.remove('valid', 'invalid'));
+                return;
+            }
+            if (index >= cellsToPlay.length) {
+                onComplete();
+                return;
+            }
+            const cell = cellsToPlay[index];
+            const word = cell.textContent.toLowerCase();
+            cell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            if (wordlist.has(word)) {
+                cell.classList.add('valid', 'bounce');
+                correctSound.currentTime = 0;
+                correctSound.play().catch(e => console.error("Audio play failed:", e));
+            } else {
+                cell.classList.add('invalid', 'shake');
+                wrongSound.currentTime = 0;
+                wrongSound.play().catch(e => console.error("Audio play failed:", e));
+            }
+            
+            setTimeout(() => cell.classList.remove('bounce', 'shake'), 500);
 
-    const playbackId = Date.now();
-    currentPlaybackId = playbackId;
-    speaking = true;
+            index++;
+            setTimeout(step, 300);
+        };
+        step();
+    };
 
-    const step = (idx) => {
-        if (currentPlaybackId !== playbackId || !speaking) {
-            clearActive();
-            if (currentPlaybackId === null) speaking = false;
-            return;
-        }
+    const executeSpeakingPass = (onComplete) => {
+        let index = 0;
+        const step = () => {
+            if (currentPlaybackId !== playbackId || !speaking) {
+                clearActive();
+                if (currentPlaybackId === null) speaking = false;
+                return;
+            }
+            if (index >= cellsToPlay.length) {
+                clearActive();
+                onComplete();
+                return;
+            }
+            const cell = cellsToPlay[index];
+            const word = cell.textContent;
+            clearActive();
+            cell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            cell.classList.add('active');
+            speakWord(word, () => {
+                index++;
+                step();
+            });
+        };
+        step();
+    };
 
-        if (idx >= cellsToPlay.length) {
-            clearActive();
-            speaking = false;
-            startBouncingAnimation(cellsToPlay); 
-            return;
-        }
-
-        const cell = cellsToPlay[idx];
-        const word = cell.textContent;
-
-        clearActive();
-        cell.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-        
-        let highlightClass = 'active';
-        if (settings.enableValidationHighlight && wordlistLoaded) {
-            highlightClass = wordlist.has(word.toLowerCase()) ? 'valid' : 'invalid';
-        }
-        cell.classList.add(highlightClass);
-
-        speakWord(word, () => step(idx + 1));
-    };
-    step(0);
- }
-
+    if (settings.enableValidationHighlight && wordlistLoaded) {
+        executeSpeakingPass(() => {
+            setTimeout(() => {
+                executeValidationPass(() => {
+                    speaking = false;
+                    setTimeout(() => startBouncingAnimation(cellsToPlay), 200);
+                });
+            }, 750);
+        });
+    } else {
+        executeSpeakingPass(() => {
+            speaking = false;
+            startBouncingAnimation(cellsToPlay);
+        });
+    }
+}
 function startBarendroomSequence(analysis) {
       const allWords = [];
       const count = Math.pow(analysis.uniqueGroups.length, analysis.groups.length);
@@ -911,8 +929,7 @@ function startBarendroomSequence(analysis) {
       grid.style.height = 'auto';
       grid.onscroll = null;
       paginationControls.style.display = 'none';
-      comboCount.textContent = `${count.toLocaleString('nl-NL')} Barendroom woorden`;
-
+      comboCount.textContent = `${count.toLocaleString('nl-NL')} combinaties`;
       const originalCells = [];
       allWords.forEach((word, index) => {
           const cell = document.createElement('div');
@@ -926,7 +943,6 @@ function startBarendroomSequence(analysis) {
       
       playBarendroomAndAnimate(originalCells);
   }
-
 function startBouncingAnimation(originalCells) {
     const overlay = document.createElement('div');
     overlay.id = 'barendroom-2d-overlay';
@@ -946,7 +962,8 @@ function startBouncingAnimation(originalCells) {
         overlay.appendChild(cell);
         
         cell.classList.add('bouncing-cell');
-        cell.classList.remove('cell', 'active', 'valid', 'invalid');
+        // Keep valid/invalid, remove active
+        cell.classList.remove('cell', 'active');
         cell.style.width = `${rect.width}px`;
         cell.style.height = `${rect.height}px`;
         cell.style.left = '0px';
@@ -955,22 +972,18 @@ function startBouncingAnimation(originalCells) {
         
         return { el: cell, x: rect.left, y: rect.top, vx: Math.random() * 8 - 4, vy: Math.random() * -10 - 5, width: rect.width, height: rect.height, trace: [], isDragged: false };
     });
-
     outputCard.style.display = 'none';
-
     let draggedButton = null;
     let dragOffsetX = 0, dragOffsetY = 0;
     let lastPos = { x: 0, y: 0 };
     const velocityHistory = [];
     const MAX_HISTORY = 5;
-
     let gravity = { x: 0, y: 0.3 };
     const friction = 0.995;
     const bounceFactor = 0.8;
     const restitution = 0.65;
     const maxTraceLength = 20;
     const MAX_SPEED = 40;
-
     const handleOrientation = (event) => {
         if (event.accelerationIncludingGravity) {
             const GRAVITY_SCALE = 0.3 / 9.8; 
@@ -992,18 +1005,15 @@ function startBouncingAnimation(originalCells) {
     } else {
         window.addEventListener('devicemotion', handleOrientation);
     }
-
     const confetti = [];
     const CONFETTI_COUNT = 150;
     const confettiColors = ['#6ee7f5', '#9b8cff', '#4ade80', '#ff4d6d'];
     for (let i = 0; i < CONFETTI_COUNT; i++) {
         confetti.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height, width: Math.random() * 6 + 4, height: Math.random() * 12 + 8, vx: Math.random() * 2 - 1, vy: Math.random() * 2 + 2, rotation: Math.random() * Math.PI * 2, rotationSpeed: (Math.random() - 0.5) * 0.1, color: confettiColors[Math.floor(Math.random() * confettiColors.length)] });
     }
-
     function animate() {
         ctx.fillStyle = '#0f1226';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
         confetti.forEach(c => {
             c.x += c.vx; c.y += c.vy; c.rotation += c.rotationSpeed;
             if (c.y > canvas.height + 20) { c.x = Math.random() * canvas.width; c.y = -20; }
@@ -1012,7 +1022,6 @@ function startBouncingAnimation(originalCells) {
             ctx.fillStyle = c.color; ctx.fillRect(-c.width / 2, -c.height / 2, c.width, c.height);
             ctx.restore();
         });
-
         bouncingButtons.forEach(btn => {
             if (!btn.isDragged) {
                 btn.vx += gravity.x; btn.vy += gravity.y;
@@ -1100,7 +1109,6 @@ function startBouncingAnimation(originalCells) {
     overlay.addEventListener('touchstart', e => { e.preventDefault(); handleStart(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
     overlay.addEventListener('touchmove', e => { e.preventDefault(); if (draggedButton && e.touches.length) handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
     window.addEventListener('touchend', handleEnd);
-
     animate();
     
     const popup = document.createElement('div');
@@ -1153,32 +1161,25 @@ function startBouncingAnimation(originalCells) {
         outputCard.style.display = 'block'; displayPage(1);
     });
 }
-
-
   // --- Settings Management ---
   const defaultAllowedVowels = TWO_LETTER_VOWELS.reduce((acc, vg) => ({ ...acc, [vg]: true }), {});
   const defaultSettings = { enable3d: false, enableValidationHighlight: false, language: 'nl-NL', allowedVowelGroups: { ...defaultAllowedVowels }, vowelOptionsExpanded: false, pitch: 1.0, rate: 1.00 };
   const DEFAULT_VOWEL_MASK = (1 << TWO_LETTER_VOWELS.length) - 1;
-
   function compressSettings(settingsToCompress) {
       const compressed = {};
       const defaults = defaultSettings;
-
       if (settingsToCompress.enable3d !== defaults.enable3d) compressed.d = settingsToCompress.enable3d ? 1 : 0;
       if (settingsToCompress.enableValidationHighlight) compressed.h = 1;
       if (settingsToCompress.vowelOptionsExpanded !== defaults.vowelOptionsExpanded) compressed.e = settingsToCompress.vowelOptionsExpanded ? 1 : 0;
       if (settingsToCompress.pitch !== defaults.pitch) compressed.p = settingsToCompress.pitch;
       if (settingsToCompress.rate !== defaults.rate) compressed.r = settingsToCompress.rate;
-
       let mask = 0;
       TWO_LETTER_VOWELS.forEach((vowel, index) => {
           if (settingsToCompress.allowedVowelGroups[vowel]) mask |= (1 << index);
       });
-
       if (mask !== DEFAULT_VOWEL_MASK) compressed.v = mask;
       return compressed;
   }
-
   function decompressSettings(compressed) {
       const decompressed = JSON.parse(JSON.stringify(defaultSettings));
       if (compressed.d !== undefined) decompressed.enable3d = compressed.d === 1;
@@ -1193,10 +1194,8 @@ function startBouncingAnimation(originalCells) {
           allowed[vowel] = (mask & (1 << index)) !== 0;
       });
       decompressed.allowedVowelGroups = allowed;
-
       return decompressed;
   }
-
   function getActiveVowelGroups() {
       const allowed = Object.entries(settings.allowedVowelGroups || {})
           .filter(([, isAllowed]) => isAllowed)
@@ -1208,7 +1207,6 @@ function startBouncingAnimation(originalCells) {
       const activeVowels = getActiveVowelGroups();
       validVowelsList.textContent = activeVowels.join(' ');
   }
-
   function saveSettings() {
     settings.enable3d = enable3dCheckbox.checked;
     settings.enableValidationHighlight = enableValidationHighlightCheckbox.checked;
@@ -1216,22 +1214,18 @@ function startBouncingAnimation(originalCells) {
     settings.pitch = parseFloat(pitchSlider.value);
     settings.rate = parseFloat(rateSlider.value);
     settings.vowelOptionsExpanded = vowelOptionsDetails.open;
-
     const newAllowed = {};
     vowelGroupGrid.querySelectorAll('.toggle-switch').forEach(toggle => {
         newAllowed[toggle.dataset.vowelGroup] = toggle.checked;
     });
     settings.allowedVowelGroups = newAllowed;
-
     localStorage.setItem('barendGenSettings', JSON.stringify(settings));
     updateValidVowelsDisplay();
   }
-
   function updateSliderValues() {
     pitchValueSpan.textContent = parseFloat(pitchSlider.value).toFixed(2);
     rateValueSpan.textContent = parseFloat(rateSlider.value).toFixed(2);
   }
-
   function applySettings(newSettings) {
     settings = { ...defaultSettings, ...newSettings };
     settings.allowedVowelGroups = { ...defaultAllowedVowels, ...(settings.allowedVowelGroups || {}) };
@@ -1242,18 +1236,15 @@ function startBouncingAnimation(originalCells) {
     pitchSlider.value = settings.pitch;
     rateSlider.value = settings.rate;
     vowelOptionsDetails.open = settings.vowelOptionsExpanded;
-
     if (settings.allowedVowelGroups) {
         Object.entries(settings.allowedVowelGroups).forEach(([vg, isAllowed]) => {
             const toggle = document.getElementById(`vowel-toggle-${vg}`);
             if (toggle) toggle.checked = isAllowed;
         });
     }
-
     updateSliderValues();
     updateValidVowelsDisplay();
   }
-
   function loadSettings() {
     const saved = localStorage.getItem('barendGenSettings');
     const loadedSettings = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultSettings));
@@ -1276,7 +1267,6 @@ function startBouncingAnimation(originalCells) {
     activeMaterial = new THREE.MeshPhysicalMaterial({ color: 0x9b8cff, metalness: 0.1, roughness: 0.5, emissive: 0x6ee7f5, emissiveIntensity: 0.5, clearcoat: 0.8 });
     validMaterial = new THREE.MeshPhysicalMaterial({ color: 0x4ade80, metalness: 0.1, roughness: 0.5, emissive: 0x4ade80, emissiveIntensity: 0.5, clearcoat: 0.8 });
     invalidMaterial = new THREE.MeshPhysicalMaterial({ color: 0xff4d6d, metalness: 0.1, roughness: 0.5, emissive: 0xff4d6d, emissiveIntensity: 0.5, clearcoat: 0.8 });
-
     let isRot = false, rotX = 0, rotY = Math.PI / 2, camDist = 8;
     let lastTouch = null, lastPinch = null;
     const getDist = (a,b) => Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
@@ -1430,7 +1420,6 @@ function renderVirtualizedGrid(wordObjects) {
         if (i < positions.length) { const btn = createWordButton(wordObject.word, positions[i], wordObject.index); scene.add(btn); wordButtons.push(btn); }
     });
   }
-
   // --- Speech Synthesis ---
     const speakWord = (text, onend) => {
         const u = new SpeechSynthesisUtterance(text);
@@ -1454,7 +1443,6 @@ function renderVirtualizedGrid(wordObjects) {
 const speakSingle = (word, element) => {
     stopSpeech(true);
     clearActive();
-
     let highlightClass = 'active';
     let highlightMaterial = activeMaterial;
     if (settings.enableValidationHighlight && wordlistLoaded) {
@@ -1462,7 +1450,6 @@ const speakSingle = (word, element) => {
         highlightClass = isValid ? 'valid' : 'invalid';
         highlightMaterial = isValid ? validMaterial : invalidMaterial;
     }
-
     if (element.userData && element.userData.baseMaterial){ // 3D
       const original = element.userData.baseMaterial;
       element.children[0].material = highlightMaterial;
@@ -1472,7 +1459,6 @@ const speakSingle = (word, element) => {
       speakWord(word, () => element.classList.remove('active', 'valid', 'invalid'));
     }
   };
-
   // --- Word Processing Logic ---
   const findVowelGroups = (word) => {
     const activeVowelGroups = getActiveVowelGroups();
@@ -1492,13 +1478,11 @@ const speakSingle = (word, element) => {
     if (uniqueGroups.length < 2) return { ok:false };
     return { ok:true, word, groups, uniqueGroups };
   };
-
   function updatePaginationControls() {
     const totalPages = Math.ceil(totalCombinations / itemsPerPage);
     prevPageBtn.disabled = currentPage <= 1; nextPageBtn.disabled = currentPage >= totalPages;
     prevPageBtn.style.opacity = prevPageBtn.disabled ? 0.4 : 1; nextPageBtn.style.opacity = nextPageBtn.disabled ? 0.4 : 1;
    }
-
   function buildNthVariant(n, analysis) {
     const { word, groups, uniqueGroups } = analysis; const base = uniqueGroups.length;
     let comboVowels = []; let tempN = n;
@@ -1509,7 +1493,6 @@ const speakSingle = (word, element) => {
     }
     result += word.slice(pos); return result;
   }
-
   function displayPage(page) {
     const totalPages = Math.ceil(totalCombinations / itemsPerPage); if (page < 1 || page > totalPages) return;
     currentPage = page; const startIndex = (page - 1) * itemsPerPage;
@@ -1522,36 +1505,119 @@ const speakSingle = (word, element) => {
     if (totalPages > 1) { paginationControls.style.display = 'flex'; } else { paginationControls.style.display = 'none'; }
     updatePaginationControls();
   }
-
-  function playCurrentPage() {
-    stopSpeech(true); const playbackId = Date.now(); currentPlaybackId = playbackId; speaking = true;
-    const startIndex = (currentPage - 1) * itemsPerPage; const wordsOnPage = [];
+  function playPaginatedTwoPass() {
+    stopSpeech(true);
+    const playbackId = Date.now();
+    currentPlaybackId = playbackId;
+    speaking = true;
+    const wordsOnPage = [];
+    const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, totalCombinations);
-    for (let i = startIndex; i < endIndex; i++) { wordsOnPage.push(buildNthVariant(i, currentAnalysis)); }
+    for (let i = startIndex; i < endIndex; i++) {
+        wordsOnPage.push(buildNthVariant(i, currentAnalysis));
+    }
+    const executeSpeakingPass = (onComplete) => {
+        let index = 0;
+        const step = () => {
+            if (currentPlaybackId !== playbackId || !speaking) {
+                clearActive(); if (currentPlaybackId === null) speaking = false; return;
+            }
+            if (index >= wordsOnPage.length) {
+                document.querySelectorAll('.cell.active').forEach(c => c.classList.remove('active'));
+                onComplete(); return;
+            }
+            const word = wordsOnPage[index];
+            const globalIndex = startIndex + index;
+            document.querySelectorAll('.cell.active').forEach(c => c.classList.remove('active'));
+            if (grid._scrollToIndex) grid._scrollToIndex(index);
+            const findAndHighlight = (attempt = 0) => {
+                if (attempt > 15) return;
+                const cell = grid.querySelector(`[data-index='${globalIndex}']`);
+                if (cell) cell.classList.add('active');
+                else requestAnimationFrame(() => findAndHighlight(attempt + 1));
+            };
+            findAndHighlight();
+            speakWord(word, () => { index++; step(); });
+        };
+        step();
+    };
+    const executeValidationPass = (onComplete) => {
+        let index = 0;
+        const step = () => {
+            if (currentPlaybackId !== playbackId) { return; }
+            if (index >= wordsOnPage.length) { onComplete(); return; }
+            const word = wordsOnPage[index];
+            const globalIndex = startIndex + index;
+            if (grid._scrollToIndex) grid._scrollToIndex(index);
+            const findAndValidate = (attempt = 0) => {
+                if (attempt > 15) return;
+                const cell = grid.querySelector(`[data-index='${globalIndex}']`);
+                if (cell) {
+                    if (wordlist.has(word.toLowerCase())) {
+                        cell.classList.add('valid', 'bounce');
+                        correctSound.currentTime = 0; correctSound.play().catch(e=>console.error(e));
+                    } else {
+                        cell.classList.add('invalid', 'shake');
+                        wrongSound.currentTime = 0; wrongSound.play().catch(e=>console.error(e));
+                    }
+                    setTimeout(() => cell.classList.remove('bounce', 'shake'), 500);
+                } else { requestAnimationFrame(() => findAndValidate(attempt + 1)); }
+            };
+            findAndValidate();
+            index++;
+            setTimeout(step, 500);
+        };
+        step();
+    };
+    executeSpeakingPass(() => {
+        setTimeout(() => {
+            executeValidationPass(() => {
+                const totalPages = Math.ceil(totalCombinations / itemsPerPage);
+                if (speaking && currentPage < totalPages) {
+                    currentPage++;
+                    displayPage(currentPage);
+                    setTimeout(playPaginatedTwoPass, 250);
+                } else {
+                    speaking = false;
+                }
+            });
+        }, 250);
+    });
+  }
+  function playCurrentPage() {
+    stopSpeech(true);
+    const playbackId = Date.now();
+    currentPlaybackId = playbackId;
+    speaking = true;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const wordsOnPage = [];
+    const endIndex = Math.min(startIndex + itemsPerPage, totalCombinations);
+    for (let i = startIndex; i < endIndex; i++) {
+        wordsOnPage.push(buildNthVariant(i, currentAnalysis));
+    }
     const step = (idx) => {
         if (currentPlaybackId !== playbackId || !speaking) {
-            clearActive(); if (currentPlaybackId === null) speaking = false; return;
-        }
-        if (idx >= wordsOnPage.length) {
-            clearActive(); const totalPages = Math.ceil(totalCombinations / itemsPerPage);
-            if (speaking && currentPage < totalPages) {
-                currentPage++; displayPage(currentPage); setTimeout(playCurrentPage, 250);
-            } else { speaking = false; }
+            clearActive();
+            if (currentPlaybackId === null) speaking = false;
             return;
         }
-        
+        if (idx >= wordsOnPage.length) {
+            clearActive();
+            const totalPages = Math.ceil(totalCombinations / itemsPerPage);
+            if (speaking && currentPage < totalPages) {
+                currentPage++;
+                displayPage(currentPage);
+                setTimeout(playCurrentPage, 250);
+            } else {
+                speaking = false;
+            }
+            return;
+        }
         const word = wordsOnPage[idx];
         const globalIndex = startIndex + idx;
         clearActive();
-        
-        let highlightClass = 'active';
-        let highlightMaterial = activeMaterial;
-        if (settings.enableValidationHighlight && wordlistLoaded) {
-            const isValid = wordlist.has(word.toLowerCase());
-            highlightClass = isValid ? 'valid' : 'invalid';
-            highlightMaterial = isValid ? validMaterial : invalidMaterial;
-        }
-
+        const highlightClass = 'active';
+        const highlightMaterial = activeMaterial;
         if (settings.enable3d && canvasContainer.style.display !== 'none') {
             const button = wordButtons.find(b => b.userData.index === globalIndex);
             if (button) button.children[0].material = highlightMaterial;
@@ -1560,16 +1626,18 @@ const speakSingle = (word, element) => {
             const highlightWhenVisible = (attempt = 0) => {
                 if (attempt > 15) return;
                 const cell = grid.querySelector(`[data-index='${globalIndex}']`);
-                if (cell) { cell.classList.add(highlightClass); }
-                else { requestAnimationFrame(() => highlightWhenVisible(attempt + 1)); }
+                if (cell) {
+                    cell.classList.add(highlightClass);
+                } else {
+                    requestAnimationFrame(() => highlightWhenVisible(attempt + 1));
+                }
             };
             highlightWhenVisible();
         }
         speakWord(word, () => step(idx + 1));
     };
     step(0);
-}
-
+  }
   const showError = () => {
     stopSpeech(true); if (!modal.open) modal.showModal(); const u = new SpeechSynthesisUtterance('Neehee');
     const voices = speechSynthesis.getVoices() || [];
@@ -1580,7 +1648,6 @@ const speakSingle = (word, element) => {
   
   // --- Event Listeners & Initialization ---
   closeModal.addEventListener('click', () => { if (modal.open) modal.close(); input.focus(); input.select(); });
-
   shareBtn.addEventListener('click', async () => {
     if (!currentAnalysis || !currentAnalysis.ok) {
         input.animate([ { transform: 'translateX(0)' }, { transform: 'translateX(-5px)' }, { transform: 'translateX(5px)' }, { transform: 'translateX(0)' } ], { duration: 300, easing: 'ease-in-out' });
@@ -1594,32 +1661,49 @@ const speakSingle = (word, element) => {
     if (navigator.share && navigator.canShare(shareData)) { try { await navigator.share(shareData); } catch (err) { console.error('Share failed:', err); }
     } else { try { await navigator.clipboard.writeText(shareUrl); const originalIcon = shareBtn.innerHTML; shareBtn.innerHTML = '✅'; setTimeout(() => { shareBtn.innerHTML = originalIcon; }, 2000); } catch (err) { alert('Kon de link niet naar het klembord kopiëren.'); } }
   });
-
   function proceedWithGeneration() {
-        currentAnalysis = window._pendingAnalysis;
-        totalCombinations = Math.pow(currentAnalysis.uniqueGroups.length, currentAnalysis.groups.length);
-        const isBarendroom = checkAllWordsExist(currentAnalysis);
-        if (isBarendroom) { startBarendroomSequence(currentAnalysis); }
-        else { outputCard.style.display = 'block'; displayPage(1); playCurrentPage(); }
-        window._pendingAnalysis = null;
-    }
+      currentAnalysis = window._pendingAnalysis;
+      totalCombinations = Math.pow(currentAnalysis.uniqueGroups.length, currentAnalysis.groups.length);
+      const isBarendroom = checkAllWordsExist(currentAnalysis);
 
+      if (isBarendroom) {
+          startBarendroomSequence(currentAnalysis);
+      } else {
+          outputCard.style.display = 'block';
+          displayPage(1);
+          if (settings.enableValidationHighlight && wordlistLoaded) {
+              playPaginatedTwoPass();
+          } else {
+              playCurrentPage();
+          }
+      }
+      window._pendingAnalysis = null;
+  }
   function showWarningModal(check) {
     const numGroups = check.uniqueGroups.length; const estimatedTotal = Math.pow(numGroups, check.groups.length);
     const warningMessage = `Je staat op het punt een ${numGroups}D hyperkubus te genereren met ${estimatedTotal.toLocaleString('nl-NL')} combinaties in 3D-modus. Dit kan erg traag zijn of de browser laten crashen. Weet je het zeker?`;
     warningModalText.textContent = warningMessage; warningModal.showModal(); window._pendingAnalysis = check;
   }
-
   form.addEventListener('submit', (e) => {
     e.preventDefault(); const check = analyzeWord(input.value);
     if (!check.ok) { showError(); return; }
     if (settings.enable3d && check.uniqueGroups.length > 3) { showWarningModal(check); }
     else { window._pendingAnalysis = check; proceedWithGeneration(); }
   });
-
   confirmProceedBtn.addEventListener('click', () => { warningModal.close(); if(window._pendingAnalysis) { proceedWithGeneration(); } });
   confirmCancelBtn.addEventListener('click', () => { warningModal.close(); window._pendingAnalysis = null; });
-  btnSpeak.addEventListener('click', () => { if(totalCombinations > 0) playCurrentPage(); });
+  btnSpeak.addEventListener('click', () => {
+    if (totalCombinations > 0) {
+        if (checkAllWordsExist(currentAnalysis)){
+             // Re-running a Barendroom needs the special sequence.
+             startBarendroomSequence(currentAnalysis);
+        } else if (settings.enableValidationHighlight && wordlistLoaded) {
+            playPaginatedTwoPass();
+        } else {
+            playCurrentPage();
+        }
+    }
+  });
   btnStop.addEventListener('click', () => stopSpeech());
   prevPageBtn.addEventListener('click', () => { if (currentPage > 1) { stopSpeech(); displayPage(currentPage - 1); } });
   nextPageBtn.addEventListener('click', () => { const totalPages = Math.ceil(totalCombinations / itemsPerPage); if (currentPage < totalPages) { stopSpeech(); displayPage(currentPage + 1); } });
@@ -1641,7 +1725,6 @@ const speakSingle = (word, element) => {
     });
     pageIndicator.parentNode.insertBefore(pageInput, prevPageBtn); pageInput.focus(); pageInput.select();
  });
-
   optionsBtn.addEventListener('click', () => optionsModal.showModal());
   closeOptionsModal.addEventListener('click', () => optionsModal.close());
   enable3dCheckbox.addEventListener('change', saveSettings);
@@ -1654,7 +1737,6 @@ const speakSingle = (word, element) => {
   vowelsSelectAllBtn.addEventListener('click', () => { vowelGroupGrid.querySelectorAll('.toggle-switch').forEach(toggle => toggle.checked = true); saveSettings(); });
   vowelsSelectNoneBtn.addEventListener('click', () => { vowelGroupGrid.querySelectorAll('.toggle-switch').forEach(toggle => toggle.checked = false); saveSettings(); });
   vowelGroupGrid.addEventListener('change', (e) => { if (e.target.matches('.toggle-switch')) saveSettings(); });
-
   function populateVowelOptions() {
       vowelGroupGrid.innerHTML = '';
       TWO_LETTER_VOWELS.forEach(vg => {
@@ -1663,7 +1745,6 @@ const speakSingle = (word, element) => {
           vowelGroupGrid.appendChild(item);
       });
   }
-
   function populateLanguageOptions() {
     const voices = speechSynthesis.getVoices(); if (!voices.length) return;
     const langDisplayNames = new Intl.DisplayNames(['nl'], { type: 'language' });
@@ -1682,8 +1763,6 @@ const speakSingle = (word, element) => {
     settings.language = languageSelect.value;
   }
   speechSynthesis.onvoiceschanged = populateLanguageOptions;
-
-
   function initializeFromUrl() {
       const urlParams = new URLSearchParams(window.location.search);
       const wordFromUrl = urlParams.get('word'); const settingsFromUrl = urlParams.get('s');
@@ -1696,14 +1775,12 @@ const speakSingle = (word, element) => {
       } else { loadSettings(); }
       if (wordFromUrl) { input.value = wordFromUrl; setTimeout(() => { document.getElementById('generate').click(); }, 250); }
   }
-
   // --- Final Initialization ---
   input.setAttribute('autofocus','true');
   loadWordlist();
   populateVowelOptions();
   initializeFromUrl();
   populateLanguageOptions();
-
 })();
 </script>
 </body>
