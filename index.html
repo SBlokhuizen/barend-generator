@@ -526,7 +526,7 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(1);
       background: var(--card);
       border-radius: var(--radius);
       padding: 24px 32px;
@@ -535,6 +535,7 @@
       z-index: 10001;
       border: 1px solid rgba(110,231,245,.35);
       animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: transform 0.3s ease, opacity 0.3s ease;
   }
 
   .barendroom-congrats-popup h2 {
@@ -551,6 +552,18 @@
       margin-bottom: 24px;
       color: var(--muted);
   }
+
+  .barendroom-popup-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+  }
+  .barendroom-popup-actions .btn {
+      padding: 10px 20px;
+      font-size: 14px;
+  }
+
 
   @media (max-width:680px){
     .wrap{width:calc(100% - 24px)}
@@ -1156,29 +1169,107 @@ function startBouncingAnimation(originalCells) {
 
     animate();
     
-    // Popup and return button logic (unchanged, with one addition for cleanup)
     const popup = document.createElement('div');
     popup.className = 'barendroom-congrats-popup';
-    popup.addEventListener('touchstart', (e) => {
-        e.stopPropagation();
-    });
+    popup.innerHTML = `<h2>Gefeliciteerd!</h2><p>Je hebt een Barendroom gevonden!</p>`;
+    popup.addEventListener('touchstart', (e) => e.stopPropagation());
+    
+    const popupActions = document.createElement('div');
+    popupActions.className = 'barendroom-popup-actions';
+
+    const shareBarendroomBtn = document.createElement('button');
+    shareBarendroomBtn.className = 'btn ghost';
+    shareBarendroomBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>Delen`;
+
+    const minimizeBtn = document.createElement('button');
+    minimizeBtn.className = 'btn ghost';
+    minimizeBtn.textContent = 'Minimaliseren';
     
     const returnBtn = document.createElement('button');
     returnBtn.className = 'btn primary';
-    returnBtn.textContent = 'Terug naar de app';
-    
-    popup.innerHTML = `<h2>Gefeliciteerd!</h2><p>Je hebt een Barendroom gevonden!</p>`;
-    popup.appendChild(returnBtn);
+    returnBtn.textContent = 'Terug';
+
+    popupActions.appendChild(shareBarendroomBtn);
+    popupActions.appendChild(minimizeBtn);
+    popupActions.appendChild(returnBtn);
+    popup.appendChild(popupActions);
     overlay.appendChild(popup);
+
+    shareBarendroomBtn.addEventListener('click', async () => {
+        const wordToShare = input.value.trim();
+        const compressed = compressSettings(settings);
+        const baseUrl = window.location.origin + window.location.pathname;
+        let shareUrl = `${baseUrl}?word=${encodeURIComponent(wordToShare)}`;
+        if (Object.keys(compressed).length > 0) {
+            shareUrl += `&s=${encodeURIComponent(btoa(JSON.stringify(compressed)))}`;
+        }
+        const shareData = {
+            title: 'Barend Generator',
+            text: `Ik heb een Barendroom gevonden: "${wordToShare}"! 🎉`,
+            url: shareUrl,
+        };
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                await navigator.clipboard.writeText(shareUrl);
+                shareBarendroomBtn.textContent = '✅ Gekopieerd!';
+                setTimeout(() => { shareBarendroomBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>Delen`; }, 2000);
+            }
+        } catch (err) {
+            console.error('Share failed:', err);
+        }
+    });
+
+    minimizeBtn.addEventListener('click', () => {
+        popup.style.transform = 'translate(-50%, -50%) scale(0)';
+        popup.style.opacity = '0';
+        popup.style.pointerEvents = 'none';
+
+        if (!document.getElementById('restore-popup-btn')) {
+            const restoreBtn = document.createElement('button');
+            restoreBtn.id = 'restore-popup-btn';
+            restoreBtn.className = 'btn ghost';
+            
+            restoreBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+            
+            restoreBtn.style.position = 'absolute';
+            restoreBtn.style.top = '20px'; 
+            restoreBtn.style.left = '50%';
+            restoreBtn.style.transform = 'translateX(-50%)';
+            restoreBtn.style.zIndex = '10002';
+            restoreBtn.style.width = '48px';
+            restoreBtn.style.height = '48px';
+            restoreBtn.style.borderRadius = '50%';
+            restoreBtn.style.padding = '0';
+
+            const restoreAction = () => {
+                popup.style.transform = 'translate(-50%, -50%) scale(1)';
+                popup.style.opacity = '1';
+                popup.style.pointerEvents = 'auto';
+                if (overlay.contains(restoreBtn)) {
+                    overlay.removeChild(restoreBtn);
+                }
+            };
+
+            // Listener for desktop
+            restoreBtn.addEventListener('click', restoreAction);
+
+            // Listener for mobile
+            restoreBtn.addEventListener('touchstart', (e) => {
+                e.stopPropagation(); // Prevents the overlay from handling the touch
+                restoreAction();
+            });
+
+            overlay.appendChild(restoreBtn);
+        }
+    });
     
     returnBtn.addEventListener('click', () => {
         cancelAnimationFrame(barendroomAnimationId);
         barendroomAnimationId = null;
         document.body.removeChild(overlay);
-        
-        // IMPORTANT: Remove the event listener to prevent it from running in the background.
         window.removeEventListener('devicemotion', handleOrientation);
-        
         outputCard.style.display = 'block';
         displayPage(1);
     });
@@ -2067,4 +2158,3 @@ const speakSingle = (word, element) => {
 </script>
 </body>
 </html>
-
