@@ -331,17 +331,17 @@
   .cell.active {
     background: linear-gradient(180deg, rgba(155, 140, 255, .18), rgba(110, 231, 245, .12));
     border-color: rgba(110, 231, 245, .65);
-    box-shadow: 0 0 0 6px rgba(110, 231, 245, .08), inset 0 0 40px rgba(110, 231, 245, .06);
+    box-shadow: inset 0 0 0 6px rgba(110, 231, 245, .08), inset 0 0 40px rgba(110, 231, 245, .06);
   }
   .cell.valid {
     background: linear-gradient(180deg, rgba(74, 222, 128, .18), rgba(74, 222, 128, .12));
     border-color: rgba(74, 222, 128, .65);
-    box-shadow: 0 0 0 6px rgba(74, 222, 128, .08), inset 0 0 40px rgba(74, 222, 128, .06);
+    box-shadow: inset 0 0 0 6px rgba(74, 222, 128, .08), inset 0 0 40px rgba(74, 222, 128, .06);
   }
   .cell.invalid {
     background: linear-gradient(180deg, rgba(255, 77, 109, .18), rgba(255, 77, 109, .12));
     border-color: rgba(255, 77, 109, .65);
-    box-shadow: 0 0 0 6px rgba(255, 77, 109, .08), inset 0 0 40px rgba(255, 77, 109, .06);
+    box-shadow: inset 0 0 0 6px rgba(255, 77, 109, .08), inset 0 0 40px rgba(255, 77, 109, .06);
   }
   .cell.shake {
     animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
@@ -907,20 +907,20 @@
     <div class="modal-head"><div id="options-modal-title" class="modal-title">Instellingen</div></div>
     <div class="modal-body">
       <div class="option-row">
-        <label for="enable-3d">3D weergave inschakelen</label>
+        <label for="enable-3d" title="Toon de combinaties in een 3D-ruimte.">3D weergave inschakelen</label>
         <input type="checkbox" id="enable-3d" class="toggle-switch">
       </div>
         <div class="option-row">
-        <label for="enable-validation-highlight">Barendroom Validatie</label>
+        <label for="enable-validation-highlight" title="Controleert of de gegenereerde woorden in het woordenboek bestaan.">Barendroom Validatie</label>
         <input type="checkbox" id="enable-validation-highlight" class="toggle-switch">
       </div>
       <div class="option-row">
-        <label for="language-select">Spraaktaal</label>
+        <label for="language-select" title="Selecteer de taal en stem voor het uitspreken van de woorden.">Spraaktaal</label>
         <select id="language-select" style="background: #0e1230; color: var(--text); border: 1px solid rgba(255,255,255,.12); border-radius: 6px; padding: 4px 8px; flex: 0 1 172px;"></select>
       </div>
       <details id="vowel-options-details" class="option-group">
         <summary class="option-row">
-            <span>Toegestane Tweeklanken</span>
+            <span title="Kies welke klinkercombinaties (tweeklanken) gebruikt mogen worden om variaties te genereren.">Toegestane Tweeklanken</span>
         </summary>
         <div class="collapsible-content">
             <div class="option-group-header">
@@ -935,17 +935,17 @@
         </div>
       </details>
       <div class="option-row">
-        <label for="pitch-slider">Toonhoogte</label>
+        <label for="pitch-slider" title="Past de toonhoogte van de spraak aan. Hogere waarden klinken hoger.">Toonhoogte</label>
         <input type="range" id="pitch-slider" min="0" max="2" step="0.1">
         <span id="pitch-value" class="slider-value"></span>
       </div>
       <div class="option-row">
-        <label for="rate-slider">Snelheid</label>
+        <label for="rate-slider" title="Past de spreeksnelheid aan. Hogere waarden zijn sneller.">Snelheid</label>
         <input type="range" id="rate-slider" min="0.1" max="10" step="0.1">
         <span id="rate-value" class="slider-value"></span>
       </div>
       <div class="option-row">
-        <button type="button" class="btn ghost" id="reset-settings-btn" style="padding: 8px 16px; font-size: 14px; width: 100%;">Instellingen resetten</button>
+        <button type="button" class="btn ghost" id="reset-settings-btn" style="padding: 8px 16px; font-size: 14px; width: 100%;" title="Zet alle instellingen terug naar de standaardwaarden.">Instellingen resetten</button>
       </div>
     </div>
     <div class="modal-actions"><button class="btn primary" id="close-options-modal">Sluiten</button></div>
