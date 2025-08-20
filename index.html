@@ -735,8 +735,10 @@
   // Audio elements for validation
   const correctSound = new Audio('correct.mp3');
   const wrongSound = new Audio('wrong.mp3');
+  const victorySound= new Audio('victory.mp3');
   correctSound.preload = 'auto';
   wrongSound.preload = 'auto';
+  victorySound.preload = 'auto';
 
   // Constants & DOM Elements
   const BUTTON_DEPTH = 0.28;
@@ -944,6 +946,9 @@ function startBarendroomSequence(analysis) {
       playBarendroomAndAnimate(originalCells);
   }
 function startBouncingAnimation(originalCells) {
+
+    victorySound.currentTime = 0;
+    victorySound.play().catch(e => console.error("Audio play failed:", e));
     const overlay = document.createElement('div');
     overlay.id = 'barendroom-2d-overlay';
     
