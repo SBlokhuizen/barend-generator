@@ -859,7 +859,6 @@
         <input id="word" name="word" type="text" spellcheck="false" placeholder="bijv. Barend" maxlength="48" />
         <div class="form-actions">
           <button type="submit" class="btn primary" id="generate">Genereren</button>
-          <button type="button" class="btn ghost" id="speak">Opnieuw</button>
           <button type="button" class="btn stop" id="stop">Stop</button>
         </div>
       </form>
@@ -985,7 +984,6 @@
   const canvasContainer = document.getElementById('canvas-container');
   const canvas = document.getElementById('three-canvas');
   const dimensionInfo = document.getElementById('dimension-info');
-  const btnSpeak = document.getElementById('speak');
   const btnStop = document.getElementById('stop');
   
   // Modals
@@ -2134,25 +2132,37 @@
   }
 
   form.addEventListener('submit', (e) => {
-    e.preventDefault(); const check = analyzeWord(input.value);
-    if (!check.ok) { showError(); return; }
-    if (settings.enable3d && check.uniqueGroups.length > 3) { showWarningModal(check); }
-    else { window._pendingAnalysis = check; proceedWithGeneration(); }
-  });
-  confirmProceedBtn.addEventListener('click', () => { warningModal.close(); if(window._pendingAnalysis) { proceedWithGeneration(); } });
-  confirmCancelBtn.addEventListener('click', () => { warningModal.close(); window._pendingAnalysis = null; });
-  btnSpeak.addEventListener('click', () => {
-    if (totalCombinations > 0) {
+    e.preventDefault();
+    const newWord = input.value.trim();
+
+    // If the word is the same as the current one, replay. Otherwise, generate new.
+    if (currentAnalysis.ok && newWord.toLowerCase() === currentAnalysis.word.toLowerCase()) {
+      if (totalCombinations > 0) {
         if (checkAllWordsExist(currentAnalysis)){
-            // Re-running a Barendroom needs the special sequence.
             startBarendroomSequence(currentAnalysis);
         } else if (settings.enableValidationHighlight && wordlistLoaded) {
             playPaginatedTwoPass();
         } else {
             playCurrentPage();
         }
+      }
+    } else {
+      const check = analyzeWord(newWord);
+      if (!check.ok) {
+        showError();
+        return;
+      }
+      if (settings.enable3d && check.uniqueGroups.length > 3) {
+        showWarningModal(check);
+      } else {
+        window._pendingAnalysis = check;
+        proceedWithGeneration();
+      }
     }
   });
+  
+  confirmProceedBtn.addEventListener('click', () => { warningModal.close(); if(window._pendingAnalysis) { proceedWithGeneration(); } });
+  confirmCancelBtn.addEventListener('click', () => { warningModal.close(); window._pendingAnalysis = null; });
   btnStop.addEventListener('click', () => stopSpeech());
   prevPageBtn.addEventListener('click', () => { if (currentPage > 1) { stopSpeech(); displayPage(currentPage - 1); } });
   nextPageBtn.addEventListener('click', () => { const totalPages = Math.ceil(totalCombinations / itemsPerPage); if (currentPage < totalPages) { stopSpeech(); displayPage(currentPage + 1); } });
