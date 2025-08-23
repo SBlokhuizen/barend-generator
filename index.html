@@ -940,7 +940,7 @@
         fill="currentColor"
       >
         <path
-          d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24-.42-.12-.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"
+          d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24-.42-.12-.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59-1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"
         />
       </svg>
     </button>
@@ -1001,8 +1001,34 @@
       >
         <div id="info-bar">
           <div id="combo-count"></div>
-          <div id="pagination-controls">
+          <div id="pagination-controls" style="display: none">
             <span id="page-indicator"></span>
+            <button
+              type="button"
+              class="btn ghost"
+              id="randomize-btn"
+              aria-label="Willekeurige volgorde"
+              title="Willekeurige volgorde"
+              style="display: none; padding: 10px"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="16 3 21 3 21 8"></polyline>
+                <line x1="4" y1="20" x2="21" y2="3"></line>
+                <polyline points="21 16 21 21 16 21"></polyline>
+                <line x1="15" y1="15" x2="21" y2="21"></line>
+                <line x1="4" y1="4" x2="9" y2="9"></line>
+              </svg>
+            </button>
             <button
               type="button"
               class="btn ghost"
@@ -1281,6 +1307,7 @@
         const wordlist = new Set();
         let wordlistLoaded = false;
         let barendroomAnimationId = null;
+        let combinationOrder = [];
         // DOM Refs for dynamic elements
         const comboCount = document.getElementById("combo-count");
         const paginationControls = document.getElementById(
@@ -1290,6 +1317,7 @@
         const prevPageBtn = document.getElementById("prev-page");
         const nextPageBtn = document.getElementById("next-page");
         const shareBtn = document.getElementById("share-btn");
+        const randomizeBtn = document.getElementById("randomize-btn");
 
         // --- Barendroom Feature ---
         async function loadWordlist() {
@@ -1559,7 +1587,8 @@
             analysis.groups.length,
           );
           for (let i = 0; i < count; i++) {
-            allWords.push(buildNthVariant(i, analysis));
+            const originalIndex = combinationOrder[i];
+            allWords.push(buildNthVariant(originalIndex, analysis));
           }
 
           const use3D =
@@ -2468,21 +2497,14 @@
           el.style.textAlign = "center";
         }
 
-        function renderGrid(words, N) {
-          if (settings.enable3d && N >= 3 && words.length <= itemsPerPage) {
+        function renderGrid(wordObjects, N) {
+          if (settings.enable3d && N >= 3 && wordObjects.length <= itemsPerPage) {
             grid.style.display = "none";
             canvasContainer.style.display = "block";
             if (!scene) initThreeJS();
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            render3DVisualization(
-              words.map((word, i) => ({ word, index: startIndex + i })),
-              N,
-            );
+            render3DVisualization(wordObjects, N);
           } else {
-            const globalStartIndex = (currentPage - 1) * itemsPerPage;
-            renderVirtualizedGrid(
-              words.map((word, i) => ({ word, index: globalStartIndex + i })),
-            );
+            renderVirtualizedGrid(wordObjects);
           }
         }
 
@@ -2705,18 +2727,23 @@
             startIndex + itemsPerPage,
             totalCombinations,
           );
-          const pageVariants = [];
+          const pageObjects = [];
           for (let i = startIndex; i < endIndex; i++) {
-            pageVariants.push(buildNthVariant(i, currentAnalysis));
+            const originalIndex = combinationOrder[i];
+            pageObjects.push({
+              word: buildNthVariant(originalIndex, currentAnalysis),
+              index: i,
+            });
           }
-          renderGrid(pageVariants, currentAnalysis.uniqueGroups.length);
+          renderGrid(pageObjects, currentAnalysis.uniqueGroups.length);
           comboCount.textContent = `${totalCombinations.toLocaleString("nl-NL")} combinaties`;
           pageIndicator.textContent = `Pagina ${currentPage} / ${totalPages.toLocaleString("nl-NL")}`;
-          if (totalPages > 1) {
-            paginationControls.style.display = "flex";
-          } else {
-            paginationControls.style.display = "none";
-          }
+
+          const showPagination = totalPages > 1;
+          pageIndicator.style.display = showPagination ? "inline" : "none";
+          prevPageBtn.style.display = showPagination ? "inline-flex" : "none";
+          nextPageBtn.style.display = showPagination ? "inline-flex" : "none";
+
           updatePaginationControls();
         }
 
@@ -2733,7 +2760,8 @@
           );
           const wordsOnPage = [];
           for (let i = startIndex; i < endIndex; i++) {
-            wordsOnPage.push(buildNthVariant(i, currentAnalysis));
+            const originalIndex = combinationOrder[i];
+            wordsOnPage.push(buildNthVariant(originalIndex, currentAnalysis));
           }
 
           const is3D =
@@ -2877,7 +2905,8 @@
             totalCombinations,
           );
           for (let i = startIndex; i < endIndex; i++) {
-            wordsOnPage.push(buildNthVariant(i, currentAnalysis));
+            const originalIndex = combinationOrder[i];
+            wordsOnPage.push(buildNthVariant(originalIndex, currentAnalysis));
           }
           const step = (idx) => {
             if (currentPlaybackId !== playbackId || !speaking) {
@@ -2931,6 +2960,7 @@
 
         const showError = () => {
           stopSpeech(true);
+          paginationControls.style.display = "none";
           if (!modal.open) modal.showModal();
           const u = new SpeechSynthesisUtterance("Neehee");
           const voices = speechSynthesis.getVoices() || [];
@@ -2944,12 +2974,28 @@
           speechSynthesis.speak(u);
         };
 
+        function shuffleArray(array) {
+          for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+          }
+        }
+
         // --- Event Listeners & Initialization ---
         closeModal.addEventListener("click", () => {
           if (modal.open) modal.close();
           input.focus();
           input.select();
         });
+
+        randomizeBtn.addEventListener("click", () => {
+          if (combinationOrder.length > 0) {
+            stopSpeech();
+            shuffleArray(combinationOrder);
+            displayPage(1);
+          }
+        });
+
         shareBtn.addEventListener("click", async () => {
           if (!currentAnalysis || !currentAnalysis.ok) {
             input.animate(
@@ -3001,16 +3047,25 @@
 
         function proceedWithGeneration() {
           currentAnalysis = window._pendingAnalysis;
+          currentAnalysis.settingsSnapshot = JSON.stringify(
+            getActiveVowelGroups(),
+          );
           totalCombinations = Math.pow(
             currentAnalysis.uniqueGroups.length,
             currentAnalysis.groups.length,
           );
+          combinationOrder = Array.from(
+            { length: totalCombinations },
+            (_, i) => i,
+          );
+
           const isBarendroom = checkAllWordsExist(currentAnalysis);
 
           if (isBarendroom) {
             startBarendroomSequence(currentAnalysis);
           } else {
             outputCard.style.display = "block";
+            paginationControls.style.display = totalCombinations > 0 ? "flex" : "none";
             displayPage(1);
             if (settings.enableValidationHighlight && wordlistLoaded) {
               playPaginatedTwoPass();
@@ -3018,6 +3073,8 @@
               playCurrentPage();
             }
           }
+          randomizeBtn.style.display =
+            totalCombinations > 1 && !isBarendroom ? "inline-flex" : "none";
           window._pendingAnalysis = null;
         }
 
@@ -3033,11 +3090,12 @@
         form.addEventListener("submit", (e) => {
           e.preventDefault();
           const newWord = input.value.trim();
+          const currentActiveVowels = JSON.stringify(getActiveVowelGroups());
 
-          // If the word is the same as the current one, replay. Otherwise, generate new.
           if (
             currentAnalysis.ok &&
-            newWord.toLowerCase() === currentAnalysis.word.toLowerCase()
+            newWord.toLowerCase() === currentAnalysis.word.toLowerCase() &&
+            currentAnalysis.settingsSnapshot === currentActiveVowels
           ) {
             if (totalCombinations > 0) {
               if (checkAllWordsExist(currentAnalysis)) {
@@ -3118,7 +3176,7 @@
               revertToSpan();
             }
           });
-          pageIndicator.parentNode.insertBefore(pageInput, prevPageBtn);
+          pageIndicator.parentNode.insertBefore(pageInput, randomizeBtn);
           pageInput.focus();
           pageInput.select();
         });
