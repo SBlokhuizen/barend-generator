@@ -76,6 +76,11 @@
         align-content: center;
         margin: 0;
       }
+      .title-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
       .card {
         background:
           linear-gradient(
@@ -1031,7 +1036,8 @@
       </svg>
     </button>
     <div class="wrap" role="main">
-      <h1 id="title" class="title">
+	    <a href="." class="title-link" aria-label="Home">
+    <h1 id="title" class="title">
         <span class="title-text">B</span>
         <div class="morphing-letter pos1">
           <div class="letter-container">
@@ -1047,7 +1053,9 @@
           </div>
         </div>
         <span class="title-text">nd Generator</span>
-      </h1>
+    </h1>
+</a>
+
       <header class="card" aria-labelledby="title">
         <form id="scramble-form" autocomplete="off" novalidate>
           <input
