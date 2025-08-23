@@ -274,22 +274,25 @@
         background: linear-gradient(135deg, #ff97aa, var(--danger));
         box-shadow: 0 10px 30px rgba(255, 77, 109, 0.12);
       }
-      #options-btn {
+      .top-left-controls {
         position: fixed;
         top: 24px;
         left: 24px;
         z-index: 100;
-      }
-      .grid {
-        margin-top: 12px;
-        display: grid;
-        gap: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
       }
       #share-btn {
         position: fixed;
         top: 24px;
         right: 24px;
         z-index: 100;
+      }
+      .grid {
+        margin-top: 12px;
+        display: grid;
+        gap: 14px;
       }
       #grid {
         max-height: clamp(320px, 60vh, 600px);
@@ -529,6 +532,8 @@
         background: linear-gradient(180deg, #1b1f45, #131736);
         color: var(--text);
         box-shadow: var(--shadow);
+        max-width: 500px;
+        width: calc(100% - 32px);
       }
       .modal-head {
         padding: 14px 16px;
@@ -548,6 +553,8 @@
       .modal-body {
         padding: 14px 16px;
         color: #dfe5ff;
+        max-height: 60vh;
+        overflow-y: auto;
       }
       .modal-actions {
         padding: 12px 16px;
@@ -890,6 +897,46 @@
         padding: 10px 20px;
         font-size: 14px;
       }
+      #leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+      }
+      #leaderboard-table th,
+      #leaderboard-table td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      #leaderboard-table th {
+        font-weight: 700;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      #leaderboard-table td {
+        font-size: 15px;
+      }
+      .revealed-word-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .revealed-word-container span {
+        font-weight: 700;
+        color: var(--accent);
+      }
+	.clickable-barendroom {
+	  cursor: pointer;
+	  font-weight: 700;
+	  color: var(--accent);
+	  transition: text-decoration 0.2s ease;
+	}
+	.clickable-barendroom:hover {
+	  text-decoration: underline;
+	}
+
+
       @media (max-width: 680px) {
         .wrap {
           width: calc(100% - 24px);
@@ -919,9 +966,9 @@
         .form-actions #options-btn {
           flex-grow: 0;
         }
-        #options-btn {
-          top: 16px;
-          left: 16px;
+        .top-left-controls {
+            top: 16px;
+            left: 16px;
         }
         #share-btn {
           top: 16px;
@@ -931,24 +978,45 @@
     </style>
   </head>
   <body>
-    <button
-      type="button"
-      class="btn ghost"
-      id="options-btn"
-      aria-label="Instellingen"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="currentColor"
+    <div class="top-left-controls">
+      <button
+        type="button"
+        class="btn ghost"
+        id="options-btn"
+        aria-label="Instellingen"
       >
-        <path
-          d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24-.42-.12-.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"
-        />
-      </svg>
-    </button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path
+            d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24-.42-.12-.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"
+          />
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="btn ghost"
+        id="leaderboard-btn"
+        aria-label="Leaderboard"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path
+            d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm7 6c-1.65 0-3-1.35-3-3V5h6v6c0 1.65-1.35 3-3 3zm7-6c0 1.3-.84 2.4-2 2.82V7h2v1z"
+          />
+        </svg>
+      </button>
+    </div>
+
     <button type="button" class="btn ghost" id="share-btn" aria-label="Delen">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -1229,7 +1297,64 @@
         <button class="btn primary" id="close-options-modal">Sluiten</button>
       </div>
     </dialog>
+    <dialog
+      id="leaderboard-modal"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="leaderboard-modal-title"
+    >
+      <div class="modal-head">
+        <div id="leaderboard-modal-title" class="modal-title">
+          Barendroom Leaderboard
+        </div>
+      </div>
+      <div class="modal-body">
+        <table id="leaderboard-table">
+          <thead>
+            <tr>
+              <th>Datum</th>
+              <th>Ontdekker</th>
+              <th>Barendroom</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body">
+            </tbody>
+        </table>
+        <p id="leaderboard-loading" style="text-align: center; display: none;">Laden...</p>
+        <p id="leaderboard-error" style="text-align: center; display: none; color: var(--danger);"></p>
+
+      </div>
+      <div class="modal-actions">
+        <button class="btn primary" id="close-leaderboard-modal">Sluiten</button>
+      </div>
+    </dialog>
+
+    <dialog
+      id="spoiler-warning-modal"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="spoiler-warning-modal-title"
+    >
+      <div class="modal-head">
+        <div id="spoiler-warning-modal-title" class="modal-title">
+          Spoiler Waarschuwing
+        </div>
+      </div>
+      <div class="modal-body">
+        <p>
+          Weet je zeker dat je deze Barendroom wilt onthullen?
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="spoiler-cancel">Annuleren</button>
+        <button class="btn primary" id="spoiler-confirm">
+          Toon de Barendroom
+        </button>
+      </div>
+    </dialog>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <script>
       (() => {
         // Morphing title animation
@@ -1300,6 +1425,14 @@
         const warningModalText = document.getElementById("warning-modal-text");
         const confirmProceedBtn = document.getElementById("confirm-proceed");
         const confirmCancelBtn = document.getElementById("confirm-cancel");
+        const leaderboardBtn = document.getElementById("leaderboard-btn");
+        const leaderboardModal = document.getElementById("leaderboard-modal");
+        const closeLeaderboardModal = document.getElementById("close-leaderboard-modal");
+        const spoilerWarningModal = document.getElementById("spoiler-warning-modal");
+        const spoilerCancelBtn = document.getElementById("spoiler-cancel");
+        const spoilerConfirmBtn = document.getElementById("spoiler-confirm");
+        const leaderboardBody = document.getElementById("leaderboard-body");
+
 
         // Options Controls
         const enable3dCheckbox = document.getElementById("enable-3d");
@@ -1334,6 +1467,8 @@
         let wordlistLoaded = false;
         let barendroomAnimationId = null;
         let combinationOrder = [];
+        let _pendingSpoilerReveal = null;
+
         // DOM Refs for dynamic elements
         const comboCount = document.getElementById("combo-count");
         const paginationControls = document.getElementById(
@@ -1346,6 +1481,54 @@
         const randomizeBtn = document.getElementById("randomize-btn");
 
         if (randomWordBtn) randomWordBtn.disabled = true;
+
+        // --- Leaderboard ---
+        async function loadLeaderboard() {
+            const loadingIndicator = document.getElementById("leaderboard-loading");
+            const errorIndicator = document.getElementById("leaderboard-error");
+            loadingIndicator.style.display = "block";
+            errorIndicator.style.display = "none";
+            leaderboardBody.innerHTML = "";
+
+            try {
+                const response = await fetch("leaderboard.yaml");
+                if (!response.ok) {
+                    throw new Error(`Leaderboard-bestand niet gevonden (status: ${response.status})`);
+                }
+                const yamlText = await response.text();
+                const data = jsyaml.load(yamlText);
+
+                if (!data || data.length === 0) {
+                   leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nog geen Barendromen ontdekt!</td></tr>';
+                   return;
+                }
+
+                data.forEach(item => {
+                    const row = leaderboardBody.insertRow();
+                    row.insertCell(0).textContent = item.date || 'N/A';
+                    row.insertCell(1).textContent = item.discoverer || 'Anoniem';
+                    const wordCell = row.insertCell(2);
+                    
+                    const showBtn = document.createElement('button');
+                    showBtn.textContent = 'Toon';
+                    showBtn.className = 'btn-tiny';
+                    showBtn.dataset.word = item.word;
+                    showBtn.addEventListener('click', () => {
+                        _pendingSpoilerReveal = { cell: wordCell, word: item.word };
+                        spoilerWarningModal.showModal();
+                    });
+                    wordCell.appendChild(showBtn);
+                });
+
+            } catch (err) {
+                 errorIndicator.textContent = `Fout bij laden leaderboard: ${err.message}`;
+                 errorIndicator.style.display = 'block';
+                 console.error("Error loading leaderboard:", err);
+            } finally {
+                loadingIndicator.style.display = "none";
+            }
+        }
+
 
         // --- Barendroom Feature ---
         async function loadWordlist() {
@@ -3218,7 +3401,7 @@
           const totalPages = Math.ceil(totalCombinations / itemsPerPage);
           if (currentPage < totalPages) {
             stopSpeech();
-            displayPage(currentPage + 1);
+            displayPage(currentPage - 1);
           }
         });
 
@@ -3258,6 +3441,40 @@
         });
         optionsBtn.addEventListener("click", () => optionsModal.showModal());
         closeOptionsModal.addEventListener("click", () => optionsModal.close());
+        leaderboardBtn.addEventListener('click', () => {
+            leaderboardModal.showModal();
+            // Load data only when opened, or cache it
+            if (leaderboardBody.innerHTML.trim() === '') {
+                loadLeaderboard();
+            }
+        });
+        closeLeaderboardModal.addEventListener('click', () => leaderboardModal.close());
+        spoilerCancelBtn.addEventListener('click', () => {
+            spoilerWarningModal.close();
+            _pendingSpoilerReveal = null;
+        });
+        spoilerConfirmBtn.addEventListener('click', () => {
+		if (_pendingSpoilerReveal) {
+    const { cell, word } = _pendingSpoilerReveal;
+    cell.innerHTML = ''; // Clear the "Show" button
+
+    const wordSpan = document.createElement('span');
+    wordSpan.textContent = word;
+    // Add a class for styling and add the click event directly
+    wordSpan.className = 'clickable-barendroom'; 
+    wordSpan.addEventListener('click', () => {
+        input.value = word;
+        leaderboardModal.close();
+        spoilerWarningModal.close();
+        form.dispatchEvent(new Event('submit'));
+    });
+    
+    cell.appendChild(wordSpan);
+}
+
+            spoilerWarningModal.close();
+            _pendingSpoilerReveal = null;
+        });
         enable3dCheckbox.addEventListener("change", saveSettings);
         enableValidationHighlightCheckbox.addEventListener(
           "change",
