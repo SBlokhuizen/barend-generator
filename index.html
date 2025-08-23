@@ -240,13 +240,18 @@
         letter-spacing: 0.3px;
         transition:
           transform 0.06s ease,
-          box-shadow 0.18s ease;
+          box-shadow 0.18s ease,
+          opacity 0.18s ease;
         white-space: nowrap;
         flex: 0 0 auto;
         font-size: 18px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
+      }
+      .btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
       }
       .btn:active {
         transform: translateY(1px);
@@ -940,7 +945,7 @@
         fill="currentColor"
       >
         <path
-          d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24-.42-.12-.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59-1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"
+          d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24-.42-.12-.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"
         />
       </svg>
     </button>
@@ -988,6 +993,26 @@
           <div class="form-actions">
             <button type="submit" class="btn primary" id="generate">
               Genereren
+            </button>
+            <button
+              type="button"
+              class="btn ghost"
+              id="random-word-btn"
+              title="Genereer met een willekeurig woord"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                style="margin-right: 8px"
+              >
+                <path
+                  d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"
+                />
+              </svg>
+              Verras me
             </button>
             <button type="button" class="btn stop" id="stop">Stop</button>
           </div>
@@ -1260,6 +1285,7 @@
         const canvas = document.getElementById("three-canvas");
         const dimensionInfo = document.getElementById("dimension-info");
         const btnStop = document.getElementById("stop");
+        const randomWordBtn = document.getElementById("random-word-btn");
 
         // Modals
         const modal = document.getElementById("modal");
@@ -1319,12 +1345,18 @@
         const shareBtn = document.getElementById("share-btn");
         const randomizeBtn = document.getElementById("randomize-btn");
 
+        if (randomWordBtn) randomWordBtn.disabled = true;
+
         // --- Barendroom Feature ---
         async function loadWordlist() {
           try {
             const response = await fetch("wordlist.txt");
             if (!response.ok) {
               console.error("Wordlist not found or failed to load.");
+              if (randomWordBtn) {
+                  randomWordBtn.disabled = true;
+                  randomWordBtn.title = "Woordenlijst kon niet worden geladen.";
+              }
               return;
             }
             const text = await response.text();
@@ -1332,9 +1364,14 @@
               if (word) wordlist.add(word.trim().toLowerCase());
             });
             wordlistLoaded = true;
+            if (randomWordBtn) randomWordBtn.disabled = false;
             console.log(`Wordlist loaded with ${wordlist.size} words.`);
           } catch (e) {
             console.error("Error loading wordlist:", e);
+            if (randomWordBtn) {
+                randomWordBtn.disabled = true;
+                randomWordBtn.title = "Woordenlijst kon niet worden geladen.";
+            }
           }
         }
 
@@ -2980,6 +3017,41 @@
             [array[i], array[j]] = [array[j], array[i]];
           }
         }
+        
+        function handleRandomWordGeneration() {
+          if (!wordlistLoaded || wordlist.size === 0) {
+            console.warn("Wordlist not loaded yet.");
+            return;
+          }
+
+          const wordArray = Array.from(wordlist);
+          let randomWord = null;
+          let attempts = 0;
+          const maxAttempts = 200;
+
+          while (attempts < maxAttempts) {
+            const candidate =
+              wordArray[Math.floor(Math.random() * wordArray.length)];
+            const analysis = analyzeWord(candidate);
+            if (analysis.ok) {
+              randomWord = candidate;
+              break;
+            }
+            attempts++;
+          }
+
+          if (randomWord) {
+            input.value = randomWord;
+            document.getElementById("generate").click();
+          } else {
+            alert(
+              "Kon geen geschikt willekeurig woord vinden. Probeer het opnieuw.",
+            );
+            console.error(
+              `Failed to find a valid random word after ${maxAttempts} attempts.`,
+            );
+          }
+        }
 
         // --- Event Listeners & Initialization ---
         closeModal.addEventListener("click", () => {
@@ -3120,6 +3192,10 @@
             }
           }
         });
+        
+        if (randomWordBtn) {
+            randomWordBtn.addEventListener("click", handleRandomWordGeneration);
+        }
 
         confirmProceedBtn.addEventListener("click", () => {
           warningModal.close();
