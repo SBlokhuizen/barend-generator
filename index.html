@@ -288,12 +288,6 @@
         flex-direction: column;
         gap: 8px;
       }
-      #share-btn {
-        position: fixed;
-        top: 24px;
-        right: 24px;
-        z-index: 100;
-      }
       .grid {
         margin-top: 12px;
         display: grid;
@@ -997,10 +991,6 @@
           top: 16px;
           left: 16px;
         }
-        #share-btn {
-          top: 16px;
-          right: 16px;
-        }
       }
     </style>
   </head>
@@ -1042,6 +1032,24 @@
           />
         </svg>
       </button>
+      <button
+        type="button"
+        class="btn ghost"
+        id="definitions-btn"
+        aria-label="Woordenboek"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path
+            d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"
+          />
+        </svg>
+      </button>
       <button type="button" class="btn ghost" id="help-btn" aria-label="Uitleg">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -1055,21 +1063,21 @@
           />
         </svg>
       </button>
+      <button type="button" class="btn ghost" id="share-btn" aria-label="Delen">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path
+            d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"
+          />
+        </svg>
+      </button>
     </div>
 
-    <button type="button" class="btn ghost" id="share-btn" aria-label="Delen">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-      >
-        <path
-          d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"
-        />
-      </svg>
-    </button>
     <div class="wrap" role="main">
       <a href="." class="title-link" aria-label="Home">
         <h1 id="title" class="title">
@@ -1388,34 +1396,60 @@
     </dialog>
 
     <dialog
-      id="help-modal"
+      id="definitions-modal"
       aria-modal="true"
       role="dialog"
-      aria-labelledby="help-modal-title"
+      aria-labelledby="definitions-modal-title"
     >
       <div class="modal-head">
-        <div id="help-modal-title" class="modal-title">Instructies & Woordenboek</div>
+        <div id="definitions-modal-title" class="modal-title">
+          Barend Woordenboek
+        </div>
       </div>
       <div class="modal-body">
-        <p>
-          De <strong>Barend Generator</strong> creëert een 'Barendogram' van elk
-          woord dat je invoert. Een Barendogram is een matrix van
-          woordvariaties, gemaakt door de klinkergroepen in jouw woord te
-          verwisselen.
-        </p>
-        <p>
-          Voer een woord in, klik op 'Genereren' en ontdek de combinaties. Als
-          alle gegenereerde woorden in het woordenboek staan, heb je een
-          <strong>Barendroom</strong> gevonden!
-        </p>
-        <hr style="border-color: rgba(255, 255, 255, 0.1); margin: 16px 0" />
-        <h3 style="font-weight: 700; color: var(--accent); margin-bottom: 12px">
-          Barend Woordenboek
-        </h3>
         <div id="definitions-container"><p>Definities laden...</p></div>
       </div>
       <div class="modal-actions">
-        <button class="btn primary" id="close-help-modal">OK</button>
+        <button class="btn primary" id="close-definitions-modal">OK</button>
+      </div>
+    </dialog>
+
+    <dialog
+      id="instructions-modal"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="instructions-modal-title"
+    >
+      <div class="modal-head">
+        <div id="instructions-modal-title" class="modal-title">Instructies</div>
+      </div>
+      <div class="modal-body">
+        <p>
+          De <strong>Barend Generator</strong> creëert een 'Barendogram': een
+          matrix van woordvariaties door de klinkergroepen in jouw woord te
+          verwisselen.
+        </p>
+        <p>
+          Als alle gegenereerde woorden in het woordenboek staan, heb je een
+          <strong>Barendroom</strong> gevonden!
+        </p>
+        <h3 style="font-weight: 700; color: var(--accent); margin: 16px 0 8px">
+          Hoe het werkt
+        </h3>
+        <p>
+          <strong>1. Woord Invoeren:</strong> Typ een woord in het invoerveld.
+          Het woord moet minstens twee verschillende klinkergroepen hebben
+          (bijv. 'Barend' heeft 'a' en 'e').<br /><br />
+          <strong>2. Genereren:</strong> Klik op 'Genereren' om alle combinaties
+          te zien. Je kunt ook op 'Verras me' klikken om een willekeurig
+          woord te genereren.<br /><br />
+          <strong>3. Instellingen:</strong> Gebruik de instellingen om de
+          weergave (2D/3D), de toegestane klinkergroepen, en de stem instellingen
+          aan te passen.<br /><br />
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn primary" id="close-instructions-modal">OK</button>
       </div>
     </dialog>
 
@@ -1504,8 +1538,15 @@
         const spoilerConfirmBtn = document.getElementById("spoiler-confirm");
         const leaderboardBody = document.getElementById("leaderboard-body");
         const helpBtn = document.getElementById("help-btn");
-        const helpModal = document.getElementById("help-modal");
-        const closeHelpModal = document.getElementById("close-help-modal");
+        const instructionsModal = document.getElementById("instructions-modal");
+        const closeInstructionsModal = document.getElementById(
+          "close-instructions-modal",
+        );
+        const definitionsBtn = document.getElementById("definitions-btn");
+        const definitionsModal = document.getElementById("definitions-modal");
+        const closeDefinitionsModal = document.getElementById(
+          "close-definitions-modal",
+        );
 
         // Options Controls
         const enable3dCheckbox = document.getElementById("enable-3d");
@@ -1563,7 +1604,9 @@
           try {
             const response = await fetch("definitions.yaml");
             if (!response.ok) {
-              throw new Error(`Bestand niet gevonden (status: ${response.status})`);
+              throw new Error(
+                `Bestand niet gevonden (status: ${response.status})`,
+              );
             }
             const yamlText = await response.text();
             const data = jsyaml.load(yamlText);
@@ -1574,7 +1617,8 @@
             dl.style.padding = "0";
 
             data.forEach((item) => {
-              const termId = "def-term-" + item.term.toLowerCase().replace(/\s+/g, "-");
+              const termId =
+                "def-term-" + item.term.toLowerCase().replace(/\s+/g, "-");
 
               const dt = document.createElement("dt");
               dt.id = termId;
@@ -3625,11 +3669,19 @@
           spoilerWarningModal.close();
           _pendingSpoilerReveal = null;
         });
-        helpBtn.addEventListener("click", () => {
-          helpModal.showModal();
-          loadDefinitions();
+        helpBtn.addEventListener("click", () => instructionsModal.showModal());
+        closeInstructionsModal.addEventListener("click", () =>
+          instructionsModal.close(),
+        );
+
+        definitionsBtn.addEventListener("click", () => {
+          definitionsModal.showModal();
+          loadDefinitions(); // Only load definitions when this modal is opened
         });
-        closeHelpModal.addEventListener("click", () => helpModal.close());
+        closeDefinitionsModal.addEventListener("click", () =>
+          definitionsModal.close(),
+        );
+
         document
           .getElementById("definitions-container")
           .addEventListener("click", (e) => {
@@ -3637,11 +3689,15 @@
               const term = e.target.dataset.term;
               if (!term) return;
 
-              const targetId = "def-term-" + term.toLowerCase().replace(/\s+/g, "-");
+              const targetId =
+                "def-term-" + term.toLowerCase().replace(/\s+/g, "-");
               const targetElement = document.getElementById(targetId);
 
               if (targetElement) {
-                targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
+                targetElement.scrollIntoView({
+                  behavior: "smooth",
+                  block: "center",
+                });
 
                 // Highlight the term and its definition
                 const targetDd = targetElement.nextElementSibling;
