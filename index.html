@@ -1252,8 +1252,8 @@
         <details id="vowel-options-details" class="option-group">
           <summary class="option-row">
             <span
-              title="Kies welke klinkercombinaties (tweeklanken) gebruikt mogen worden om variaties te genereren."
-              >Toegestane Tweeklanken</span
+              title="Kies welke klinkergroepen gebruikt mogen worden om variaties te genereren."
+              >Toegestane Klinkergroepen</span
             >
           </summary>
           <div class="collapsible-content">
@@ -1408,6 +1408,7 @@
           "ai",
           "au",
           "ou",
+          "y",
         ];
         const ONE_LETTER_VOWELS = ["a", "e", "i", "o", "u"];
         const form = document.getElementById("scramble-form");
@@ -2233,10 +2234,11 @@
         }
 
         // --- Settings Management ---
-        const defaultAllowedVowels = TWO_LETTER_VOWELS.reduce(
-          (acc, vg) => ({ ...acc, [vg]: true }),
-          {},
-        );
+	const defaultAllowedVowels = TWO_LETTER_VOWELS.reduce(
+	      (acc, vg) => ({ ...acc, [vg]: vg !== 'y' }), // Set 'y' to false, all others to true
+	      {},
+	    );
+
         const defaultSettings = {
           enable3d: false,
           enableValidationHighlight: false,
@@ -2246,7 +2248,13 @@
           pitch: 1.0,
           rate: 1.0,
         };
-        const DEFAULT_VOWEL_MASK = (1 << TWO_LETTER_VOWELS.length) - 1;
+    // Create a mask with all bits set to 1
+    const allVowelsOnMask = (1 << TWO_LETTER_VOWELS.length) - 1;
+    // Find the position of 'y' to turn its corresponding bit off
+    const yIndex = TWO_LETTER_VOWELS.indexOf('y');
+    // The new default mask has the bit for 'y' set to 0
+    const DEFAULT_VOWEL_MASK = allVowelsOnMask & ~(1 << yIndex);
+
 
         function compressSettings(settingsToCompress) {
           const compressed = {};
