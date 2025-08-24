@@ -1,0 +1,29 @@
+- term: Barenda
+  definition: Een woord uit een [[Barendogram]].
+
+- term: Barendogram
+  definition: De matrix van alle gegenereerde [[Barenda]]'s.
+
+- term: Niehiest
+  definition: Een woord dat ongeldig is voor de Barend Generator (bijv. te weinig verschillende klinkergroepen).
+
+- term: Primaire Barenda
+  definition: De woorden in een [[Barendogram]] die geen [[Niehiest]] zijn.
+
+- term: Secundaire Barenda
+  definition: Een woord dat op zichzelf een [[Niehiest]] is, maar wel deel uitmaakt van de set van een [[Primaire Barenda]].
+
+- term: Barendroom
+  definition: Een [[Barendogram]] waarvan alle [[Barenda]]'s in het Nederlandse woordenboek staan.
+
+- term: Valse Barendogram
+  definition: Een [[Barendogram]] waarbij alleen het origineel ingevoerde woord in het woordenboek staat.
+
+- term: Barendograaf
+  definition: Het apparaat waarop de Barend Generator wordt gebruikt.
+
+- term: Barendicus
+  definition: De persoon die de Barend Generator gebruikt.
+
+- term: Barendoandus
+  definition: De ontdekker van een [[Barendroom]].

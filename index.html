@@ -77,10 +77,10 @@
         margin: 0;
       }
       .title-link {
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-}
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
+      }
       .card {
         background:
           linear-gradient(
@@ -931,16 +931,38 @@
         font-weight: 700;
         color: var(--accent);
       }
-	.clickable-barendroom {
-	  cursor: pointer;
-	  font-weight: 700;
-	  color: var(--accent);
-	  transition: text-decoration 0.2s ease;
-	}
-	.clickable-barendroom:hover {
-	  text-decoration: underline;
-	}
-
+      .clickable-barendroom {
+        cursor: pointer;
+        font-weight: 700;
+        color: var(--accent);
+        transition: text-decoration 0.2s ease;
+      }
+      .clickable-barendroom:hover {
+        text-decoration: underline;
+      }
+      .def-link {
+        color: var(--accent);
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        border-bottom: 1px dotted var(--accent);
+      }
+      .def-link:hover {
+        text-decoration: none;
+        border-bottom: 1px solid var(--accent);
+      }
+      @keyframes highlight-def {
+        from {
+          background-color: rgba(110, 231, 245, 0.2);
+        }
+        to {
+          background-color: transparent;
+        }
+      }
+      .highlight-def {
+        animation: highlight-def 1.5s ease-out;
+        border-radius: 4px;
+      }
 
       @media (max-width: 680px) {
         .wrap {
@@ -972,8 +994,8 @@
           flex-grow: 0;
         }
         .top-left-controls {
-            top: 16px;
-            left: 16px;
+          top: 16px;
+          left: 16px;
         }
         #share-btn {
           top: 16px;
@@ -1020,6 +1042,19 @@
           />
         </svg>
       </button>
+      <button type="button" class="btn ghost" id="help-btn" aria-label="Uitleg">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"
+          />
+        </svg>
+      </button>
     </div>
 
     <button type="button" class="btn ghost" id="share-btn" aria-label="Delen">
@@ -1036,25 +1071,25 @@
       </svg>
     </button>
     <div class="wrap" role="main">
-	    <a href="." class="title-link" aria-label="Home">
-    <h1 id="title" class="title">
-        <span class="title-text">B</span>
-        <div class="morphing-letter pos1">
-          <div class="letter-container">
-            <span class="letter-a">a</span>
-            <span class="letter-e">e</span>
+      <a href="." class="title-link" aria-label="Home">
+        <h1 id="title" class="title">
+          <span class="title-text">B</span>
+          <div class="morphing-letter pos1">
+            <div class="letter-container">
+              <span class="letter-a">a</span>
+              <span class="letter-e">e</span>
+            </div>
           </div>
-        </div>
-        <span class="title-text">r</span>
-        <div class="morphing-letter pos2">
-          <div class="letter-container">
-            <span class="letter-a">a</span>
-            <span class="letter-e">e</span>
+          <span class="title-text">r</span>
+          <div class="morphing-letter pos2">
+            <div class="letter-container">
+              <span class="letter-a">a</span>
+              <span class="letter-e">e</span>
+            </div>
           </div>
-        </div>
-        <span class="title-text">nd Generator</span>
-    </h1>
-</a>
+          <span class="title-text">nd Generator</span>
+        </h1>
+      </a>
 
       <header class="card" aria-labelledby="title">
         <form id="scramble-form" autocomplete="off" novalidate>
@@ -1313,15 +1348,20 @@
               <th>Barendroom</th>
             </tr>
           </thead>
-          <tbody id="leaderboard-body">
-            </tbody>
+          <tbody id="leaderboard-body"></tbody>
         </table>
-        <p id="leaderboard-loading" style="text-align: center; display: none;">Laden...</p>
-        <p id="leaderboard-error" style="text-align: center; display: none; color: var(--danger);"></p>
-
+        <p id="leaderboard-loading" style="text-align: center; display: none">
+          Laden...
+        </p>
+        <p
+          id="leaderboard-error"
+          style="text-align: center; display: none; color: var(--danger)"
+        ></p>
       </div>
       <div class="modal-actions">
-        <button class="btn primary" id="close-leaderboard-modal">Sluiten</button>
+        <button class="btn primary" id="close-leaderboard-modal">
+          Sluiten
+        </button>
       </div>
     </dialog>
 
@@ -1337,15 +1377,45 @@
         </div>
       </div>
       <div class="modal-body">
-        <p>
-          Weet je zeker dat je deze Barendroom wilt onthullen?
-        </p>
+        <p>Weet je zeker dat je deze Barendroom wilt onthullen?</p>
       </div>
       <div class="modal-actions">
         <button class="btn ghost" id="spoiler-cancel">Annuleren</button>
         <button class="btn primary" id="spoiler-confirm">
           Toon de Barendroom
         </button>
+      </div>
+    </dialog>
+
+    <dialog
+      id="help-modal"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="help-modal-title"
+    >
+      <div class="modal-head">
+        <div id="help-modal-title" class="modal-title">Instructies & Woordenboek</div>
+      </div>
+      <div class="modal-body">
+        <p>
+          De <strong>Barend Generator</strong> creëert een 'Barendogram' van elk
+          woord dat je invoert. Een Barendogram is een matrix van
+          woordvariaties, gemaakt door de klinkergroepen in jouw woord te
+          verwisselen.
+        </p>
+        <p>
+          Voer een woord in, klik op 'Genereren' en ontdek de combinaties. Als
+          alle gegenereerde woorden in het woordenboek staan, heb je een
+          <strong>Barendroom</strong> gevonden!
+        </p>
+        <hr style="border-color: rgba(255, 255, 255, 0.1); margin: 16px 0" />
+        <h3 style="font-weight: 700; color: var(--accent); margin-bottom: 12px">
+          Barend Woordenboek
+        </h3>
+        <div id="definitions-container"><p>Definities laden...</p></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn primary" id="close-help-modal">OK</button>
       </div>
     </dialog>
 
@@ -1424,12 +1494,18 @@
         const confirmCancelBtn = document.getElementById("confirm-cancel");
         const leaderboardBtn = document.getElementById("leaderboard-btn");
         const leaderboardModal = document.getElementById("leaderboard-modal");
-        const closeLeaderboardModal = document.getElementById("close-leaderboard-modal");
-        const spoilerWarningModal = document.getElementById("spoiler-warning-modal");
+        const closeLeaderboardModal = document.getElementById(
+          "close-leaderboard-modal",
+        );
+        const spoilerWarningModal = document.getElementById(
+          "spoiler-warning-modal",
+        );
         const spoilerCancelBtn = document.getElementById("spoiler-cancel");
         const spoilerConfirmBtn = document.getElementById("spoiler-confirm");
         const leaderboardBody = document.getElementById("leaderboard-body");
-
+        const helpBtn = document.getElementById("help-btn");
+        const helpModal = document.getElementById("help-modal");
+        const closeHelpModal = document.getElementById("close-help-modal");
 
         // Options Controls
         const enable3dCheckbox = document.getElementById("enable-3d");
@@ -1465,6 +1541,7 @@
         let barendroomAnimationId = null;
         let combinationOrder = [];
         let _pendingSpoilerReveal = null;
+        let definitionsLoaded = false;
 
         // DOM Refs for dynamic elements
         const comboCount = document.getElementById("combo-count");
@@ -1479,53 +1556,118 @@
 
         if (randomWordBtn) randomWordBtn.disabled = true;
 
-        // --- Leaderboard ---
-        async function loadLeaderboard() {
-            const loadingIndicator = document.getElementById("leaderboard-loading");
-            const errorIndicator = document.getElementById("leaderboard-error");
-            loadingIndicator.style.display = "block";
-            errorIndicator.style.display = "none";
-            leaderboardBody.innerHTML = "";
-
-            try {
-                const response = await fetch("leaderboard.yaml");
-                if (!response.ok) {
-                    throw new Error(`Leaderboard-bestand niet gevonden (status: ${response.status})`);
-                }
-                const yamlText = await response.text();
-                const data = jsyaml.load(yamlText);
-
-                if (!data || data.length === 0) {
-                   leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nog geen Barendromen ontdekt!</td></tr>';
-                   return;
-                }
-
-                data.forEach(item => {
-                    const row = leaderboardBody.insertRow();
-                    row.insertCell(0).textContent = item.date || 'N/A';
-                    row.insertCell(1).textContent = item.discoverer || 'Anoniem';
-                    const wordCell = row.insertCell(2);
-                    
-                    const showBtn = document.createElement('button');
-                    showBtn.textContent = 'Toon';
-                    showBtn.className = 'btn-tiny';
-                    showBtn.dataset.word = item.word;
-                    showBtn.addEventListener('click', () => {
-                        _pendingSpoilerReveal = { cell: wordCell, word: item.word };
-                        spoilerWarningModal.showModal();
-                    });
-                    wordCell.appendChild(showBtn);
-                });
-
-            } catch (err) {
-                 errorIndicator.textContent = `Fout bij laden leaderboard: ${err.message}`;
-                 errorIndicator.style.display = 'block';
-                 console.error("Error loading leaderboard:", err);
-            } finally {
-                loadingIndicator.style.display = "none";
+        // --- Definitions ---
+        async function loadDefinitions() {
+          if (definitionsLoaded) return;
+          const container = document.getElementById("definitions-container");
+          try {
+            const response = await fetch("definitions.yaml");
+            if (!response.ok) {
+              throw new Error(`Bestand niet gevonden (status: ${response.status})`);
             }
+            const yamlText = await response.text();
+            const data = jsyaml.load(yamlText);
+            data.sort((a, b) => a.term.localeCompare(b.term));
+            container.innerHTML = "";
+            const dl = document.createElement("dl");
+            dl.style.margin = "0";
+            dl.style.padding = "0";
+
+            data.forEach((item) => {
+              const termId = "def-term-" + item.term.toLowerCase().replace(/\s+/g, "-");
+
+              const dt = document.createElement("dt");
+              dt.id = termId;
+              dt.textContent = item.term;
+              dt.style.fontWeight = "700";
+              dt.style.color = "var(--text)";
+              dt.style.padding = "2px 4px";
+              dt.style.margin = "0 -4px";
+
+              const dd = document.createElement("dd");
+              dd.style.marginLeft = "16px";
+              dd.style.marginBottom = "10px";
+              dd.style.color = "var(--muted)";
+              dd.style.padding = "2px 4px";
+              dd.style.margin = "0 -4px 10px 12px";
+
+              // Parse definition for [[links]]
+              const definitionParts = item.definition.split(/(\[\[.*?\]\])/g);
+              definitionParts.forEach((part) => {
+                const match = part.match(/\[\[(.*?)\]\]/);
+                if (match) {
+                  const term = match[1];
+                  const link = document.createElement("span");
+                  link.className = "def-link";
+                  link.textContent = term;
+                  link.dataset.term = term;
+                  dd.appendChild(link);
+                } else {
+                  dd.appendChild(document.createTextNode(part));
+                }
+              });
+
+              dl.appendChild(dt);
+              dl.appendChild(dd);
+            });
+            container.appendChild(dl);
+            definitionsLoaded = true;
+          } catch (err) {
+            container.innerHTML = `<p style="color: var(--danger);">Kon definities niet laden: ${err.message}</p>`;
+            console.error("Error loading definitions:", err);
+          }
         }
 
+        // --- Leaderboard ---
+        async function loadLeaderboard() {
+          const loadingIndicator = document.getElementById(
+            "leaderboard-loading",
+          );
+          const errorIndicator = document.getElementById("leaderboard-error");
+          loadingIndicator.style.display = "block";
+          errorIndicator.style.display = "none";
+          leaderboardBody.innerHTML = "";
+
+          try {
+            const response = await fetch("leaderboard.yaml");
+            if (!response.ok) {
+              throw new Error(
+                `Leaderboard-bestand niet gevonden (status: ${response.status})`,
+              );
+            }
+            const yamlText = await response.text();
+            const data = jsyaml.load(yamlText);
+
+            if (!data || data.length === 0) {
+              leaderboardBody.innerHTML =
+                '<tr><td colspan="3" style="text-align:center;">Nog geen Barendromen ontdekt!</td></tr>';
+              return;
+            }
+
+            data.forEach((item) => {
+              const row = leaderboardBody.insertRow();
+              row.insertCell(0).textContent = item.date || "N/A";
+              row.insertCell(1).textContent = item.discoverer || "Anoniem";
+              const wordCell = row.insertCell(2);
+
+              const showBtn = document.createElement("button");
+              showBtn.textContent = "Toon";
+              showBtn.className = "btn-tiny";
+              showBtn.dataset.word = item.word;
+              showBtn.addEventListener("click", () => {
+                _pendingSpoilerReveal = { cell: wordCell, word: item.word };
+                spoilerWarningModal.showModal();
+              });
+              wordCell.appendChild(showBtn);
+            });
+          } catch (err) {
+            errorIndicator.textContent = `Fout bij laden leaderboard: ${err.message}`;
+            errorIndicator.style.display = "block";
+            console.error("Error loading leaderboard:", err);
+          } finally {
+            loadingIndicator.style.display = "none";
+          }
+        }
 
         // --- Barendroom Feature ---
         async function loadWordlist() {
@@ -1534,8 +1676,8 @@
             if (!response.ok) {
               console.error("Wordlist not found or failed to load.");
               if (randomWordBtn) {
-                  randomWordBtn.disabled = true;
-                  randomWordBtn.title = "Woordenlijst kon niet worden geladen.";
+                randomWordBtn.disabled = true;
+                randomWordBtn.title = "Woordenlijst kon niet worden geladen.";
               }
               return;
             }
@@ -1549,8 +1691,8 @@
           } catch (e) {
             console.error("Error loading wordlist:", e);
             if (randomWordBtn) {
-                randomWordBtn.disabled = true;
-                randomWordBtn.title = "Woordenlijst kon niet worden geladen.";
+              randomWordBtn.disabled = true;
+              randomWordBtn.title = "Woordenlijst kon niet worden geladen.";
             }
           }
         }
@@ -2222,10 +2364,10 @@
         }
 
         // --- Settings Management ---
-	const defaultAllowedVowels = TWO_LETTER_VOWELS.reduce(
-	      (acc, vg) => ({ ...acc, [vg]: vg !== 'y' }), // Set 'y' to false, all others to true
-	      {},
-	    );
+        const defaultAllowedVowels = TWO_LETTER_VOWELS.reduce(
+          (acc, vg) => ({ ...acc, [vg]: vg !== "y" }), // Set 'y' to false, all others to true
+          {},
+        );
 
         const defaultSettings = {
           enable3d: false,
@@ -2236,13 +2378,12 @@
           pitch: 1.0,
           rate: 1.0,
         };
-    // Create a mask with all bits set to 1
-    const allVowelsOnMask = (1 << TWO_LETTER_VOWELS.length) - 1;
-    // Find the position of 'y' to turn its corresponding bit off
-    const yIndex = TWO_LETTER_VOWELS.indexOf('y');
-    // The new default mask has the bit for 'y' set to 0
-    const DEFAULT_VOWEL_MASK = allVowelsOnMask & ~(1 << yIndex);
-
+        // Create a mask with all bits set to 1
+        const allVowelsOnMask = (1 << TWO_LETTER_VOWELS.length) - 1;
+        // Find the position of 'y' to turn its corresponding bit off
+        const yIndex = TWO_LETTER_VOWELS.indexOf("y");
+        // The new default mask has the bit for 'y' set to 0
+        const DEFAULT_VOWEL_MASK = allVowelsOnMask & ~(1 << yIndex);
 
         function compressSettings(settingsToCompress) {
           const compressed = {};
@@ -2722,7 +2863,11 @@
         }
 
         function renderGrid(wordObjects, N) {
-          if (settings.enable3d && N >= 3 && wordObjects.length <= itemsPerPage) {
+          if (
+            settings.enable3d &&
+            N >= 3 &&
+            wordObjects.length <= itemsPerPage
+          ) {
             grid.style.display = "none";
             canvasContainer.style.display = "block";
             if (!scene) initThreeJS();
@@ -3204,7 +3349,7 @@
             [array[i], array[j]] = [array[j], array[i]];
           }
         }
-        
+
         function handleRandomWordGeneration() {
           if (!wordlistLoaded || wordlist.size === 0) {
             console.warn("Wordlist not loaded yet.");
@@ -3324,7 +3469,8 @@
             startBarendroomSequence(currentAnalysis);
           } else {
             outputCard.style.display = "block";
-            paginationControls.style.display = totalCombinations > 0 ? "flex" : "none";
+            paginationControls.style.display =
+              totalCombinations > 0 ? "flex" : "none";
             displayPage(1);
             if (settings.enableValidationHighlight && wordlistLoaded) {
               playPaginatedTwoPass();
@@ -3379,9 +3525,9 @@
             }
           }
         });
-        
+
         if (randomWordBtn) {
-            randomWordBtn.addEventListener("click", handleRandomWordGeneration);
+          randomWordBtn.addEventListener("click", handleRandomWordGeneration);
         }
 
         confirmProceedBtn.addEventListener("click", () => {
@@ -3445,40 +3591,74 @@
         });
         optionsBtn.addEventListener("click", () => optionsModal.showModal());
         closeOptionsModal.addEventListener("click", () => optionsModal.close());
-        leaderboardBtn.addEventListener('click', () => {
-            leaderboardModal.showModal();
-            // Load data only when opened, or cache it
-            if (leaderboardBody.innerHTML.trim() === '') {
-                loadLeaderboard();
+        leaderboardBtn.addEventListener("click", () => {
+          leaderboardModal.showModal();
+          if (leaderboardBody.innerHTML.trim() === "") {
+            loadLeaderboard();
+          }
+        });
+        closeLeaderboardModal.addEventListener("click", () =>
+          leaderboardModal.close(),
+        );
+        spoilerCancelBtn.addEventListener("click", () => {
+          spoilerWarningModal.close();
+          _pendingSpoilerReveal = null;
+        });
+        spoilerConfirmBtn.addEventListener("click", () => {
+          if (_pendingSpoilerReveal) {
+            const { cell, word } = _pendingSpoilerReveal;
+            cell.innerHTML = ""; // Clear the "Show" button
+
+            const wordSpan = document.createElement("span");
+            wordSpan.textContent = word;
+            wordSpan.className = "clickable-barendroom";
+            wordSpan.addEventListener("click", () => {
+              input.value = word;
+              leaderboardModal.close();
+              spoilerWarningModal.close();
+              form.dispatchEvent(new Event("submit"));
+            });
+
+            cell.appendChild(wordSpan);
+          }
+
+          spoilerWarningModal.close();
+          _pendingSpoilerReveal = null;
+        });
+        helpBtn.addEventListener("click", () => {
+          helpModal.showModal();
+          loadDefinitions();
+        });
+        closeHelpModal.addEventListener("click", () => helpModal.close());
+        document
+          .getElementById("definitions-container")
+          .addEventListener("click", (e) => {
+            if (e.target.classList.contains("def-link")) {
+              const term = e.target.dataset.term;
+              if (!term) return;
+
+              const targetId = "def-term-" + term.toLowerCase().replace(/\s+/g, "-");
+              const targetElement = document.getElementById(targetId);
+
+              if (targetElement) {
+                targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
+
+                // Highlight the term and its definition
+                const targetDd = targetElement.nextElementSibling;
+                targetElement.classList.add("highlight-def");
+                if (targetDd) {
+                  targetDd.classList.add("highlight-def");
+                }
+
+                setTimeout(() => {
+                  targetElement.classList.remove("highlight-def");
+                  if (targetDd) {
+                    targetDd.classList.remove("highlight-def");
+                  }
+                }, 1500);
+              }
             }
-        });
-        closeLeaderboardModal.addEventListener('click', () => leaderboardModal.close());
-        spoilerCancelBtn.addEventListener('click', () => {
-            spoilerWarningModal.close();
-            _pendingSpoilerReveal = null;
-        });
-        spoilerConfirmBtn.addEventListener('click', () => {
-		if (_pendingSpoilerReveal) {
-    const { cell, word } = _pendingSpoilerReveal;
-    cell.innerHTML = ''; // Clear the "Show" button
-
-    const wordSpan = document.createElement('span');
-    wordSpan.textContent = word;
-    // Add a class for styling and add the click event directly
-    wordSpan.className = 'clickable-barendroom'; 
-    wordSpan.addEventListener('click', () => {
-        input.value = word;
-        leaderboardModal.close();
-        spoilerWarningModal.close();
-        form.dispatchEvent(new Event('submit'));
-    });
-    
-    cell.appendChild(wordSpan);
-}
-
-            spoilerWarningModal.close();
-            _pendingSpoilerReveal = null;
-        });
+          });
         enable3dCheckbox.addEventListener("change", saveSettings);
         enableValidationHighlightCheckbox.addEventListener(
           "change",
