@@ -269,7 +269,15 @@
       .btn.ghost {
         color: #dbe7ff;
         background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+      }
+      .card .btn.ghost {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.16);
       }
       .btn.ghost svg {
         vertical-align: middle;
@@ -283,10 +291,56 @@
         position: fixed;
         top: 24px;
         left: 24px;
+        display: block;
         z-index: 100;
+      }
+      #menu-toggle {
+        position: relative;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      #menu-toggle svg {
+        transition: opacity 0.2s ease;
+      }
+
+      .top-left-controls.menu-open #menu-toggle {
+        transform: rotate(180deg);
+        border-color: var(--accent);
+      }
+      .menu-items {
         display: flex;
         flex-direction: column;
         gap: 8px;
+        margin-top: 8px;
+        pointer-events: none;
+      }
+      .menu-items .btn {
+        opacity: 0;
+        transform: translateY(-10px);
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
+      }
+      .top-left-controls.menu-open .menu-items {
+        pointer-events: auto;
+      }
+      .top-left-controls.menu-open .menu-items .btn {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .top-left-controls.menu-open .menu-items .btn:nth-child(1) {
+        transition-delay: 0.04s;
+      }
+      .top-left-controls.menu-open .menu-items .btn:nth-child(2) {
+        transition-delay: 0.08s;
+      }
+      .top-left-controls.menu-open .menu-items .btn:nth-child(3) {
+        transition-delay: 0.12s;
+      }
+      .top-left-controls.menu-open .menu-items .btn:nth-child(4) {
+        transition-delay: 0.16s;
+      }
+      .top-left-controls.menu-open .menu-items .btn:nth-child(5) {
+        transition-delay: 0.2s;
       }
       .grid {
         margin-top: 12px;
@@ -999,83 +1053,125 @@
       <button
         type="button"
         class="btn ghost"
-        id="options-btn"
-        aria-label="Instellingen"
+        id="menu-toggle"
+        aria-label="Menu"
+        aria-expanded="false"
+        aria-controls="menu-items-wrapper"
       >
         <svg
+          id="menu-icon"
           xmlns="http://www.w3.org/2000/svg"
           width="20"
           height="20"
           viewBox="0 0 24 24"
-          fill="currentColor"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
         >
-          <path
-            d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24-.42-.12-.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"
-          />
+          <line class="top" x1="4" y1="6" x2="20" y2="6"></line>
+          <line class="middle" x1="4" y1="12" x2="20" y2="12"></line>
+          <line class="bottom" x1="4" y1="18" x2="20" y2="18"></line>
         </svg>
       </button>
-      <button
-        type="button"
-        class="btn ghost"
-        id="leaderboard-btn"
-        aria-label="Leaderboard"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="currentColor"
+      <div class="menu-items" id="menu-items-wrapper">
+        <button
+          type="button"
+          class="btn ghost"
+          id="options-btn"
+          aria-label="Instellingen"
         >
-          <path
-            d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm7 6c-1.65 0-3-1.35-3-3V5h6v6c0 1.65-1.35 3-3 3zm7-6c0 1.3-.84 2.4-2 2.82V7h2v1z"
-          />
-        </svg>
-      </button>
-      <button
-        type="button"
-        class="btn ghost"
-        id="definitions-btn"
-        aria-label="Woordenboek"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="currentColor"
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24-.42-.12-.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"
+            />
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="btn ghost"
+          id="leaderboard-btn"
+          aria-label="Leaderboard"
         >
-          <path
-            d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"
-          />
-        </svg>
-      </button>
-      <button type="button" class="btn ghost" id="help-btn" aria-label="Uitleg">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="currentColor"
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm7 6c-1.65 0-3-1.35-3-3V5h6v6c0 1.65-1.35 3-3 3zm7-6c0 1.3-.84 2.4-2 2.82V7h2v1z"
+            />
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="btn ghost"
+          id="definitions-btn"
+          aria-label="Woordenboek"
         >
-          <path
-            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"
-          />
-        </svg>
-      </button>
-      <button type="button" class="btn ghost" id="share-btn" aria-label="Delen">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="currentColor"
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M3 4c1.1-.5 2.4-.9 4-.9 1.7 0 3.3.4 5 1.3 1.7-.9 3.3-1.3 5-1.3 1.6 0 2.9.4 4 .9v15c-1.1-.5-2.4-.9-4-.9-1.7 0-3.3.4-5 1.3-1.7-.9-3.3-1.3-5-1.3-1.6 0-2.9.4-4 .9V4z"
+            />
+            <line x1="12" y1="5" x2="12" y2="20" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="btn ghost"
+          id="help-btn"
+          aria-label="Uitleg"
         >
-          <path
-            d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"
-          />
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"
+            />
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="btn ghost"
+          id="share-btn"
+          aria-label="Delen"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <div class="wrap" role="main">
@@ -1441,11 +1537,11 @@
           Het woord moet minstens twee verschillende klinkergroepen hebben
           (bijv. 'Barend' heeft 'a' en 'e').<br /><br />
           <strong>2. Genereren:</strong> Klik op 'Genereren' om alle combinaties
-          te zien. Je kunt ook op 'Verras me' klikken om een willekeurig
-          woord te genereren.<br /><br />
+          te zien. Je kunt ook op 'Verras me' klikken om een willekeurig woord
+          te genereren.<br /><br />
           <strong>3. Instellingen:</strong> Gebruik de instellingen om de
-          weergave (2D/3D), de toegestane klinkergroepen, en de stem instellingen
-          aan te passen.<br /><br />
+          weergave (2D/3D), de toegestane klinkergroepen, en de stem
+          instellingen aan te passen.<br /><br />
         </p>
       </div>
       <div class="modal-actions">
@@ -1473,6 +1569,25 @@
         }
         title.classList.add(morphStates[currentMorphState]);
         setInterval(morphTitle, 2000);
+
+        // New Menu Toggle Logic
+        const menuToggle = document.getElementById("menu-toggle");
+        const controlsContainer = document.querySelector(".top-left-controls");
+        if (menuToggle) {
+          menuToggle.addEventListener("click", () => {
+            const isOpen = controlsContainer.classList.toggle("menu-open");
+            menuToggle.setAttribute("aria-expanded", isOpen);
+          });
+          document.addEventListener("click", (e) => {
+            if (
+              !controlsContainer.contains(e.target) &&
+              controlsContainer.classList.contains("menu-open")
+            ) {
+              controlsContainer.classList.remove("menu-open");
+              menuToggle.setAttribute("aria-expanded", false);
+            }
+          });
+        }
 
         // Audio elements for validation
         const correctSound = new Audio("correct.mp3");
