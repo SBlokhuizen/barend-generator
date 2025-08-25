@@ -9,7 +9,10 @@
 
     <meta property="og:title" content="Barend Generator" />
     <meta property="og:description" content="Creeër je eigen Barendogram!" />
-    <meta property="og:image" content="https://sblokhuizen.github.io/barend/assets/images/barend.jpeg" />
+    <meta
+      property="og:image"
+      content="https://sblokhuizen.github.io/barend/assets/images/barend.jpeg"
+    />
     <meta property="og:url" content="https://sblokhuizen.github.io/barend/" />
     <meta property="og:type" content="website" />
 
@@ -20,38 +23,125 @@
   </head>
   <body>
     <div class="top-left-controls">
-      <button type="button" class="btn ghost" id="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="menu-items-wrapper">
-        <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <button
+        type="button"
+        class="btn ghost"
+        id="menu-toggle"
+        aria-label="Menu"
+        aria-expanded="false"
+        aria-controls="menu-items-wrapper"
+      >
+        <svg
+          id="menu-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
           <line class="top" x1="4" y1="6" x2="20" y2="6"></line>
           <line class="middle" x1="4" y1="12" x2="20" y2="12"></line>
           <line class="bottom" x1="4" y1="18" x2="20" y2="18"></line>
         </svg>
       </button>
       <div class="menu-items" id="menu-items-wrapper">
-        <button type="button" class="btn ghost" id="options-btn" aria-label="Instellingen">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24-.42-.12-.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z" />
+        <button
+          type="button"
+          class="btn ghost"
+          id="options-btn"
+          aria-label="Instellingen"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24-.42-.12-.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"
+            />
           </svg>
         </button>
-        <button type="button" class="btn ghost" id="leaderboard-btn" aria-label="Leaderboard">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm7 6c-1.65 0-3-1.35-3-3V5h6v6c0 1.65-1.35 3-3 3zm7-6c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+        <button
+          type="button"
+          class="btn ghost"
+          id="leaderboard-btn"
+          aria-label="Leaderboard"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm7 6c-1.65 0-3-1.35-3-3V5h6v6c0 1.65-1.35 3-3 3zm7-6c0 1.3-.84 2.4-2 2.82V7h2v1z"
+            />
           </svg>
         </button>
-        <button type="button" class="btn ghost" id="definitions-btn" aria-label="Woordenboek">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 4c1.1-.5 2.4-.9 4-.9 1.7 0 3.3.4 5 1.3 1.7-.9 3.3-1.3 5-1.3 1.6 0 2.9.4 4 .9v15c-1.1-.5-2.4-.9-4-.9-1.7 0-3.3.4-5 1.3-1.7-.9-3.3-1.3-5-1.3-1.6 0-2.9.4-4 .9V4z" />
+        <button
+          type="button"
+          class="btn ghost"
+          id="definitions-btn"
+          aria-label="Woordenboek"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M3 4c1.1-.5 2.4-.9 4-.9 1.7 0 3.3.4 5 1.3 1.7-.9 3.3-1.3 5-1.3 1.6 0 2.9.4 4 .9v15c-1.1-.5-2.4-.9-4-.9-1.7 0-3.3.4-5 1.3-1.7-.9-3.3-1.3-5-1.3-1.6 0-2.9.4-4 .9V4z"
+            />
             <line x1="12" y1="5" x2="12" y2="20" />
           </svg>
         </button>
-        <button type="button" class="btn ghost" id="help-btn" aria-label="Uitleg">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" />
+        <button
+          type="button"
+          class="btn ghost"
+          id="help-btn"
+          aria-label="Uitleg"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"
+            />
           </svg>
         </button>
-        <button type="button" class="btn ghost" id="share-btn" aria-label="Delen">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z" />
+        <button
+          type="button"
+          class="btn ghost"
+          id="share-btn"
+          aria-label="Delen"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"
+            />
           </svg>
         </button>
       </div>
@@ -80,22 +170,60 @@
 
       <header class="card" aria-labelledby="title">
         <form id="scramble-form" autocomplete="off" novalidate>
-          <input id="word" name="word" type="text" spellcheck="false" placeholder="bijv. Barend" maxlength="48" />
+          <input
+            id="word"
+            name="word"
+            type="text"
+            spellcheck="false"
+            placeholder="bijv. Barend"
+            maxlength="48"
+          />
           <div class="form-actions">
-            <button type="submit" class="btn primary" id="generate">Genereren</button>
-            <button type="button" class="btn ghost" id="random-word-btn" title="Genereer met een willekeurig woord">Verras me</button>
+            <button type="submit" class="btn primary" id="generate">
+              Genereren
+            </button>
+            <button
+              type="button"
+              class="btn ghost"
+              id="random-word-btn"
+              title="Genereer met een willekeurig woord"
+            >
+              Verras me
+            </button>
             <button type="button" class="btn stop" id="stop">Stop</button>
           </div>
         </form>
       </header>
 
-      <section id="output-card" class="card" aria-live="polite" style="display: none">
+      <section
+        id="output-card"
+        class="card"
+        aria-live="polite"
+        style="display: none"
+      >
         <div id="info-bar">
           <div id="combo-count"></div>
           <div id="pagination-controls" style="display: none">
             <span id="page-indicator"></span>
-            <button type="button" class="btn ghost" id="randomize-btn" aria-label="Willekeurige volgorde" title="Willekeurige volgorde" style="display: none; padding: 10px">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <button
+              type="button"
+              class="btn ghost"
+              id="randomize-btn"
+              aria-label="Willekeurige volgorde"
+              title="Willekeurige volgorde"
+              style="display: none; padding: 10px"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <polyline points="16 3 21 3 21 8"></polyline>
                 <line x1="4" y1="20" x2="21" y2="3"></line>
                 <polyline points="21 16 21 21 16 21"></polyline>
@@ -103,16 +231,36 @@
                 <line x1="4" y1="4" x2="9" y2="9"></line>
               </svg>
             </button>
-            <button type="button" class="btn ghost" id="prev-page" aria-label="Vorige pagina">&lt;</button>
-            <button type="button" class="btn ghost" id="next-page" aria-label="Volgende pagina">&gt;</button>
+            <button
+              type="button"
+              class="btn ghost"
+              id="prev-page"
+              aria-label="Vorige pagina"
+            >
+              &lt;
+            </button>
+            <button
+              type="button"
+              class="btn ghost"
+              id="next-page"
+              aria-label="Volgende pagina"
+            >
+              &gt;
+            </button>
           </div>
         </div>
         <div id="grid" class="grid" aria-hidden="false"></div>
         <div id="canvas-container" style="display: none">
-          <canvas id="three-canvas" role="img" aria-label="3D knoppen canvas"></canvas>
+          <canvas
+            id="three-canvas"
+            role="img"
+            aria-label="3D knoppen canvas"
+          ></canvas>
           <div class="canvas-overlay">
             <div class="canvas-controls">
-              <span class="desktop-hint">Sleep = roteren • Scroll/knijp = zoomen</span>
+              <span class="desktop-hint"
+                >Sleep = roteren • Scroll/knijp = zoomen</span
+              >
               <span class="mobile-hint">Sleep = roteren • Knijp = zoomen</span>
             </div>
             <div class="dimension-info" id="dimension-info"></div>
@@ -121,19 +269,32 @@
       </section>
     </div>
 
-    <dialog id="modal" aria-modal="true" role="dialog" aria-labelledby="error-modal-title">
+    <dialog
+      id="modal"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="error-modal-title"
+    >
       <div class="modal-head">
         <div id="error-modal-title" class="modal-title">NEEHEE</div>
       </div>
       <div class="modal-body">
-        <p>Het woord moet minstens twee verschillende klinkergroepen bevatten. Geldige groepen: <span class="kbd" id="valid-vowels-list"></span>.</p>
+        <p>
+          Het woord moet minstens twee verschillende klinkergroepen bevatten.
+          Geldige groepen: <span class="kbd" id="valid-vowels-list"></span>.
+        </p>
       </div>
       <div class="modal-actions">
         <button class="btn primary" id="close-modal">OK</button>
       </div>
     </dialog>
 
-    <dialog id="warning-modal" aria-modal="true" role="dialog" aria-labelledby="warning-modal-title">
+    <dialog
+      id="warning-modal"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="warning-modal-title"
+    >
       <div class="modal-head">
         <div id="warning-modal-title" class="modal-title">Waarschuwing</div>
       </div>
@@ -146,50 +307,102 @@
       </div>
     </dialog>
 
-    <dialog id="options-modal" aria-modal="true" role="dialog" aria-labelledby="options-modal-title">
+    <dialog
+      id="options-modal"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="options-modal-title"
+    >
       <div class="modal-head">
         <div id="options-modal-title" class="modal-title">Instellingen</div>
       </div>
       <div class="modal-body">
         <div class="option-row">
-          <label for="enable-3d" title="Toon de combinaties in een 3D-ruimte.">3D weergave inschakelen</label>
+          <label for="enable-3d" title="Toon de combinaties in een 3D-ruimte."
+            >3D weergave inschakelen</label
+          >
           <input type="checkbox" id="enable-3d" class="toggle-switch" />
         </div>
         <div class="option-row">
-          <label for="enable-validation-highlight" title="Controleert of de gegenereerde woorden in het woordenboek bestaan.">Barendroom Validatie</label>
-          <input type="checkbox" id="enable-validation-highlight" class="toggle-switch" />
+          <label
+            for="enable-validation-highlight"
+            title="Controleert of de gegenereerde woorden in het woordenboek bestaan."
+            >Barendroom Validatie</label
+          >
+          <input
+            type="checkbox"
+            id="enable-validation-highlight"
+            class="toggle-switch"
+          />
         </div>
         <div class="option-row">
-          <label for="language-select" title="Selecteer de taal en stem voor het uitspreken van de woorden.">Spraaktaal</label>
-          <select id="language-select" style="background: #0e1230; color: var(--text); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 6px; padding: 4px 8px; flex: 0 1 172px;"></select>
+          <label
+            for="language-select"
+            title="Selecteer de taal en stem voor het uitspreken van de woorden."
+            >Spraaktaal</label
+          >
+          <select
+            id="language-select"
+            style="
+              background: #0e1230;
+              color: var(--text);
+              border: 1px solid rgba(255, 255, 255, 0.12);
+              border-radius: 6px;
+              padding: 4px 8px;
+              flex: 0 1 172px;
+            "
+          ></select>
         </div>
         <details id="vowel-options-details" class="option-group">
           <summary class="option-row">
-            <span title="Kies welke klinkergroepen gebruikt mogen worden om variaties te genereren.">Toegestane Klinkergroepen</span>
+            <span
+              title="Kies welke klinkergroepen gebruikt mogen worden om variaties te genereren."
+              >Toegestane Klinkergroepen</span
+            >
           </summary>
           <div class="collapsible-content">
             <div class="option-group-header">
               <span></span>
               <div class="vowel-controls">
-                <button type="button" class="btn-tiny" id="vowels-all">Alles</button>
-                <button type="button" class="btn-tiny" id="vowels-none">Geen</button>
+                <button type="button" class="btn-tiny" id="vowels-all">
+                  Alles
+                </button>
+                <button type="button" class="btn-tiny" id="vowels-none">
+                  Geen
+                </button>
               </div>
             </div>
             <div id="vowel-group-grid" class="vowel-group-grid"></div>
           </div>
         </details>
         <div class="option-row">
-          <label for="pitch-slider" title="Past de toonhoogte van de spraak aan. Hogere waarden klinken hoger.">Toonhoogte</label>
+          <label
+            for="pitch-slider"
+            title="Past de toonhoogte van de spraak aan. Hogere waarden klinken hoger."
+            >Toonhoogte</label
+          >
           <input type="range" id="pitch-slider" min="0" max="2" step="0.1" />
           <span id="pitch-value" class="slider-value"></span>
         </div>
         <div class="option-row">
-          <label for="rate-slider" title="Past de spreeksnelheid aan. Hogere waarden zijn sneller.">Snelheid</label>
+          <label
+            for="rate-slider"
+            title="Past de spreeksnelheid aan. Hogere waarden zijn sneller."
+            >Snelheid</label
+          >
           <input type="range" id="rate-slider" min="0.1" max="10" step="0.1" />
           <span id="rate-value" class="slider-value"></span>
         </div>
         <div class="option-row">
-          <button type="button" class="btn ghost" id="reset-settings-btn" style="padding: 8px 16px; font-size: 14px; width: 100%" title="Zet alle instellingen terug naar de standaardwaarden.">Instellingen resetten</button>
+          <button
+            type="button"
+            class="btn ghost"
+            id="reset-settings-btn"
+            style="padding: 8px 16px; font-size: 14px; width: 100%"
+            title="Zet alle instellingen terug naar de standaardwaarden."
+          >
+            Instellingen resetten
+          </button>
         </div>
       </div>
       <div class="modal-actions">
@@ -197,9 +410,16 @@
       </div>
     </dialog>
 
-    <dialog id="leaderboard-modal" aria-modal="true" role="dialog" aria-labelledby="leaderboard-modal-title">
+    <dialog
+      id="leaderboard-modal"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="leaderboard-modal-title"
+    >
       <div class="modal-head">
-        <div id="leaderboard-modal-title" class="modal-title">🏆 Barendroom Hall of Fame 🏆</div>
+        <div id="leaderboard-modal-title" class="modal-title">
+          🏆 Barendroom Hall of Fame 🏆
+        </div>
       </div>
       <div class="modal-body">
         <table id="leaderboard-table">
@@ -212,30 +432,53 @@
           </thead>
           <tbody id="leaderboard-body"></tbody>
         </table>
-        <p id="leaderboard-loading" style="text-align: center; display: none">Laden...</p>
-        <p id="leaderboard-error" style="text-align: center; display: none; color: var(--danger)"></p>
+        <p id="leaderboard-loading" style="text-align: center; display: none">
+          Laden...
+        </p>
+        <p
+          id="leaderboard-error"
+          style="text-align: center; display: none; color: var(--danger)"
+        ></p>
       </div>
       <div class="modal-actions">
-        <button class="btn primary" id="close-leaderboard-modal">Sluiten</button>
+        <button class="btn primary" id="close-leaderboard-modal">
+          Sluiten
+        </button>
       </div>
     </dialog>
 
-    <dialog id="spoiler-warning-modal" aria-modal="true" role="dialog" aria-labelledby="spoiler-warning-modal-title">
+    <dialog
+      id="spoiler-warning-modal"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="spoiler-warning-modal-title"
+    >
       <div class="modal-head">
-        <div id="spoiler-warning-modal-title" class="modal-title">Spoiler Waarschuwing</div>
+        <div id="spoiler-warning-modal-title" class="modal-title">
+          Spoiler Waarschuwing
+        </div>
       </div>
       <div class="modal-body">
         <p>Weet je zeker dat je deze Barendroom wilt onthullen?</p>
       </div>
       <div class="modal-actions">
         <button class="btn ghost" id="spoiler-cancel">Annuleren</button>
-        <button class="btn primary" id="spoiler-confirm">Toon de Barendroom</button>
+        <button class="btn primary" id="spoiler-confirm">
+          Toon de Barendroom
+        </button>
       </div>
     </dialog>
 
-    <dialog id="definitions-modal" aria-modal="true" role="dialog" aria-labelledby="definitions-modal-title">
+    <dialog
+      id="definitions-modal"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="definitions-modal-title"
+    >
       <div class="modal-head">
-        <div id="definitions-modal-title" class="modal-title">Barend Woordenboek</div>
+        <div id="definitions-modal-title" class="modal-title">
+          Barend Woordenboek
+        </div>
       </div>
       <div class="modal-body">
         <div id="definitions-container"><p>Definities laden...</p></div>
@@ -245,18 +488,38 @@
       </div>
     </dialog>
 
-    <dialog id="instructions-modal" aria-modal="true" role="dialog" aria-labelledby="instructions-modal-title">
+    <dialog
+      id="instructions-modal"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="instructions-modal-title"
+    >
       <div class="modal-head">
         <div id="instructions-modal-title" class="modal-title">Instructies</div>
       </div>
       <div class="modal-body">
-        <p>De <strong>Barend Generator</strong> creëert een 'Barendogram': een matrix van woordvariaties door de klinkergroepen in jouw woord te verwisselen.</p>
-        <p>Als alle gegenereerde woorden in het woordenboek staan, heb je een <strong>Barendroom</strong> gevonden!</p>
-        <h3 style="font-weight: 700; color: var(--accent); margin: 16px 0 8px">Hoe het werkt</h3>
         <p>
-          <strong>1. Woord Invoeren:</strong> Typ een woord in het invoerveld. Het woord moet minstens twee verschillende klinkergroepen hebben (bijv. 'Barend' heeft 'a' en 'e').<br /><br />
-          <strong>2. Genereren:</strong> Klik op 'Genereren' om alle combinaties te zien. Je kunt ook op 'Verras me' klikken om een willekeurig woord te genereren.<br /><br />
-          <strong>3. Instellingen:</strong> Gebruik de instellingen om de weergave (2D/3D), de toegestane klinkergroepen, en de stem instellingen aan te passen.<br /><br />
+          De <strong>Barend Generator</strong> creëert een 'Barendogram': een
+          matrix van woordvariaties door de klinkergroepen in jouw woord te
+          verwisselen.
+        </p>
+        <p>
+          Als alle gegenereerde woorden in het woordenboek staan, heb je een
+          <strong>Barendroom</strong> gevonden!
+        </p>
+        <h3 style="font-weight: 700; color: var(--accent); margin: 16px 0 8px">
+          Hoe het werkt
+        </h3>
+        <p>
+          <strong>1. Woord Invoeren:</strong> Typ een woord in het invoerveld.
+          Het woord moet minstens twee verschillende klinkergroepen hebben
+          (bijv. 'Barend' heeft 'a' en 'e').<br /><br />
+          <strong>2. Genereren:</strong> Klik op 'Genereren' om alle combinaties
+          te zien. Je kunt ook op 'Verras me' klikken om een willekeurig woord
+          te genereren.<br /><br />
+          <strong>3. Instellingen:</strong> Gebruik de instellingen om de
+          weergave (2D/3D), de toegestane klinkergroepen, en de stem
+          instellingen aan te passen.<br /><br />
         </p>
       </div>
       <div class="modal-actions">

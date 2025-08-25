@@ -30,16 +30,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(
-      1200px 600px at 10% -10%,
-      #1a1f46 0%,
-      transparent 60%
-    ),
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #1a1f46 0%, transparent 60%),
     radial-gradient(900px 500px at 110% 10%, #1a2b4a 0%, transparent 60%),
     linear-gradient(180deg, #0b0e1d 0%, #0f1226 60%, #0b0e1d 100%);
   color: var(--text);
-  font: 16px/1.5 "Inter", system-ui, -apple-system, Segoe UI, Roboto,
-    Helvetica, Arial;
+  font:
+    16px/1.5 "Inter",
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -57,18 +60,19 @@ body {
   cursor: pointer;
 }
 .card {
-  background: linear-gradient(
-      135deg,
-      rgba(110, 231, 245, 0.08),
-      rgba(155, 140, 255, 0.06)
-    )
-    padding-box,
+  background:
     linear-gradient(
-      135deg,
-      rgba(110, 231, 245, 0.35),
-      rgba(155, 140, 255, 0.35)
-    )
-    border-box;
+        135deg,
+        rgba(110, 231, 245, 0.08),
+        rgba(155, 140, 255, 0.06)
+      )
+      padding-box,
+    linear-gradient(
+        135deg,
+        rgba(110, 231, 245, 0.35),
+        rgba(155, 140, 255, 0.35)
+      )
+      border-box;
   border: 1px solid transparent;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -217,7 +221,10 @@ input[type="text"]:focus {
   border-radius: 12px;
   font-weight: 700;
   letter-spacing: 0.3px;
-  transition: transform 0.06s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+  transition:
+    transform 0.06s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease;
   white-space: nowrap;
   flex: 0 0 auto;
   font-size: 18px;
@@ -287,7 +294,9 @@ input[type="text"]:focus {
 .menu-items .btn {
   opacity: 0;
   transform: translateY(-10px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 .top-left-controls.menu-open .menu-items {
   pointer-events: auto;
@@ -383,7 +392,9 @@ input[type="text"]:focus {
   justify-content: center;
   line-height: 1.1;
   white-space: nowrap;
-  transition: border-color 0.15s ease, background-color 0.15s ease,
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
     box-shadow 0.15s ease;
 }
 .cell::after {
@@ -408,7 +419,8 @@ input[type="text"]:focus {
     rgba(110, 231, 245, 0.12)
   );
   border-color: rgba(110, 231, 245, 0.65);
-  box-shadow: inset 0 0 0 6px rgba(110, 231, 245, 0.08),
+  box-shadow:
+    inset 0 0 0 6px rgba(110, 231, 245, 0.08),
     inset 0 0 40px rgba(110, 231, 245, 0.06);
 }
 .cell.valid {
@@ -418,7 +430,8 @@ input[type="text"]:focus {
     rgba(74, 222, 128, 0.12)
   );
   border-color: rgba(74, 222, 128, 0.65);
-  box-shadow: inset 0 0 0 6px rgba(74, 222, 128, 0.08),
+  box-shadow:
+    inset 0 0 0 6px rgba(74, 222, 128, 0.08),
     inset 0 0 40px rgba(74, 222, 128, 0.06);
 }
 .cell.invalid {
@@ -428,7 +441,8 @@ input[type="text"]:focus {
     rgba(255, 77, 109, 0.12)
   );
   border-color: rgba(255, 77, 109, 0.65);
-  box-shadow: inset 0 0 0 6px rgba(255, 77, 109, 0.08),
+  box-shadow:
+    inset 0 0 0 6px rgba(255, 77, 109, 0.08),
     inset 0 0 40px rgba(255, 77, 109, 0.06);
 }
 .cell.shake {
@@ -476,11 +490,7 @@ input[type="text"]:focus {
   position: relative;
   border-radius: 16px;
   overflow: hidden;
-  background: linear-gradient(
-    135deg,
-    rgba(0, 0, 0, 0.25),
-    rgba(0, 0, 0, 0.08)
-  );
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.08));
 }
 #three-canvas {
   width: 100%;
@@ -535,11 +545,7 @@ input[type="text"]:focus {
   backdrop-filter: blur(4px);
 }
 dialog::backdrop {
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.45),
-    rgba(0, 0, 0, 0.65)
-  );
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.65));
 }
 dialog {
   border: 0;
@@ -581,7 +587,11 @@ dialog {
   background: #0e1230;
 }
 .kbd {
-  font: 600 12px ui-monospace, Menlo, Monaco, monospace;
+  font:
+    600 12px ui-monospace,
+    Menlo,
+    Monaco,
+    monospace;
   background: #0e1230;
   border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 2px 6px;
@@ -747,8 +757,7 @@ details[open] > .option-row::after {
   padding: 30px 50px;
   text-align: center;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-  animation: popUp 1s 0.5s forwards
-    cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: popUp 1s 0.5s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .barendroom-popup h2 {
   font-size: 48px;
@@ -760,11 +769,7 @@ details[open] > .option-row::after {
 }
 .cloud {
   position: absolute;
-  background: radial-gradient(
-    circle,
-    white 60%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  background: radial-gradient(circle, white 60%, rgba(255, 255, 255, 0) 100%);
   border-radius: 50%;
   opacity: 0.6;
   animation: moveCloud 20s linear infinite;
@@ -883,7 +888,9 @@ details[open] > .option-row::after {
   z-index: 10001;
   border: 1px solid rgba(110, 231, 245, 0.35);
   animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
 .barendroom-congrats-popup h2 {
   font-size: 32px;
