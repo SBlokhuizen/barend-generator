@@ -234,7 +234,26 @@ export function applySettings(newSettings) {
   DOM.enable3dCheckbox.checked = settings.enable3d;
   DOM.enableValidationHighlightCheckbox.checked =
     settings.enableValidationHighlight;
-  DOM.languageSelect.value = settings.language;
+
+  if (DOM.languageSelect.options.length > 0) {
+    const targetLang = settings.language;
+    const optionExists = [...DOM.languageSelect.options].some(
+      (o) => o.value === targetLang,
+    );
+
+    if (optionExists) {
+      DOM.languageSelect.value = targetLang;
+    } else {
+      const dutchOption = [...DOM.languageSelect.options].find((o) =>
+        o.value.startsWith("nl"),
+      );
+      if (dutchOption) {
+        DOM.languageSelect.value = dutchOption.value;
+      }
+    }
+  }
+  settings.language = DOM.languageSelect.value;
+
   DOM.pitchSlider.value = settings.pitch;
   DOM.rateSlider.value = settings.rate;
   DOM.vowelOptionsDetails.open = settings.vowelOptionsExpanded;
@@ -269,6 +288,8 @@ export function compressSettings(settings) {
     compressed.o = settings.voiceOptionsExpanded ? 1 : 0;
   if (settings.pitch !== DEFAULT_SETTINGS.pitch) compressed.p = settings.pitch;
   if (settings.rate !== DEFAULT_SETTINGS.rate) compressed.r = settings.rate;
+  if (settings.language !== DEFAULT_SETTINGS.language)
+    compressed.l = settings.language;
   let mask = 0;
   VOWEL_GROUPS.forEach((vowel, index) => {
     if (settings.allowedVowelGroups[vowel]) mask |= 1 << index;
@@ -288,6 +309,7 @@ export function decompressSettings(compressed) {
     decompressed.voiceOptionsExpanded = compressed.o === 1;
   if (compressed.p !== undefined) decompressed.pitch = compressed.p;
   if (compressed.r !== undefined) decompressed.rate = compressed.r;
+  if (compressed.l !== undefined) decompressed.language = compressed.l;
   const mask = compressed.v !== undefined ? compressed.v : DEFAULT_VOWEL_MASK;
   const allowed = {};
   VOWEL_GROUPS.forEach((vowel, index) => {
