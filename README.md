@@ -1,6 +1,6 @@
 # https://sblokhuizen.github.io/barend/
 
-![Description](barend.jpeg)
+![Description](assets/images/barend.jpeg)
 
 <details>
   <summary>Citations</summary>
