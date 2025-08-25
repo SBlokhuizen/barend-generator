@@ -1873,287 +1873,6 @@
           return true;
         }
 
-        function playBarendroomAndAnimate(cellsToPlay) {
-          stopSpeech(true);
-          const playbackId = Date.now();
-          currentPlaybackId = playbackId;
-          speaking = true;
-
-          const executeValidationPass = (onComplete) => {
-            let index = 0;
-            const step = () => {
-              if (currentPlaybackId !== playbackId) {
-                cellsToPlay.forEach((c) =>
-                  c.classList.remove("valid", "invalid"),
-                );
-                return;
-              }
-              if (index >= cellsToPlay.length) {
-                onComplete();
-                return;
-              }
-              const cell = cellsToPlay[index];
-              const word = cell.textContent.toLowerCase();
-              cell.scrollIntoView({ behavior: "smooth", block: "center" });
-
-              if (wordlist.has(word)) {
-                cell.classList.add("valid", "bounce");
-                correctSound.currentTime = 0;
-                correctSound
-                  .play()
-                  .catch((e) => console.error("Audio play failed:", e));
-              } else {
-                cell.classList.add("invalid", "shake");
-                wrongSound.currentTime = 0;
-                wrongSound
-                  .play()
-                  .catch((e) => console.error("Audio play failed:", e));
-              }
-
-              setTimeout(() => cell.classList.remove("bounce", "shake"), 500);
-
-              index++;
-              setTimeout(step, 300);
-            };
-            step();
-          };
-
-          const executeSpeakingPass = (onComplete) => {
-            let index = 0;
-            const step = () => {
-              if (currentPlaybackId !== playbackId || !speaking) {
-                clearActive();
-                if (currentPlaybackId === null) speaking = false;
-                return;
-              }
-              if (index >= cellsToPlay.length) {
-                clearActive();
-                onComplete();
-                return;
-              }
-              const cell = cellsToPlay[index];
-              const word = cell.textContent;
-              clearActive();
-              cell.scrollIntoView({ behavior: "smooth", block: "center" });
-              cell.classList.add("active");
-              speakWord(word, () => {
-                index++;
-                step();
-              });
-            };
-            step();
-          };
-
-          if (settings.enableValidationHighlight && wordlistLoaded) {
-            executeSpeakingPass(() => {
-              setTimeout(() => {
-                executeValidationPass(() => {
-                  speaking = false;
-                  setTimeout(() => startBouncingAnimation(cellsToPlay), 200);
-                });
-              }, 750);
-            });
-          } else {
-            executeSpeakingPass(() => {
-              speaking = false;
-              startBouncingAnimation(cellsToPlay);
-            });
-          }
-        }
-
-        function playBarendroom3DAndAnimate(buttonsToAnimate) {
-          stopSpeech(true);
-          const playbackId = Date.now();
-          currentPlaybackId = playbackId;
-          speaking = true;
-
-          const animate3DObject = (object, animationType) => {
-            const originalPos = object.position.clone();
-            const originalScale = object.scale.clone();
-            let startTime = null;
-            const duration = 500;
-
-            function frame(currentTime) {
-              if (!startTime) startTime = currentTime;
-              const elapsed = currentTime - startTime;
-              const progress = Math.min(elapsed / duration, 1);
-
-              if (animationType === "bounce") {
-                const scale = 1 + 0.2 * Math.sin(progress * Math.PI);
-                object.scale.set(scale, scale, scale);
-              } else if (animationType === "shake") {
-                const shakeAmount = 0.05 * Math.sin(progress * Math.PI * 4);
-                object.position.x = originalPos.x + shakeAmount;
-              }
-
-              if (progress < 1) {
-                requestAnimationFrame(frame);
-              } else {
-                object.position.copy(originalPos);
-                object.scale.copy(originalScale);
-              }
-            }
-            requestAnimationFrame(frame);
-          };
-
-          const executeSpeakingPass = (onComplete) => {
-            let index = 0;
-            const step = () => {
-              if (currentPlaybackId !== playbackId || !speaking) {
-                clearActive();
-                if (currentPlaybackId === null) speaking = false;
-                return;
-              }
-              if (index >= buttonsToAnimate.length) {
-                clearActive();
-                onComplete();
-                return;
-              }
-              const buttonGroup = buttonsToAnimate[index];
-              const word = buttonGroup.userData.word;
-              clearActive();
-              buttonGroup.children[0].material = activeMaterial;
-              speakWord(word, () => {
-                index++;
-                step();
-              });
-            };
-            step();
-          };
-
-          const executeValidationPass = (onComplete) => {
-            let index = 0;
-            const step = () => {
-              if (currentPlaybackId !== playbackId) {
-                buttonsToAnimate.forEach(
-                  (btn) =>
-                    (btn.children[0].material = btn.userData.baseMaterial),
-                );
-                return;
-              }
-              if (index >= buttonsToAnimate.length) {
-                onComplete();
-                return;
-              }
-              const buttonGroup = buttonsToAnimate[index];
-              const word = buttonGroup.userData.word.toLowerCase();
-
-              if (wordlist.has(word)) {
-                buttonGroup.children[0].material = validMaterial;
-                animate3DObject(buttonGroup, "bounce");
-                correctSound.currentTime = 0;
-                correctSound
-                  .play()
-                  .catch((e) => console.error("Audio play failed:", e));
-              } else {
-                buttonGroup.children[0].material = invalidMaterial;
-                animate3DObject(buttonGroup, "shake");
-                wrongSound.currentTime = 0;
-                wrongSound
-                  .play()
-                  .catch((e) => console.error("Audio play failed:", e));
-              }
-
-              index++;
-              setTimeout(step, 300);
-            };
-            step();
-          };
-
-          executeSpeakingPass(() => {
-            if (currentPlaybackId !== playbackId) return;
-            setTimeout(() => {
-              executeValidationPass(() => {
-                if (currentPlaybackId !== playbackId) return;
-                speaking = false;
-
-                const allWords = buttonsToAnimate.map(
-                  (btn) => btn.userData.word,
-                );
-                canvasContainer.style.display = "none";
-                grid.style.display = "grid";
-                grid.innerHTML = "";
-                grid.style.gridTemplateColumns = "repeat(2, 1fr)";
-                grid.style.position = "static";
-                grid.style.height = "auto";
-
-                const cellsToBounce = [];
-                allWords.forEach((word) => {
-                  const cell = document.createElement("div");
-                  cell.className = "cell";
-                  cell.textContent = word;
-                  if (wordlist.has(word.toLowerCase())) {
-                    cell.classList.add("valid");
-                  } else {
-                    cell.classList.add("invalid");
-                  }
-                  grid.appendChild(cell);
-                  fitText(cell);
-                  cellsToBounce.push(cell);
-                });
-
-                setTimeout(() => startBouncingAnimation(cellsToBounce), 200);
-              });
-            }, 750);
-          });
-        }
-
-        function startBarendroomSequence(analysis) {
-          const allWords = [];
-          const count = Math.pow(
-            analysis.uniqueGroups.length,
-            analysis.groups.length,
-          );
-          for (let i = 0; i < count; i++) {
-            const originalIndex = combinationOrder[i];
-            allWords.push(buildNthVariant(originalIndex, analysis));
-          }
-
-          const use3D =
-            settings.enable3d &&
-            analysis.uniqueGroups.length >= 3 &&
-            allWords.length <= itemsPerPage;
-
-          if (use3D) {
-            outputCard.style.display = "block";
-            grid.style.display = "none";
-            canvasContainer.style.display = "block";
-            paginationControls.style.display = "none";
-            comboCount.textContent = `${count.toLocaleString("nl-NL")} combinaties`;
-
-            render3DVisualization(
-              allWords.map((word, i) => ({ word, index: i })),
-              analysis.uniqueGroups.length,
-            );
-
-            setTimeout(() => playBarendroom3DAndAnimate(wordButtons), 100);
-          } else {
-            outputCard.style.display = "block";
-            canvasContainer.style.display = "none";
-            grid.style.display = "grid";
-            grid.innerHTML = "";
-            grid.style.gridTemplateColumns = "repeat(2, 1fr)";
-
-            grid.style.position = "static";
-            grid.style.height = "auto";
-            grid.onscroll = null;
-            paginationControls.style.display = "none";
-            comboCount.textContent = `${count.toLocaleString("nl-NL")} combinaties`;
-            const originalCells = [];
-            allWords.forEach((word, index) => {
-              const cell = document.createElement("div");
-              cell.className = "cell";
-              cell.textContent = word;
-              cell.dataset.index = index;
-              grid.appendChild(cell);
-              fitText(cell);
-              originalCells.push(cell);
-            });
-
-            playBarendroomAndAnimate(originalCells);
-          }
-        }
-
         function startBouncingAnimation(originalCells) {
           victorySound.currentTime = 0;
           victorySound
@@ -3275,7 +2994,7 @@
           updatePaginationControls();
         }
 
-        function playPaginatedTwoPass() {
+        function playPaginatedTwoPass(isBarendroom) {
           stopSpeech(true);
           const playbackId = Date.now();
           currentPlaybackId = playbackId;
@@ -3412,16 +3131,42 @@
                 if (speaking && currentPage < totalPages) {
                   currentPage++;
                   displayPage(currentPage);
-                  setTimeout(playPaginatedTwoPass, 250);
+                  setTimeout(() => playPaginatedTwoPass(isBarendroom), 250);
+                } else if (isBarendroom) {
+                  speaking = false;
+                  const cellsToBounce = [];
+                  if (is3D) {
+                    // Recreate grid from 3D objects to start animation
+                    canvasContainer.style.display = "none";
+                    grid.style.display = "grid";
+                    grid.innerHTML = "";
+                    grid.style.gridTemplateColumns = "repeat(2, 1fr)";
+                    grid.style.position = "static";
+                    grid.style.height = "auto";
+                    wordButtons.forEach((btnGroup) => {
+                      const cell = document.createElement("div");
+                      cell.className = "cell valid"; // All are valid in a Barendroom
+                      cell.textContent = btnGroup.userData.word;
+                      grid.appendChild(cell);
+                      fitText(cell);
+                      cellsToBounce.push(cell);
+                    });
+                  } else {
+                    // Collect all existing grid cells
+                    document
+                      .querySelectorAll("#grid .cell")
+                      .forEach((cell) => cellsToBounce.push(cell));
+                  }
+                  setTimeout(() => startBouncingAnimation(cellsToBounce), 200);
                 } else {
                   speaking = false;
                 }
               });
-            }, 250);
+            }, 750);
           });
         }
 
-        function playCurrentPage() {
+        function playCurrentPage(isBarendroom) {
           stopSpeech(true);
           const playbackId = Date.now();
           currentPlaybackId = playbackId;
@@ -3448,7 +3193,33 @@
               if (speaking && currentPage < totalPages) {
                 currentPage++;
                 displayPage(currentPage);
-                setTimeout(playCurrentPage, 250);
+                setTimeout(() => playCurrentPage(isBarendroom), 250);
+              } else if (isBarendroom) {
+                speaking = false;
+                const is3D =
+                  settings.enable3d && canvasContainer.style.display !== "none";
+                const cellsToBounce = [];
+                if (is3D) {
+                  canvasContainer.style.display = "none";
+                  grid.style.display = "grid";
+                  grid.innerHTML = "";
+                  grid.style.gridTemplateColumns = "repeat(2, 1fr)";
+                  grid.style.position = "static";
+                  grid.style.height = "auto";
+                  wordButtons.forEach((btnGroup) => {
+                    const cell = document.createElement("div");
+                    cell.className = "cell valid";
+                    cell.textContent = btnGroup.userData.word;
+                    grid.appendChild(cell);
+                    fitText(cell);
+                    cellsToBounce.push(cell);
+                  });
+                } else {
+                  document
+                    .querySelectorAll("#grid .cell")
+                    .forEach((cell) => cellsToBounce.push(cell));
+                }
+                setTimeout(() => startBouncingAnimation(cellsToBounce), 200);
               } else {
                 speaking = false;
               }
@@ -3624,21 +3395,20 @@
 
           const isBarendroom = checkAllWordsExist(currentAnalysis);
 
-          if (isBarendroom) {
-            startBarendroomSequence(currentAnalysis);
+          outputCard.style.display = "block";
+          paginationControls.style.display =
+            totalCombinations > 0 ? "flex" : "none";
+
+          displayPage(1);
+
+          if (settings.enableValidationHighlight && wordlistLoaded) {
+            playPaginatedTwoPass(isBarendroom);
           } else {
-            outputCard.style.display = "block";
-            paginationControls.style.display =
-              totalCombinations > 0 ? "flex" : "none";
-            displayPage(1);
-            if (settings.enableValidationHighlight && wordlistLoaded) {
-              playPaginatedTwoPass();
-            } else {
-              playCurrentPage();
-            }
+            playCurrentPage(isBarendroom);
           }
+
           randomizeBtn.style.display =
-            totalCombinations > 1 && !isBarendroom ? "inline-flex" : "none";
+            totalCombinations > 1 ? "inline-flex" : "none";
           window._pendingAnalysis = null;
         }
 
@@ -3662,12 +3432,11 @@
             currentAnalysis.settingsSnapshot === currentActiveVowels
           ) {
             if (totalCombinations > 0) {
-              if (checkAllWordsExist(currentAnalysis)) {
-                startBarendroomSequence(currentAnalysis);
-              } else if (settings.enableValidationHighlight && wordlistLoaded) {
-                playPaginatedTwoPass();
+              const isBarendroom = checkAllWordsExist(currentAnalysis);
+              if (settings.enableValidationHighlight && wordlistLoaded) {
+                playPaginatedTwoPass(isBarendroom);
               } else {
-                playCurrentPage();
+                playCurrentPage(isBarendroom);
               }
             }
           } else {
