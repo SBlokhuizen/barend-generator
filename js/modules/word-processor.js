@@ -32,6 +32,17 @@ function findVowelGroups(word, settings) {
 
 export function analyzeWord(raw, settings) {
   const word = (raw || "").trim();
+
+  // Easter Egg Logic
+  if (word.toLowerCase() === "echt he") {
+    return {
+      ok: true,
+      word: "nee nep",
+      groups: [],
+      uniqueGroups: [],
+    };
+  }
+
   if (!/^[A-Za-z\s]+$/.test(word)) return { ok: false };
   const groups = findVowelGroups(word, settings);
   const uniqueGroups = [...new Set(groups.map((g) => g.group))];
@@ -41,6 +52,9 @@ export function analyzeWord(raw, settings) {
 
 export function buildNthVariant(n, analysis) {
   const { word, groups, uniqueGroups } = analysis;
+  if (groups.length === 0) {
+    return word;
+  }
   const base = uniqueGroups.length;
   let comboVowels = [];
   let tempN = n;
