@@ -717,7 +717,7 @@ details > summary.option-row {
 details > summary.option-row:hover {
   background-color: rgba(255, 255, 255, 0.05);
 }
-details .option-row::after {
+details > summary.option-row::after {
   content: "›";
   position: absolute;
   right: 10px;
@@ -729,7 +729,7 @@ details .option-row::after {
   color: var(--muted);
   transition: transform 0.2s ease-in-out;
 }
-details[open] > .option-row::after {
+details[open] > summary.option-row::after {
   transform: translateY(-50%) rotate(90deg);
 }
 .collapsible-content {

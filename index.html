@@ -335,24 +335,6 @@
             class="toggle-switch"
           />
         </div>
-        <div class="option-row">
-          <label
-            for="language-select"
-            title="Selecteer de taal en stem voor het uitspreken van de woorden."
-            >Spraaktaal</label
-          >
-          <select
-            id="language-select"
-            style="
-              background: #0e1230;
-              color: var(--text);
-              border: 1px solid rgba(255, 255, 255, 0.12);
-              border-radius: 6px;
-              padding: 4px 8px;
-              flex: 0 1 172px;
-            "
-          ></select>
-        </div>
         <details id="vowel-options-details" class="option-group">
           <summary class="option-row">
             <span
@@ -375,24 +357,63 @@
             <div id="vowel-group-grid" class="vowel-group-grid"></div>
           </div>
         </details>
-        <div class="option-row">
-          <label
-            for="pitch-slider"
-            title="Past de toonhoogte van de spraak aan. Hogere waarden klinken hoger."
-            >Toonhoogte</label
-          >
-          <input type="range" id="pitch-slider" min="0" max="2" step="0.1" />
-          <span id="pitch-value" class="slider-value"></span>
-        </div>
-        <div class="option-row">
-          <label
-            for="rate-slider"
-            title="Past de spreeksnelheid aan. Hogere waarden zijn sneller."
-            >Snelheid</label
-          >
-          <input type="range" id="rate-slider" min="0.1" max="10" step="0.1" />
-          <span id="rate-value" class="slider-value"></span>
-        </div>
+        <details id="voice-options-details" class="option-group">
+          <summary class="option-row">
+            <span title="Pas de taal, toonhoogte en snelheid van de stem aan."
+              >Spraakinstellingen</span
+            >
+          </summary>
+          <div class="collapsible-content" style="padding: 0px 16px">
+            <div class="option-row">
+              <label
+                for="language-select"
+                title="Selecteer de taal en stem voor het uitspreken van de woorden."
+                >Spraaktaal</label
+              >
+              <select
+                id="language-select"
+                style="
+                  background: #0e1230;
+                  color: var(--text);
+                  border: 1px solid rgba(255, 255, 255, 0.12);
+                  border-radius: 6px;
+                  padding: 4px 8px;
+                  flex: 0 1 172px;
+                "
+              ></select>
+            </div>
+            <div class="option-row">
+              <label
+                for="pitch-slider"
+                title="Past de toonhoogte van de spraak aan. Hogere waarden klinken hoger."
+                >Toonhoogte</label
+              >
+              <input
+                type="range"
+                id="pitch-slider"
+                min="0"
+                max="2"
+                step="0.1"
+              />
+              <span id="pitch-value" class="slider-value"></span>
+            </div>
+            <div class="option-row">
+              <label
+                for="rate-slider"
+                title="Past de spreeksnelheid aan. Hogere waarden zijn sneller."
+                >Snelheid</label
+              >
+              <input
+                type="range"
+                id="rate-slider"
+                min="0.1"
+                max="10"
+                step="0.1"
+              />
+              <span id="rate-value" class="slider-value"></span>
+            </div>
+          </div>
+        </details>
         <div class="option-row">
           <button
             type="button"

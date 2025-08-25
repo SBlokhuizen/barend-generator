@@ -36,6 +36,7 @@ function saveSettings() {
   settings.pitch = parseFloat(DOM.pitchSlider.value);
   settings.rate = parseFloat(DOM.rateSlider.value);
   settings.vowelOptionsExpanded = DOM.vowelOptionsDetails.open;
+  settings.voiceOptionsExpanded = DOM.voiceOptionsDetails.open;
   const newAllowed = {};
   DOM.vowelGroupGrid.querySelectorAll(".toggle-switch").forEach((toggle) => {
     newAllowed[toggle.dataset.vowelGroup] = toggle.checked;
@@ -686,6 +687,7 @@ async function main() {
     DOM.enableValidationHighlightCheckbox,
     DOM.languageSelect,
     DOM.vowelOptionsDetails,
+    DOM.voiceOptionsDetails,
   ].forEach((el) => {
     el.addEventListener("change", saveSettings);
     el.addEventListener("toggle", saveSettings);

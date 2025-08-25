@@ -238,6 +238,7 @@ export function applySettings(newSettings) {
   DOM.pitchSlider.value = settings.pitch;
   DOM.rateSlider.value = settings.rate;
   DOM.vowelOptionsDetails.open = settings.vowelOptionsExpanded;
+  DOM.voiceOptionsDetails.open = settings.voiceOptionsExpanded;
   Object.entries(settings.allowedVowelGroups).forEach(([vg, isAllowed]) => {
     const toggle = document.getElementById(`vowel-toggle-${vg}`);
     if (toggle) toggle.checked = isAllowed;
@@ -264,6 +265,8 @@ export function compressSettings(settings) {
   if (settings.enableValidationHighlight) compressed.h = 1;
   if (settings.vowelOptionsExpanded !== DEFAULT_SETTINGS.vowelOptionsExpanded)
     compressed.e = settings.vowelOptionsExpanded ? 1 : 0;
+  if (settings.voiceOptionsExpanded !== DEFAULT_SETTINGS.voiceOptionsExpanded)
+    compressed.o = settings.voiceOptionsExpanded ? 1 : 0;
   if (settings.pitch !== DEFAULT_SETTINGS.pitch) compressed.p = settings.pitch;
   if (settings.rate !== DEFAULT_SETTINGS.rate) compressed.r = settings.rate;
   let mask = 0;
@@ -281,6 +284,8 @@ export function decompressSettings(compressed) {
     decompressed.enableValidationHighlight = compressed.h === 1;
   if (compressed.e !== undefined)
     decompressed.vowelOptionsExpanded = compressed.e === 1;
+  if (compressed.o !== undefined)
+    decompressed.voiceOptionsExpanded = compressed.o === 1;
   if (compressed.p !== undefined) decompressed.pitch = compressed.p;
   if (compressed.r !== undefined) decompressed.rate = compressed.r;
   const mask = compressed.v !== undefined ? compressed.v : DEFAULT_VOWEL_MASK;

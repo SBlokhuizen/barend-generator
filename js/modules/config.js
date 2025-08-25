@@ -35,6 +35,7 @@ export const DEFAULT_SETTINGS = {
   pitch: 1.0,
   rate: 1.0,
   vowelOptionsExpanded: false,
+  voiceOptionsExpanded: false,
 };
 
 const allVowelsOnMask = (1 << VOWEL_GROUPS.length) - 1;

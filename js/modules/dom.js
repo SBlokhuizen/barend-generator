@@ -43,6 +43,7 @@ export const rateSlider = getElem("rate-slider");
 export const pitchValueSpan = getElem("pitch-value");
 export const rateValueSpan = getElem("rate-value");
 export const vowelOptionsDetails = getElem("vowel-options-details");
+export const voiceOptionsDetails = getElem("voice-options-details");
 export const vowelGroupGrid = getElem("vowel-group-grid");
 export const vowelsSelectAllBtn = getElem("vowels-all");
 export const vowelsSelectNoneBtn = getElem("vowels-none");
