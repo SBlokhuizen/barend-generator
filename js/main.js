@@ -615,7 +615,21 @@ async function main() {
 
   DOM.shareBtn.addEventListener("click", async () => {
     const wordToShare = DOM.input.value.trim();
-    if (!wordToShare || !currentAnalysis.ok) return;
+
+    if (!wordToShare || !currentAnalysis.ok) {
+      DOM.input.animate(
+        [
+          { transform: "translateX(0)" },
+          { transform: "translateX(-5px)" },
+          { transform: "translateX(5px)" },
+          { transform: "translateX(0)" },
+        ],
+        { duration: 300, easing: "ease-in-out" },
+      );
+      DOM.input.focus();
+      return;
+    }
+
     const compressed = UI.compressSettings(settings);
     const baseUrl = window.location.origin + window.location.pathname;
     let shareUrl = `${baseUrl}?word=${encodeURIComponent(wordToShare)}`;
