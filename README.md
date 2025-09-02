@@ -1,4 +1,4 @@
-# https://sblokhuizen.github.io/barend/
+# https://barendgenerator.nl
 
 ![Description](assets/images/barend.jpeg)
 
