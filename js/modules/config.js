@@ -29,7 +29,7 @@ const defaultAllowedVowels = VOWEL_GROUPS.reduce((acc, vg) => {
 
 export const DEFAULT_SETTINGS = {
   enable3d: false,
-  enableValidationHighlight: false,
+  enableValidationHighlight: true,
   language: "nl-NL",
   allowedVowelGroups: { ...defaultAllowedVowels },
   pitch: 1.0,
