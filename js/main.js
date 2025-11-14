@@ -17,6 +17,7 @@ let speaking = false;
 let currentPlaybackId = null;
 let _pendingSpoilerReveal = null;
 let _pendingAnalysis = null;
+let _pendingVowelConflict = null;
 let definitionsLoaded = false;
 
 // --- Utility Functions ---
@@ -163,8 +164,14 @@ function handleFormSubmit(e) {
     }
   } else {
     const check = WordProcessor.analyzeWord(newWord, settings);
+    
     if (!check.ok) {
-      UI.showErrorModal(() => WordProcessor.getActiveVowelGroups(settings));
+      if (check.reason === 'single_group_conflict') {
+        _pendingVowelConflict = check.conflictingGroup;
+        UI.showVowelConflictModal(check.conflictingGroup);
+      } else {
+        UI.showErrorModal(() => WordProcessor.getActiveVowelGroups(settings));
+      }
       return;
     }
     if (settings.enable3d && check.uniqueGroups.length > 3) {
@@ -739,6 +746,26 @@ async function main() {
   DOM.confirmCancelBtn.addEventListener("click", () => {
     DOM.warningModal.close();
     _pendingAnalysis = null;
+  });
+  DOM.vowelConflictApplyBtn.addEventListener("click", () => {
+    if (_pendingVowelConflict) {
+      const toggle = DOM.vowelGroupGrid.querySelector(
+        `[data-vowel-group="${_pendingVowelConflict}"]`
+      );
+      if (toggle) {
+        toggle.checked = false;
+      }
+      
+      saveSettings(); 
+      _pendingVowelConflict = null;
+      DOM.vowelConflictModal.close();
+      handleFormSubmit(new Event('submit')); 
+    }
+  });
+
+  DOM.vowelConflictCancelBtn.addEventListener("click", () => {
+    DOM.vowelConflictModal.close();
+    _pendingVowelConflict = null;
   });
 
   const urlParams = new URLSearchParams(window.location.search);

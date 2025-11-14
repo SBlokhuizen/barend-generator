@@ -334,3 +334,11 @@ export function getSettingsFromUrl() {
   }
   return null;
 }
+
+export function showVowelConflictModal(group) {
+  const components = group.split('');
+  DOM.vowelConflictModalText.innerHTML = `Het woord bevat de klinkergroep "<b>${group}</b>". <br><br>Wil je de klinkergroep "<b>${group}</b>" als losse klinkers behandelen (bijv. "<b>${components.join('</b>" en "<b>')}</b>")? Je kunt dit in the instellingen terugveranderen.`;
+  if (!DOM.vowelConflictModal.open) {
+    DOM.vowelConflictModal.showModal();
+  }
+}

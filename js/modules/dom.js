@@ -57,3 +57,7 @@ export const shareBtn = getElem("share-btn");
 export const randomizeBtn = getElem("randomize-btn");
 export const menuToggle = getElem("menu-toggle");
 export const controlsContainer = document.querySelector(".top-left-controls");
+export const vowelConflictModal = getElem("vowel-conflict-modal");
+export const vowelConflictModalText = getElem("vowel-conflict-modal-text");
+export const vowelConflictApplyBtn = getElem("vowel-conflict-apply");
+export const vowelConflictCancelBtn = getElem("vowel-conflict-cancel");

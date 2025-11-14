@@ -43,10 +43,34 @@ export function analyzeWord(raw, settings) {
     };
   }
 
-  if (!/^[A-Za-z\s]+$/.test(word)) return { ok: false };
+  if (!/^[A-Za-z\s]+$/.test(word)) return { ok: false, reason: 'invalid_chars' };
+
   const groups = findVowelGroups(word, settings);
   const uniqueGroups = [...new Set(groups.map((g) => g.group))];
-  if (uniqueGroups.length < 2) return { ok: false };
+  
+  if (uniqueGroups.length < 2) {
+    if (uniqueGroups.length === 0) {
+      return { ok: false, reason: 'no_groups' };
+    }
+    const singleGroup = uniqueGroups[0];
+
+    if (singleGroup.length > 1 && settings.allowedVowelGroups[singleGroup]) {
+      
+      const components = singleGroup.split('');
+      const allComponentsAreVowels = components.every(char => ONE_LETTER_VOWELS.includes(char));
+
+      if (allComponentsAreVowels) {
+        return { 
+          ok: false, 
+          reason: 'single_group_conflict', 
+          conflictingGroup: singleGroup 
+        };
+      }
+    }
+    
+    return { ok: false, reason: 'insufficient_groups' };
+  }
+
   return { ok: true, word, groups, uniqueGroups };
 }
 
