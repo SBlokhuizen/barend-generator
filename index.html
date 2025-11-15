@@ -268,7 +268,25 @@
         </div>
       </section>
     </div>
-
+    <dialog
+      id="definition-modal"
+      class="modal"
+      aria-modal="true"
+      role="dialog"
+    >
+      <div class="modal-head">
+         <h3 id="definition-modal-title" class="modal-title">Laden...</h3>
+      </div>
+      <div id="definition-modal-body" class="modal-body">
+        <div id="definition-loading" style="text-align: center; padding: 20px 0;">
+          <p>Betekenis ophalen...</p>
+          </div>
+                <div id="definition-content"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn primary" id="close-definition-modal">Sluiten</button>
+      </div>
+    </dialog>
     <dialog
       id="modal"
       aria-modal="true"

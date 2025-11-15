@@ -35,7 +35,7 @@ export const definitionsModal = getElem("definitions-modal");
 export const closeDefinitionsModal = getElem("close-definitions-modal");
 export const enable3dCheckbox = getElem("enable-3d");
 export const enableValidationHighlightCheckbox = getElem(
-  "enable-validation-highlight",
+    "enable-validation-highlight",
 );
 export const languageSelect = getElem("language-select");
 export const pitchSlider = getElem("pitch-slider");
@@ -61,3 +61,9 @@ export const vowelConflictModal = getElem("vowel-conflict-modal");
 export const vowelConflictModalText = getElem("vowel-conflict-modal-text");
 export const vowelConflictApplyBtn = getElem("vowel-conflict-apply");
 export const vowelConflictCancelBtn = getElem("vowel-conflict-cancel");
+export const definitionModal = getElem("definition-modal");
+export const definitionModalTitle = getElem("definition-modal-title");
+export const definitionModalBody = getElem("definition-modal-body");
+export const definitionLoading = getElem("definition-loading");
+export const definitionContent = getElem("definition-content");
+export const closeDefinitionModalBtn = getElem("close-definition-modal");

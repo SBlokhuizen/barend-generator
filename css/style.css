@@ -445,10 +445,10 @@ input[type="text"]:focus {
     inset 0 0 0 6px rgba(255, 77, 109, 0.08),
     inset 0 0 40px rgba(255, 77, 109, 0.06);
 }
-.cell.shake {
+.shake {
   animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
-.cell.bounce {
+.bounce {
   animation: bounce 0.5s ease both;
 }
 @keyframes shake {
@@ -1010,4 +1010,44 @@ details[open] > summary.option-row::after {
     top: 16px;
     left: 16px;
   }
+}
+/* New container for grid items */
+.grid-item-container {
+  position: relative;
+  /* JS sets top/left/width/height */
+}
+
+/* Make the cell inside fill the container */
+.grid-item-container .cell {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box; /* Ensures padding is included */
+}
+
+/* The new definition button */
+.def-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2; /* Sits on top of the cell */
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+  border-radius: 50%;
+  font-weight: 700;
+  font-family: serif; /* Makes the 'i' look nice */
+/* --- MODIFIED --- */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  /* --- END MODIFIED --- */
+}
+
+/* --- ADDED --- */
+/* Show the button when the container gets this class */
+.grid-item-container.show-def-btn .def-btn {
+  opacity: 1;
+  pointer-events: auto;
 }
