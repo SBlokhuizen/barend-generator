@@ -34,7 +34,6 @@ A3
 A4
 A4-formaat
 A5
-AA
 AAA
 AAP
 AAW
@@ -6508,7 +6507,6 @@ ID-nummers
 IDE
 IFAB
 IFFR
-II
 III
 IJmuidenaar
 IJmuidenaars
